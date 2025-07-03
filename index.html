@@ -1,0 +1,366 @@
+import React, { useState, useEffect } from 'react';
+import { AlertCircle, TrendingUp, Clock, ChevronRight, Brain, Users, Wrench, Globe, Lightbulb, Zap } from 'lucide-react';
+
+const JobAutomationForecast = () => {
+  const [assessment, setAssessment] = useState({
+    routine: 5,
+    cognitive: 5,
+    interpersonal: 5,
+    physical: 5,
+    contextual: 5,
+    digital: 5,
+    industry: 'knowledge',
+    seniority: 'mid'
+  });
+  const [results, setResults] = useState(null);
+
+  const questions = [
+    {
+      id: 'routine',
+      label: 'Routine & Procedural Work',
+      description: 'How much follows fixed procedures?',
+      icon: <Wrench className="w-4 h-4" />
+    },
+    {
+      id: 'cognitive',
+      label: 'Creative Problem Solving',
+      description: 'Original solutions vs templates?',
+      icon: <Brain className="w-4 h-4" />
+    },
+    {
+      id: 'interpersonal',
+      label: 'Human Interaction',
+      description: 'Critical interpersonal skills?',
+      icon: <Users className="w-4 h-4" />
+    },
+    {
+      id: 'physical',
+      label: 'Physical Dexterity',
+      description: 'Manual precision required?',
+      icon: <Globe className="w-4 h-4" />
+    },
+    {
+      id: 'contextual',
+      label: 'Legal & Regulatory Liability',
+      description: 'Personal responsibility for compliance?',
+      icon: <Lightbulb className="w-4 h-4" />
+    },
+    {
+      id: 'digital',
+      label: 'Digital Integration',
+      description: 'Current software usage?',
+      icon: <Zap className="w-4 h-4" />
+    }
+  ];
+
+  const industries = [
+    { value: 'tech', label: 'Tech & AI Research', weight: 1.30 },
+    { value: 'knowledge', label: 'Knowledge Services', weight: 1.20 },
+    { value: 'finance', label: 'Finance & Trading', weight: 1.15 },
+    { value: 'creative', label: 'Creative & Media', weight: 0.95 },
+    { value: 'healthcare', label: 'Healthcare', weight: 0.90 },
+    { value: 'manufacturing', label: 'Manufacturing', weight: 1.05 },
+    { value: 'education', label: 'Education & Public', weight: 0.85 }
+  ];
+
+  const calculateRisk = () => {
+    // Base susceptibility using updated AI 2028 timeline (more aggressive)
+    let techScore = 0;
+    techScore += (11 - assessment.routine); // Higher routine = higher risk (inverted 1-10 scale)
+    techScore += (11 - assessment.cognitive) * 0.8; // Creative work provides some protection
+    techScore += (11 - assessment.interpersonal) * 0.6; // Human interaction is protective
+    techScore += (11 - assessment.physical) * 0.7; // Physical work depends on robotics timeline
+    techScore += (11 - assessment.contextual) * 0.9; // Legal liability creates adoption barriers
+    techScore += assessment.digital * 0.8; // Digital integration accelerates automation
+    
+    const avgScore = techScore / 6;
+    
+    // Industry and demographic modifiers
+    const industryWeight = industries.find(i => i.value === assessment.industry)?.weight || 1;
+    const seniorityWeight = assessment.seniority === 'entry' ? 1.25 : 
+                           assessment.seniority === 'mid' ? 1.10 : 
+                           assessment.seniority === 'senior' ? 0.80 : 0.65;
+    
+    const adjustedScore = avgScore * industryWeight * seniorityWeight;
+    
+    // More aggressive AI timeline - capabilities arrive faster
+    const baseYear = 2025;
+    let automationYear;
+    
+    // Tech/AI jobs follow superhuman coder timeline (early 2027, pushing toward late 2026)
+    if (assessment.industry === 'tech' && adjustedScore > 7) {
+      automationYear = 2026.5 + (10 - adjustedScore) * 0.2;
+    }
+    // Knowledge work follows shortly after (2027-2028)
+    else if (adjustedScore > 7) {
+      automationYear = 2027.2 + (10 - adjustedScore) * 0.4;
+    }
+    // Physical and creative work (2028-2030)
+    else if (adjustedScore > 5) {
+      automationYear = 2028.5 + (7 - adjustedScore) * 0.8;
+    }
+    // Highly interpersonal/liability-heavy work (2030+)
+    else {
+      automationYear = 2030.5 + (5 - adjustedScore) * 1.5;
+    }
+    
+    // Calculate confidence based on uncertainty
+    const variance = assessment.industry === 'tech' ? 0.8 : 1.5 + (8 - adjustedScore) * 0.3;
+    
+    // Updated probability calculations for more aggressive timeline
+    const prob2027 = assessment.industry === 'tech' && adjustedScore > 8 ? 0.8 : 
+                     adjustedScore > 8.5 ? 0.4 : 0.15;
+    const prob2030 = adjustedScore > 7 ? 0.85 : adjustedScore > 5 ? 0.6 : 0.25;
+    const prob2035 = adjustedScore > 4 ? 0.95 : adjustedScore > 2 ? 0.75 : 0.45;
+    
+    return {
+      score: adjustedScore,
+      medianYear: Math.round(automationYear),
+      confidenceLow: Math.round(automationYear - variance),
+      confidenceHigh: Math.round(automationYear + variance),
+      probability2027: prob2027,
+      probability2030: prob2030,
+      probability2035: prob2035,
+      aiMilestone: getAIMilestone(automationYear)
+    };
+  };
+
+  const getAIMilestone = (year) => {
+    if (year <= 2027) return "Superhuman Coder Era";
+    if (year <= 2028) return "Superhuman AI Researcher";
+    if (year <= 2030) return "Artificial Superintelligence";
+    return "Post-Singularity";
+  };
+
+  // Recalculate results whenever assessment changes
+  useEffect(() => {
+    setResults(calculateRisk());
+  }, [assessment]);
+
+  const riskLevel = results?.score > 8 ? 'CRITICAL' : results?.score > 6 ? 'HIGH' : results?.score > 4 ? 'MEDIUM' : 'LOW';
+  const riskColor = riskLevel === 'CRITICAL' ? 'text-red-500' : 
+                   riskLevel === 'HIGH' ? 'text-orange-500' : 
+                   riskLevel === 'MEDIUM' ? 'text-yellow-500' : 'text-green-500';
+
+  return (
+    <div className="min-h-screen bg-black text-white p-8 font-sans">
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          background: white;
+          cursor: pointer;
+          border-radius: 50%;
+        }
+        .slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          background: white;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+        }
+      `}</style>
+      
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold mb-4">When Will AI Take My Job?</h1>
+          <p className="text-xl text-gray-400">
+            Based on <a href="https://ai-2027.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">AI 2027</a> capability forecasts (updated to 2028 timeline)
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Assessment Panel */}
+          <div className="bg-gray-900 rounded-lg p-8">
+            <h2 className="text-2xl font-bold mb-6">Job Assessment</h2>
+            
+            <div className="space-y-6">
+              {questions.map((q) => (
+                <div key={q.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {q.icon}
+                      <div>
+                        <div className="font-semibold">{q.label}</div>
+                        <div className="text-xs text-gray-400">{q.description}</div>
+                      </div>
+                    </div>
+                    <div className="text-sm font-mono bg-black px-2 py-1 rounded">
+                      {assessment[q.id]}
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={assessment[q.id]}
+                    onChange={(e) => setAssessment({...assessment, [q.id]: parseInt(e.target.value)})}
+                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>Low</span>
+                    <span>High</span>
+                  </div>
+                </div>
+              ))}
+
+              <div className="pt-4 border-t border-gray-800 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Industry Sector</label>
+                  <select 
+                    value={assessment.industry}
+                    onChange={(e) => setAssessment({...assessment, industry: e.target.value})}
+                    className="w-full p-2 bg-black border border-gray-700 rounded text-sm"
+                  >
+                    {industries.map(ind => (
+                      <option key={ind.value} value={ind.value}>{ind.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">Seniority</label>
+                    <select 
+                      value={assessment.seniority}
+                      onChange={(e) => setAssessment({...assessment, seniority: e.target.value})}
+                      className="w-full p-2 bg-black border border-gray-700 rounded text-sm"
+                    >
+                      <option value="entry">Entry</option>
+                      <option value="mid">Mid</option>
+                      <option value="senior">Senior</option>
+                      <option value="executive">Executive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Results Panel */}
+          <div className="space-y-6">
+            {/* Timeline Prediction */}
+            <div className="bg-gray-900 rounded-lg p-8">
+              <h2 className="text-2xl font-bold mb-6 text-center">Automation Timeline</h2>
+              
+              <div className="text-center mb-6">
+                <div className={`text-5xl font-bold ${riskColor} mb-2`}>
+                  {results?.medianYear || '----'}
+                </div>
+                <p className="text-gray-400">Estimated automation year</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Range: {results?.confidenceLow} - {results?.confidenceHigh}
+                </p>
+                <p className="text-sm text-blue-400 mt-2">
+                  AI Milestone: {results?.aiMilestone}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-black rounded-lg p-3 text-center">
+                  <div className="text-xl font-bold">{Math.round((results?.probability2027 || 0) * 100)}%</div>
+                  <div className="text-xs text-gray-400">By 2027</div>
+                  <div className="text-xs text-gray-500">Superhuman Coder</div>
+                </div>
+                <div className="bg-black rounded-lg p-3 text-center">
+                  <div className="text-xl font-bold">{Math.round((results?.probability2030 || 0) * 100)}%</div>
+                  <div className="text-xs text-gray-400">By 2030</div>
+                  <div className="text-xs text-gray-500">Superintelligence</div>
+                </div>
+                <div className="bg-black rounded-lg p-3 text-center">
+                  <div className="text-xl font-bold">{Math.round((results?.probability2035 || 0) * 100)}%</div>
+                  <div className="text-xs text-gray-400">By 2035</div>
+                  <div className="text-xs text-gray-500">Post-Singularity</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Risk Assessment */}
+            <div className="bg-gray-900 rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-500" />
+                Risk Level: <span className={riskColor}>{riskLevel}</span>
+              </h3>
+              
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold mb-1">Key Vulnerabilities:</h4>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    {results?.score > 7 && assessment.routine > 6 && <li>• High routine work content</li>}
+                    {results?.score > 7 && assessment.digital > 6 && <li>• Already highly digitized</li>}
+                    {assessment.industry === 'tech' && <li>• In direct path of AI advancement</li>}
+                    {assessment.cognitive < 5 && <li>• Limited creative problem-solving</li>}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-1">Protective Factors:</h4>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    {assessment.interpersonal > 5 && <li>• Strong human interaction needs</li>}
+                    {assessment.contextual > 5 && <li>• High legal/regulatory liability</li>}
+                    {assessment.physical > 5 && <li>• Physical dexterity requirements</li>}
+                    {(assessment.seniority === 'senior' || assessment.seniority === 'executive') && <li>• Strategic decision-making role</li>}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Recommendations */}
+            <div className="bg-gray-900 rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Recommended Actions</h3>
+              <div className="space-y-3">
+                {results?.medianYear <= 2027 && (
+                  <div className="bg-red-900/20 border border-red-800 rounded p-3">
+                    <p className="text-sm font-semibold text-red-400">Urgent: Begin transition planning</p>
+                    <p className="text-xs text-gray-400 mt-1">Your role is in the first wave of AI automation</p>
+                  </div>
+                )}
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
+                    <span>Focus on uniquely human skills: creativity, empathy, complex judgment</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
+                    <span>Learn to work with AI tools as force multipliers</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
+                    <span>Consider roles requiring strategy, leadership, and human connection</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <ChevronRight className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-400" />
+                    <span>Stay informed about AI progress in your industry</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <Clock className="w-8 h-8 mb-3 text-gray-400" />
+            <h3 className="text-lg font-semibold mb-2">AI Capability Timeline</h3>
+            <p className="text-sm text-gray-400">Late 2026: Superhuman coding<br/>2027: Research automation<br/>2028: General superintelligence</p>
+          </div>
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <TrendingUp className="w-8 h-8 mb-3 text-gray-400" />
+            <h3 className="text-lg font-semibold mb-2">Accelerating Progress</h3>
+            <p className="text-sm text-gray-400">AI research speed: 50x by 2027<br/>Task automation doubling every 3-5 months</p>
+          </div>
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <Brain className="w-8 h-8 mb-3 text-gray-400" />
+            <h3 className="text-lg font-semibold mb-2">Industry Impact</h3>
+            <p className="text-sm text-gray-400">Tech & coding jobs first<br/>Knowledge work follows<br/>Physical tasks last</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default JobAutomationForecast;
