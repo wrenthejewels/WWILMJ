@@ -533,10 +533,6 @@
                 font-size: 1.1em;
             }
 
-            .model-explanation img {
-                max-width: 100%;
-            }
-
             .ai-equation-display {
                 padding: 15px !important;
                 font-size: 0.9em;
@@ -735,33 +731,65 @@
 
         <div class="model-explanation" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2a5298;">
             <h3 style="color: #2a5298; margin-bottom: 15px;">The Stacked Hazard Job Loss Model</h3>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="images/equation.webp" alt="Stacked Hazard Job Loss Model Equation" style="max-width: 100%; height: auto; border-radius: 8px;">
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; font-family: 'Courier New', monospace;">
+                <div style="margin-bottom: 20px; font-size: 1.05em;">
+                    <strong>Main Equation:</strong><br>
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 6px; margin-top: 10px; text-align: center;">
+                        P<sub>loss</sub>(t) = 1 - S(t) = 1 - exp(-∫<sub>0</sub><sup>t</sup> λ<sub>total</sub>(s) ds)
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px; font-size: 1.05em;">
+                    <strong>Total Hazard Function:</strong><br>
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 6px; margin-top: 10px;">
+                        λ<sub>total</sub>(s) = λ<sub>AI</sub>(s) + λ<sub>macro</sub>(s) + λ<sub>firm</sub>(s) + λ<sub>role</sub>(s) + λ<sub>personal</sub>(s)
+                    </div>
+                </div>
+
+                <div style="font-size: 1.05em;">
+                    <strong>AI Hazard Component:</strong><br>
+                    <div style="padding: 15px; background: #fff3cd; border-radius: 6px; margin-top: 10px; border: 2px solid #ffc107;">
+                        λ<sub>AI</sub>(s) = h<sub>AI</sub> / (1 + exp(-γ [A(s) - θ<sub>0</sub> - κ H(s) - β T<sub>adapt</sub>(s)]))
+                    </div>
+                </div>
             </div>
+
             <p style="color: #495057; margin-bottom: 15px;">
-                This calculator uses a <strong>stacked hazard model</strong> to estimate your probability of job displacement over time.
-                The model combines multiple risk factors that compound to determine your overall automation risk:
+                This calculator currently focuses on the <strong>AI hazard component (λ<sub>AI</sub>)</strong> to estimate your probability of job displacement over time.
+                The model uses a sigmoid function that combines multiple risk factors:
             </p>
+
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
                 <div style="background: white; padding: 12px; border-radius: 6px;">
-                    <strong style="color: #2a5298;">λ<sub>AI</sub>(s):</strong> AI capability hazard - how ready AI is to perform your tasks
+                    <strong style="color: #2a5298;">A(s):</strong> AI capability readiness over time
                 </div>
                 <div style="background: white; padding: 12px; border-radius: 6px;">
-                    <strong style="color: #2a5298;">λ<sub>macro</sub>(s):</strong> Economic and regulatory factors
+                    <strong style="color: #2a5298;">H(s):</strong> Human/organizational friction (decreases over time)
                 </div>
                 <div style="background: white; padding: 12px; border-radius: 6px;">
-                    <strong style="color: #2a5298;">λ<sub>firm</sub>(s):</strong> Your company's readiness to adopt AI
+                    <strong style="color: #2a5298;">T<sub>adapt</sub>(s):</strong> Task adaptability to AI automation
                 </div>
                 <div style="background: white; padding: 12px; border-radius: 6px;">
-                    <strong style="color: #2a5298;">λ<sub>role</sub>(s):</strong> Role-specific protection factors
+                    <strong style="color: #2a5298;">h<sub>AI</sub>:</strong> Hazard scaling factor
                 </div>
                 <div style="background: white; padding: 12px; border-radius: 6px;">
-                    <strong style="color: #2a5298;">λ<sub>personal</sub>(s):</strong> Your personal adaptability and skills
+                    <strong style="color: #2a5298;">θ<sub>0</sub>:</strong> Baseline adoption threshold
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">γ:</strong> Steepness of adoption curve
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">κ:</strong> Sensitivity to friction
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">β:</strong> Sensitivity to task adaptability
                 </div>
             </div>
+
             <p style="color: #666; font-size: 0.9em; margin-top: 15px; font-style: italic;">
-                The AI hazard function uses a sigmoid curve modulated by AI capability A(s), human friction H(s),
-                and task adaptability T<sub>adapt</sub>(s) to model how quickly AI can replace your role.
+                The complete stacked hazard model includes additional terms (λ<sub>macro</sub>, λ<sub>firm</sub>, λ<sub>role</sub>, λ<sub>personal</sub>)
+                currently set to 0. Future versions may incorporate these additional hazard components.
             </p>
         </div>
 
