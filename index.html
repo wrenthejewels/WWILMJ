@@ -719,15 +719,16 @@
         
         <div class="ai2027-warning" id="ai2027-warning">
             <h3>AI 2027 Scenario Active</h3>
-            <p>This scenario is based on the <a href="https://ai-2027.com/" target="_blank" style="color: #d63031; text-decoration: underline;">AI 2027 research team's</a> median projections for exponential algorithmic progress:</p>
+            <p>This scenario is based on the <a href="https://ai-2027.com/" target="_blank" style="color: #d63031; text-decoration: underline;">AI 2027 research team's</a> projections for exponential algorithmic progress:</p>
             <ul>
-                <li><strong>2027:</strong> Superhuman coding capability achieved (median projection)</li>
-                <li><strong>2027 (end):</strong> Artificial Superintelligence (ASI) emergence</li>
-                <li><strong>Exponential algorithmic progress:</strong> Self-improving AI systems accelerate R&D 5-8x</li>
-                <li><strong>Technical assumptions:</strong> AI capability doubling every 4 months, compute scaling at 2.25x annually</li>
+                <li><strong>Updated median (May 2025):</strong> Superhuman coding by 2029-2030</li>
+                <li><strong>Still substantial probability:</strong> Superhuman coding could arrive as early as 2027</li>
+                <li><strong>ASI timeline:</strong> Artificial Superintelligence potentially 1-2 years after superhuman coding</li>
+                <li><strong>Exponential algorithmic progress:</strong> Self-improving AI systems accelerate R&D 5-8x once superhuman coding is achieved</li>
+                <li><strong>Technical assumptions:</strong> AI capability doubling every 4-7 months, compute scaling at 2.25x annually</li>
                 <li><strong>Key mechanism:</strong> Expert-human-level AI systems automate AI research itself, creating rapid recursive improvement</li>
             </ul>
-            <p style="font-size: 0.85em; margin-top: 10px; color: #636e72;"><em>Note: This represents an aggressive but plausible scenario. Actual timelines may vary based on technical breakthroughs, compute availability, and unforeseen bottlenecks.</em></p>
+            <p style="font-size: 0.85em; margin-top: 10px; color: #636e72;"><em>Note: The team has lengthened their median timeline by ~1.5 years based on recent AI progress. This still represents an aggressive scenario with substantial uncertainty.</em></p>
         </div>
         
         <div class="setup-wizard" id="setup-wizard">
@@ -1561,7 +1562,7 @@
         let chart = null;
 
         const ai2027Assumptions = {
-            aiDoublingMonths: 4,
+            aiDoublingMonths: 6,
             computeScaling: 2.25,
             superhumanCoderModal: 2027,
             superhumanCoderMedian: 2030,
@@ -1574,13 +1575,13 @@
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            
+
             const warning = document.getElementById('ai2027-warning');
             if (scenario === 'ai2027') {
                 warning.classList.add('active');
-                document.getElementById('ai-doubling').value = 4;
+                document.getElementById('ai-doubling').value = 6;
                 document.getElementById('compute-scaling').value = 2.25;
-                document.getElementById('ai-doubling-value').textContent = '4 mo';
+                document.getElementById('ai-doubling-value').textContent = '6 mo';
                 document.getElementById('compute-scaling-value').textContent = '2.25x';
             } else {
                 warning.classList.remove('active');
