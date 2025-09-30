@@ -15,31 +15,53 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #ffffff;
             min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
         }
-        
+
         .container {
-            max-width: 1400px;
+            max-width: 100%;
+            margin: 0;
+            background: #ffffff;
+            padding: 0;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px 20px;
+        }
+
+        .narrow-content {
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2em;
-            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
         }
-        
+
         .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3em;
+            font-weight: 400;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.5;
         }
         
         .ai2027-badge {
@@ -109,10 +131,10 @@
         }
         
         .setup-wizard {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
+            background: #ffffff;
+            padding: 0;
+            border-radius: 0;
+            margin-bottom: 0;
         }
         
         .setup-section {
@@ -516,13 +538,12 @@
 
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
+            .hero-section {
+                padding: 60px 20px 40px;
             }
 
-            .container {
-                padding: 15px;
-                border-radius: 10px;
+            .content-wrapper {
+                padding: 30px 15px;
             }
 
             .model-explanation {
@@ -543,13 +564,13 @@
             }
 
             h1 {
-                font-size: 1.5em;
-                margin-bottom: 8px;
+                font-size: 2em;
+                margin-bottom: 12px;
             }
 
             .subtitle {
-                font-size: 0.9em;
-                margin-bottom: 15px;
+                font-size: 1.1em;
+                margin-bottom: 0;
             }
 
             .ai2027-badge {
@@ -726,10 +747,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Job Automation Timeline Calculator</h1>
-        <p class="subtitle">Comprehensive Stacked Hazard Model for Job Displacement Risk</p>
+        <div class="hero-section">
+            <h1>Job Automation Timeline Calculator</h1>
+            <p class="subtitle">Comprehensive Stacked Hazard Model for Job Displacement Risk</p>
+        </div>
 
-        <div class="model-explanation" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2a5298;">
+        <div class="content-wrapper narrow-content">
+            <div class="model-explanation" style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-bottom: 40px; border-left: 4px solid #667eea;">
             <h3 style="color: #2a5298; margin-bottom: 15px;">The Stacked Hazard Job Loss Model</h3>
 
             <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; font-family: 'Courier New', monospace;">
@@ -791,14 +815,15 @@
                 The complete stacked hazard model includes additional terms (λ<sub>macro</sub>, λ<sub>firm</sub>, λ<sub>role</sub>, λ<sub>personal</sub>)
                 currently set to 0. Future versions may incorporate these additional hazard components.
             </p>
-        </div>
+            </div>
 
-        <div class="scenario-selector">
-            <button class="scenario-btn active" onclick="setScenario('custom')">Custom Analysis</button>
-            <button class="scenario-btn" onclick="setScenario('ai2027')">AI 2027 Scenario</button>
-        </div>
-        
-        <div class="ai2027-warning" id="ai2027-warning">
+            <div class="scenario-selector" style="margin-bottom: 30px;">
+                <button class="scenario-btn active" onclick="setScenario('custom')">Custom Analysis</button>
+                <button class="scenario-btn" onclick="setScenario('ai2027')">AI 2027 Scenario</button>
+            </div>
+
+        <div class="content-wrapper">
+            <div class="ai2027-warning" id="ai2027-warning" style="max-width: 900px; margin: 0 auto 40px;">
             <h3>AI 2027 Scenario Active</h3>
             <p>This scenario is based on the <a href="https://ai-2027.com/" target="_blank" style="color: #d63031; text-decoration: underline;">AI 2027 research team's</a> projections for exponential algorithmic progress:</p>
             <ul>
@@ -810,9 +835,9 @@
                 <li><strong>Key mechanism:</strong> Expert-human-level AI systems automate AI research itself, creating rapid recursive improvement</li>
             </ul>
             <p style="font-size: 0.85em; margin-top: 10px; color: #636e72;"><em>Note: The team has lengthened their median timeline by ~1.5 years based on recent AI progress. This still represents an aggressive scenario with substantial uncertainty.</em></p>
-        </div>
-        
-        <div class="setup-wizard" id="setup-wizard">
+            </div>
+
+            <div class="setup-wizard" id="setup-wizard">
             <div class="progress-indicator">
                 <div>Complete all sections below for personalized analysis</div>
                 <div class="progress-bar">
@@ -1454,11 +1479,13 @@
                     </div>
                 </div>
             </div>
-            
+
             <button class="analyze-btn" onclick="analyzeRole()">Analyze My Automation Risk</button>
+            </div>
         </div>
-        
+
         <div class="results-section" id="results-section">
+            <div class="content-wrapper">
             <button class="reset-btn" onclick="resetAnalysis()">Start New Analysis</button>
             
             <div class="parameter-breakdown">
@@ -1611,9 +1638,10 @@
                     <div class="result-value" id="risk-2031">-</div>
                 </div>
             </div>
+            </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let currentScenario = 'custom';
