@@ -537,6 +537,15 @@
                 max-width: 100%;
             }
 
+            .ai-equation-display {
+                padding: 15px !important;
+                font-size: 0.9em;
+            }
+
+            .ai-equation-display h3 {
+                font-size: 1em;
+            }
+
             h1 {
                 font-size: 1.5em;
                 margin-bottom: 8px;
@@ -828,10 +837,10 @@
             </div>
             
             <div class="setup-section">
-                <h3>Step 2: Comprehensive Role Assessment</h3>
-                
+                <h3>Step 2: AI Displacement Risk Assessment</h3>
+
                 <div class="section-category">
-                    <h4>AI Readiness - A(s)</h4>
+                    <h4>AI Technical Readiness</h4>
                     
                     <div class="question-group">
                         <h5>1. Current AI Performance</h5>
@@ -943,7 +952,7 @@
                 </div>
 
                 <div class="section-category">
-                    <h4>Task Characteristics - T_adapt(s)</h4>
+                    <h4>Task Structure & Adaptability</h4>
 
                     <div class="question-group">
                         <h5>5. Task Decomposability</h5>
@@ -1082,7 +1091,7 @@
                 </div>
 
                 <div class="section-category">
-                    <h4>Human/Organizational Friction - H(s)</h4>
+                    <h4>Human & Organizational Factors</h4>
 
                     <div class="question-group">
                         <h5>10. Human Judgment & Relationships</h5>
@@ -1194,7 +1203,7 @@
                 </div>
 
                 <div class="section-category">
-                    <h4>Firm Factors - λ_firm(s)</h4>
+                    <h4>Company & Industry Context</h4>
 
                     <div class="question-group">
                         <h5>14. Company AI Adoption Readiness</h5>
@@ -1306,77 +1315,73 @@
                 </div>
 
                 <div class="section-category">
-                    <h4>Role Factors - λ_role(s)</h4>
+                    <h4>Personal Adaptability</h4>
 
                     <div class="question-group">
-                        <h5>18. Creativity Requirements</h5>
-                        <p>How much original creative work does your role require?</p>
+                        <h5>18. Skill Transferability</h5>
+                        <p>How transferable are your core skills to other roles/industries?</p>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="q18-1" name="q18" value="5">
-                                <label for="q18-1">Constant</label>
+                                <input type="radio" id="q18-1" name="q18" value="1">
+                                <label for="q18-1">Highly Specific</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q18-2" name="q18" value="4">
-                                <label for="q18-2">Frequent</label>
+                                <input type="radio" id="q18-2" name="q18" value="2">
+                                <label for="q18-2">Somewhat Specific</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="q18-3" name="q18" value="3" checked>
                                 <label for="q18-3">Moderate</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q18-4" name="q18" value="2">
-                                <label for="q18-4">Occasional</label>
+                                <input type="radio" id="q18-4" name="q18" value="4">
+                                <label for="q18-4">Transferable</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q18-5" name="q18" value="1">
-                                <label for="q18-5">Rare</label>
+                                <input type="radio" id="q18-5" name="q18" value="5">
+                                <label for="q18-5">Highly Transferable</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="question-group">
-                        <h5>19. Real-time Decision Making</h5>
-                        <p>How often must you make high-stakes decisions under time pressure?</p>
+                        <h5>19. AI Complementarity</h5>
+                        <p>How much could AI amplify (vs. replace) your productivity?</p>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="q19-1" name="q19" value="5">
-                                <label for="q19-1">Constantly</label>
+                                <input type="radio" id="q19-1" name="q19" value="1">
+                                <label for="q19-1">Replace Only</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q19-2" name="q19" value="4">
-                                <label for="q19-2">Frequently</label>
+                                <input type="radio" id="q19-2" name="q19" value="2">
+                                <label for="q19-2">Mostly Replace</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="q19-3" name="q19" value="3" checked>
-                                <label for="q19-3">Sometimes</label>
+                                <label for="q19-3">Mixed</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q19-4" name="q19" value="2">
-                                <label for="q19-4">Rarely</label>
+                                <input type="radio" id="q19-4" name="q19" value="4">
+                                <label for="q19-4">Mostly Amplify</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q19-5" name="q19" value="1">
-                                <label for="q19-5">Never</label>
+                                <input type="radio" id="q19-5" name="q19" value="5">
+                                <label for="q19-5">Amplify Only</label>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="section-category">
-                    <h4>Personal Factors - λ_personal(s)</h4>
 
                     <div class="question-group">
-                        <h5>20. Skill Transferability</h5>
-                        <p>How transferable are your core skills to other roles/industries?</p>
+                        <h5>20. Adaptability/Learning</h5>
+                        <p>How quickly can you learn and adopt new tools/technologies?</p>
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" id="q20-1" name="q20" value="1">
-                                <label for="q20-1">Highly Specific</label>
+                                <label for="q20-1">Very Slow</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="q20-2" name="q20" value="2">
-                                <label for="q20-2">Somewhat Specific</label>
+                                <label for="q20-2">Slow</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="q20-3" name="q20" value="3" checked>
@@ -1384,92 +1389,38 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="q20-4" name="q20" value="4">
-                                <label for="q20-4">Transferable</label>
+                                <label for="q20-4">Fast</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="q20-5" name="q20" value="5">
-                                <label for="q20-5">Highly Transferable</label>
+                                <label for="q20-5">Very Fast</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="question-group">
-                        <h5>21. AI Complementarity</h5>
-                        <p>How much could AI amplify (vs. replace) your productivity?</p>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="q21-1" name="q21" value="1">
-                                <label for="q21-1">Replace Only</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q21-2" name="q21" value="2">
-                                <label for="q21-2">Mostly Replace</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q21-3" name="q21" value="3" checked>
-                                <label for="q21-3">Mixed</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q21-4" name="q21" value="4">
-                                <label for="q21-4">Mostly Amplify</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q21-5" name="q21" value="5">
-                                <label for="q21-5">Amplify Only</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="question-group">
-                        <h5>22. Adaptability/Learning</h5>
-                        <p>How quickly can you learn and adopt new tools/technologies?</p>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="q22-1" name="q22" value="1">
-                                <label for="q22-1">Very Slow</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q22-2" name="q22" value="2">
-                                <label for="q22-2">Slow</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q22-3" name="q22" value="3" checked>
-                                <label for="q22-3">Moderate</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q22-4" name="q22" value="4">
-                                <label for="q22-4">Fast</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q22-5" name="q22" value="5">
-                                <label for="q22-5">Very Fast</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="question-group">
-                        <h5>23. Job Performance</h5>
+                        <h5>21. Job Performance</h5>
                         <p>How good are you at your job, relative to your peers?</p>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="q23-1" name="q23" value="1">
-                                <label for="q23-1">Below Average</label>
+                                <input type="radio" id="q21-1" name="q21" value="1">
+                                <label for="q21-1">Below Average</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q23-2" name="q23" value="2">
-                                <label for="q23-2">Average</label>
+                                <input type="radio" id="q21-2" name="q21" value="2">
+                                <label for="q21-2">Average</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q23-3" name="q23" value="3" checked>
-                                <label for="q23-3">Above Average</label>
+                                <input type="radio" id="q21-3" name="q21" value="3" checked>
+                                <label for="q21-3">Above Average</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q23-4" name="q23" value="4">
-                                <label for="q23-4">Excellent</label>
+                                <input type="radio" id="q21-4" name="q21" value="4">
+                                <label for="q21-4">Excellent</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q23-5" name="q23" value="5">
-                                <label for="q23-5">Top Performer</label>
+                                <input type="radio" id="q21-5" name="q21" value="5">
+                                <label for="q21-5">Top Performer</label>
                             </div>
                         </div>
                     </div>
@@ -1507,10 +1458,6 @@
                 <div class="parameter-item">
                     <span class="parameter-label">Firm Readiness Score:</span>
                     <span class="parameter-value" id="firm-display">-</span>
-                </div>
-                <div class="parameter-item">
-                    <span class="parameter-label">Role Protection Score:</span>
-                    <span class="parameter-value" id="role-protection-display">-</span>
                 </div>
                 <div class="parameter-item">
                     <span class="parameter-label">Personal Adaptability Score:</span>
@@ -1576,7 +1523,48 @@
             <div class="chart-container">
                 <canvas id="chart"></canvas>
             </div>
-            
+
+            <div class="ai-equation-display" style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #2a5298;">
+                <h3 style="color: #2a5298; margin-bottom: 15px; text-align: center;">AI Hazard Function</h3>
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-family: 'Times New Roman', serif; font-size: 1.1em;">
+                    <div style="margin-bottom: 15px;">
+                        <strong>P<sub>loss</sub>(t) = 1 - S(t) = 1 - exp(-∫<sub>0</sub><sup>t</sup> λ<sub>AI</sub>(s) ds)</strong>
+                    </div>
+                    <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                        <strong>λ<sub>AI</sub>(s) = h<sub>AI</sub> / (1 + exp{-γ[A(s) - θ<sub>0</sub> - κH(s) - βT<sub>adapt</sub>(s)]})</strong>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 0.9em;">
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>A(s):</strong> AI capability growth over time
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>H(s):</strong> Human/organizational friction decay
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>T<sub>adapt</sub>(s):</strong> Task adaptability factor
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>θ<sub>0</sub>:</strong> Baseline adoption threshold
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>γ:</strong> Steepness of adoption curve
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>κ:</strong> Sensitivity to friction
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>β:</strong> Sensitivity to adaptability
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 6px;">
+                        <strong>h<sub>AI</sub>:</strong> Hazard scaling factor
+                    </div>
+                </div>
+                <p style="color: #666; font-size: 0.85em; margin-top: 15px; font-style: italic; text-align: center;">
+                    This sigmoid function models how AI capability, organizational friction, and task characteristics combine to determine your displacement probability over time.
+                </p>
+            </div>
+
             <div class="results">
                 <div class="result-card" id="median-card">
                     <h4>50% Displacement Risk</h4>
@@ -1678,17 +1666,15 @@
             const firmReadiness = (getQuestionValue(14) + getQuestionValue(15) + 
                                   getQuestionValue(16) + getQuestionValue(17)) / 4;
             
-            const roleProtection = (getQuestionValue(18) + getQuestionValue(19)) / 2;
-            
-            const personalAdapt = (getQuestionValue(20) + getQuestionValue(21) + 
-                                  getQuestionValue(22) + getQuestionValue(23)) / 4;
+            const personalAdapt = (getQuestionValue(18) + getQuestionValue(19) +
+                                  getQuestionValue(20) + getQuestionValue(21)) / 4;
 
             const h0 = 0.015 + (aiReadiness / 5) * 0.12 + (firmReadiness / 5) * 0.05 - (friction / 5) * 0.08;
             const theta0 = 1 + (taskAdapt / 5) * 5 + (friction / 5) * 3 - (aiReadiness / 5) * 2;
             const gamma = 0.4 + (firmReadiness / 5) * 1.5 + (aiReadiness / 5) * 0.8 - (friction / 5) * 0.6;
-            const kappa = 0.2 + (friction / 5) * 0.7 + (roleProtection / 5) * 0.4;
+            const kappa = 0.2 + (friction / 5) * 0.7 + (personalAdapt / 5) * 0.3;
             const aiGrowth = 0.3 + (aiReadiness / 5) * 0.9 + (firmReadiness / 5) * 0.5;
-            const frictionValue = 1 + (friction / 5) * 7 + (roleProtection / 5) * 3;
+            const frictionValue = 1 + (friction / 5) * 7 + (personalAdapt / 5) * 2;
 
             currentParams = {
                 name: roleName,
@@ -1702,7 +1688,6 @@
                 taskAdapt: taskAdapt,
                 friction_score: friction,
                 firmReadiness: firmReadiness,
-                roleProtection: roleProtection,
                 personalAdapt: personalAdapt
             };
 
@@ -1725,11 +1710,9 @@
                 `${((6 - taskAdapt) * 20).toFixed(0)}/100`;
             document.getElementById('friction-display').textContent = 
                 `${(friction * 20).toFixed(0)}/100`;
-            document.getElementById('firm-display').textContent = 
+            document.getElementById('firm-display').textContent =
                 `${(firmReadiness * 20).toFixed(0)}/100`;
-            document.getElementById('role-protection-display').textContent = 
-                `${(roleProtection * 20).toFixed(0)}/100`;
-            document.getElementById('personal-display').textContent = 
+            document.getElementById('personal-display').textContent =
                 `${(personalAdapt * 20).toFixed(0)}/100`;
             
             updatePersonalTimeline();
