@@ -525,6 +525,18 @@
                 border-radius: 10px;
             }
 
+            .model-explanation {
+                padding: 15px !important;
+            }
+
+            .model-explanation h3 {
+                font-size: 1.1em;
+            }
+
+            .model-explanation img {
+                max-width: 100%;
+            }
+
             h1 {
                 font-size: 1.5em;
                 margin-bottom: 8px;
@@ -711,7 +723,39 @@
     <div class="container">
         <h1>Job Automation Timeline Calculator</h1>
         <p class="subtitle">Comprehensive Stacked Hazard Model for Job Displacement Risk</p>
-        
+
+        <div class="model-explanation" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2a5298;">
+            <h3 style="color: #2a5298; margin-bottom: 15px;">The Stacked Hazard Job Loss Model</h3>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="images/equation.webp" alt="Stacked Hazard Job Loss Model Equation" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </div>
+            <p style="color: #495057; margin-bottom: 15px;">
+                This calculator uses a <strong>stacked hazard model</strong> to estimate your probability of job displacement over time.
+                The model combines multiple risk factors that compound to determine your overall automation risk:
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">λ<sub>AI</sub>(s):</strong> AI capability hazard - how ready AI is to perform your tasks
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">λ<sub>macro</sub>(s):</strong> Economic and regulatory factors
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">λ<sub>firm</sub>(s):</strong> Your company's readiness to adopt AI
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">λ<sub>role</sub>(s):</strong> Role-specific protection factors
+                </div>
+                <div style="background: white; padding: 12px; border-radius: 6px;">
+                    <strong style="color: #2a5298;">λ<sub>personal</sub>(s):</strong> Your personal adaptability and skills
+                </div>
+            </div>
+            <p style="color: #666; font-size: 0.9em; margin-top: 15px; font-style: italic;">
+                The AI hazard function uses a sigmoid curve modulated by AI capability A(s), human friction H(s),
+                and task adaptability T<sub>adapt</sub>(s) to model how quickly AI can replace your role.
+            </p>
+        </div>
+
         <div class="scenario-selector">
             <button class="scenario-btn active" onclick="setScenario('custom')">Custom Analysis</button>
             <button class="scenario-btn" onclick="setScenario('ai2027')">AI 2027 Scenario</button>
