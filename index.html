@@ -513,6 +513,198 @@
             background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
             transition: width 0.3s;
         }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 8px;
+            }
+
+            .subtitle {
+                font-size: 0.9em;
+                margin-bottom: 15px;
+            }
+
+            .ai2027-badge {
+                display: block;
+                margin: 10px auto 0;
+                text-align: center;
+            }
+
+            .scenario-selector {
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+
+            .scenario-btn {
+                padding: 10px 16px;
+                font-size: 0.9em;
+                width: 100%;
+            }
+
+            .setup-wizard {
+                padding: 15px;
+            }
+
+            .setup-section h3 {
+                font-size: 1em;
+            }
+
+            .role-presets {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 8px;
+            }
+
+            .preset-btn {
+                padding: 10px 12px;
+                font-size: 0.85em;
+            }
+
+            .section-category {
+                padding: 15px;
+            }
+
+            .section-category h4 {
+                font-size: 1em;
+            }
+
+            .question-group h5 {
+                font-size: 0.9em;
+            }
+
+            .question-group p {
+                font-size: 0.8em;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .radio-option {
+                min-width: auto;
+            }
+
+            .radio-option label {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            .timeline-comparison {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .timeline-card {
+                padding: 15px;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .control-group {
+                padding: 15px;
+            }
+
+            .control-group h3 {
+                font-size: 1em;
+            }
+
+            .control-group p {
+                font-size: 0.85em;
+            }
+
+            .chart-container {
+                padding: 10px;
+            }
+
+            canvas {
+                height: 300px !important;
+            }
+
+            .results {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 10px;
+            }
+
+            .result-card {
+                padding: 15px;
+            }
+
+            .result-card h4 {
+                font-size: 0.8em;
+            }
+
+            .result-value {
+                font-size: 1.5em;
+            }
+
+            .analyze-btn {
+                padding: 12px;
+                font-size: 1em;
+            }
+
+            .custom-input {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+
+            .parameter-breakdown {
+                padding: 15px;
+            }
+
+            .parameter-breakdown h3 {
+                font-size: 1em;
+            }
+
+            .parameter-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .parameter-label,
+            .parameter-value {
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.3em;
+            }
+
+            .role-presets {
+                grid-template-columns: 1fr;
+            }
+
+            .results {
+                grid-template-columns: 1fr;
+            }
+
+            .slider-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .value-display {
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body>
