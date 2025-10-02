@@ -2402,7 +2402,7 @@
             const computeMultiplier = parseFloat(document.getElementById('compute-scaling').value);
             const industryPace = parseFloat(document.getElementById('industry-pace').value);
 
-            // Compute scaling now grows exponentially per year (not every 2 years)
+            // Compute scaling grows exponentially per year
             // Research shows 3.4-5x/year for leading labs, compounding annually
             const computeEffect = Math.pow(computeMultiplier, t);
             const industryEffect = industryPace;
@@ -2411,16 +2411,34 @@
             // This reflects empirical scaling laws where compute + algorithmic progress compound
             const combinedCapability = a * computeEffect * industryEffect;
 
-            // CRITICAL: Use combinedCapability directly (not log) to preserve exponential growth
-            // Once AI crosses threshold, capabilities compound explosively (64x/year at 2mo doubling + 5x compute = 320x/year)
-            // The sigmoid keeps it bounded but the exponential term creates rapid takeoff once threshold is crossed
-            const capabilityPressure = combinedCapability / 10; // Scale factor for numerical stability
+            // COMPLETELY REDESIGNED for true exponential takeoff
+            // Example at t=1 with maxed sliders: 64 * 5 * 2 = 640x capability
+            // At t=2: 64² * 5² * 2 = 204,800x capability!
 
-            const exponent = -currentParams.gamma *
-                (capabilityPressure -
-                 currentParams.theta0 - currentParams.kappa * h);
+            // Capability ratio: how much AI capability exceeds job requirements threshold
+            const capabilityRatio = combinedCapability / currentParams.theta0;
 
-            return currentParams.h0 / (1 + Math.exp(exponent));
+            // Once capability ratio > 1, automation hazard grows exponentially
+            // gamma controls steepness (higher = faster takeoff)
+            // Using direct exponential for the hazard itself, not sigmoid
+            if (capabilityRatio < 0.1) {
+                // Below threshold: minimal hazard
+                return 0.001;
+            } else if (capabilityRatio < 1) {
+                // Approaching threshold: linear growth
+                return 0.01 * capabilityRatio;
+            } else {
+                // Above threshold: EXPONENTIAL TAKEOFF
+                // Each doubling of capability ratio increases hazard dramatically
+                const excessCapability = Math.log(capabilityRatio); // How many doublings past threshold
+                const rawHazard = 0.02 * Math.exp(currentParams.gamma * excessCapability);
+
+                // Friction acts as a multiplicative damper (not additive blocker)
+                const frictionMultiplier = 1 / (1 + currentParams.kappa * h / 5);
+
+                // Return clamped hazard (max 0.95 to prevent numerical issues)
+                return Math.min(0.95, rawHazard * frictionMultiplier);
+            }
         }
 
         function calculateDisplacementProbability(t) {
