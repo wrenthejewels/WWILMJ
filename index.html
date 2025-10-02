@@ -872,6 +872,19 @@
             color: #8c857d;
         }
 
+        .author-link {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: #6ba3d4;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .author-link:hover {
+            color: #4a8bc2;
+        }
+
         .header-actions {
             display: flex;
             gap: 12px;
@@ -1283,7 +1296,7 @@
             <div class="header-brand">
                 <span class="publication-title">Don't Lose Your Job</span>
                 <span class="publication-tagline">Forecasting work in the age of AI</span>
-                <span class="publication-tagline">Clay Wren</span>
+                <a href="https://x.com/wrenclay" target="_blank" class="author-link">Clay Wren</a>
             </div>
         </div>
     </header>
@@ -1317,6 +1330,7 @@
                 </ul>
                 <p class="note">Macro, firm, role, and personal hazards stay at zero for now - the layout is ready for those chapters once the research solidifies.</p>
             </article>
+        </div>
 
         <div class="content-wrapper">
             <div class="scenario-selector">
@@ -2521,6 +2535,14 @@
         document.getElementById('industry-pace')?.addEventListener('input', function() {
             document.getElementById('industry-pace-value').textContent = parseFloat(this.value).toFixed(1) + 'x';
             updateChart();
+        });
+
+        // Auto-initialize: select custom role and trigger analysis on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const customBtn = document.querySelector('.preset-btn[data-role="custom"]');
+            if (customBtn) {
+                customBtn.click();
+            }
         });
     </script>
 </body>
