@@ -344,25 +344,27 @@
         
         .parameter-breakdown {
             background: #f0f8ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #2a5298;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 3px solid #2a5298;
         }
-        
+
         .parameter-breakdown h3 {
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+            font-size: 1em;
         }
-        
+
         .parameter-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 8px 0;
+            margin-bottom: 6px;
+            padding: 4px 0;
             border-bottom: 1px solid #e0e0e0;
+            font-size: 0.85em;
         }
-        
+
         .parameter-item:last-child {
             border-bottom: none;
         }
@@ -2028,8 +2030,8 @@
                     <h4>Your Timeline</h4>
                     <div id="personal-timeline"></div>
                 </div>
-                <div class="timeline-card ai2027">
-                    <h4>AI 2027 Updated Milestones</h4>
+                <div class="timeline-card ai2027" id="ai2027-milestones" style="display: none;">
+                    <h4>AI 2027 Milestones</h4>
                     <div class="timeline-event">
                         <span class="timeline-date">2026</span>
                         <span class="timeline-description">Useful but unreliable AI agents</span>
@@ -2061,7 +2063,7 @@
                 
                 <div class="control-group">
                     <h3>Compute Scaling</h3>
-                    <p>Annual compute growth (Global: 2.25x, Leading labs: 3.4x, Frontier models: 4-5x/year)</p>
+                    <p>Annual compute growth</p>
                     <div class="slider-container">
                         <input type="range" id="compute-scaling" min="1.5" max="5" step="0.1" value="3.4">
                         <span class="value-display" id="compute-scaling-value">3.4x</span>
@@ -2159,16 +2161,19 @@
             event.target.classList.add('active');
 
             const warning = document.getElementById('ai2027-warning');
+            const milestones = document.getElementById('ai2027-milestones');
             if (scenario === 'ai2027') {
                 warning.classList.add('active');
+                milestones.style.display = 'block';
                 document.getElementById('ai-doubling').value = 6;
                 document.getElementById('compute-scaling').value = 3.4;
                 document.getElementById('ai-doubling-value').textContent = '6 mo';
                 document.getElementById('compute-scaling-value').textContent = '3.40x';
             } else {
                 warning.classList.remove('active');
+                milestones.style.display = 'none';
             }
-            
+
             if (currentParams) {
                 updateChart();
             }
