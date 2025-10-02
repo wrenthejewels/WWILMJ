@@ -352,17 +352,39 @@
 
         .parameter-breakdown h3 {
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 1em;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .profile-scores {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-timeline {
+            border-left: 1px solid #ddd;
+            padding-left: 12px;
+        }
+
+        .profile-timeline h4 {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            color: #333;
         }
 
         .parameter-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
-            padding: 4px 0;
+            margin-bottom: 4px;
+            padding: 3px 0;
             border-bottom: 1px solid #e0e0e0;
-            font-size: 0.85em;
+            font-size: 0.8em;
         }
 
         .parameter-item:last-child {
@@ -742,6 +764,18 @@
 
             .parameter-breakdown h3 {
                 font-size: 1em;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .profile-timeline {
+                border-left: none;
+                border-top: 1px solid #ddd;
+                padding-left: 0;
+                padding-top: 12px;
             }
 
             .parameter-item {
@@ -1994,43 +2028,47 @@
             <button class="reset-btn" onclick="resetAnalysis()">Start New Analysis</button>
             
             <div class="parameter-breakdown">
-                <h3>Your Personalized Risk Profile</h3>
-                <div class="parameter-item">
-                    <span class="parameter-label">Role:</span>
-                    <span class="parameter-value" id="role-display">-</span>
+                <h3>Your Risk Profile & Timeline</h3>
+
+                <div class="profile-grid">
+                    <div class="profile-scores">
+                        <div class="parameter-item">
+                            <span class="parameter-label">Role:</span>
+                            <span class="parameter-value" id="role-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Scenario:</span>
+                            <span class="parameter-value" id="scenario-display">Custom</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">AI Readiness:</span>
+                            <span class="parameter-value" id="ai-readiness-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Task Adaptability:</span>
+                            <span class="parameter-value" id="task-adapt-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Friction:</span>
+                            <span class="parameter-value" id="friction-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Firm Readiness:</span>
+                            <span class="parameter-value" id="firm-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Personal Adapt:</span>
+                            <span class="parameter-value" id="personal-display">-</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-timeline">
+                        <h4>Your Timeline</h4>
+                        <div id="personal-timeline"></div>
+                    </div>
                 </div>
-                <div class="parameter-item">
-                    <span class="parameter-label">Scenario:</span>
-                    <span class="parameter-value" id="scenario-display">Custom</span>
-                </div>
-                <div class="parameter-item">
-                    <span class="parameter-label">AI Readiness Score:</span>
-                    <span class="parameter-value" id="ai-readiness-display">-</span>
-                </div>
-                <div class="parameter-item">
-                    <span class="parameter-label">Task Adaptability Score:</span>
-                    <span class="parameter-value" id="task-adapt-display">-</span>
-                </div>
-                <div class="parameter-item">
-                    <span class="parameter-label">Human Friction Score:</span>
-                    <span class="parameter-value" id="friction-display">-</span>
-                </div>
-                <div class="parameter-item">
-                    <span class="parameter-label">Firm Readiness Score:</span>
-                    <span class="parameter-value" id="firm-display">-</span>
-                </div>
-                <div class="parameter-item">
-                    <span class="parameter-label">Personal Adaptability Score:</span>
-                    <span class="parameter-value" id="personal-display">-</span>
-                </div>
-            </div>
-            
-            <div class="timeline-comparison">
-                <div class="timeline-card">
-                    <h4>Your Timeline</h4>
-                    <div id="personal-timeline"></div>
-                </div>
-                <div class="timeline-card ai2027" id="ai2027-milestones" style="display: none;">
+
+                <div class="timeline-card ai2027" id="ai2027-milestones" style="display: none; margin-top: 12px;">
                     <h4>AI 2027 Milestones</h4>
                     <div class="timeline-event">
                         <span class="timeline-date">2026</span>
