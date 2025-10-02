@@ -2291,32 +2291,32 @@
 
         // Per-question log-hazard multipliers
         const QUESTION_WEIGHTS = {
-            // Existing big levers
-            Q1:  { amp: +0.80 },  // digital/routine outputs
-            Q4:  { amp: +0.55 },  // core output aligns with model strengths
-            Q6:  { amp: +0.45 },  // low oversight/cheap errors/fast validation
-            Q11: { fric: -0.85 }, // regulation/licensure/liability barrier
-            Q12: { amp: -0.60 },  // in-person/physical/trust moat (protective)
+            // High-risk amplifiers (higher value = MORE automation risk)
+            Q1:  { amp: +0.80 },  // AI performance: better AI = more risk
+            Q2:  { amp: +0.40 },  // Data availability: more data = easier automation
+            Q3:  { amp: +0.35 },  // Benchmark clarity: clear metrics = easier automation
+            Q4:  { amp: +0.55 },  // Task digitization: more digital = more automatable
+            Q14: { amp: +0.15 },  // Company AI adoption: more ready = faster automation
+            Q15: { amp: +0.30 },  // Labor cost pressure: higher pressure = more automation incentive
+            Q17: { amp: +0.35 },  // IT infrastructure: modern systems = easier automation
 
-            // Additional levers to weight more strongly
-            Q2:  { amp: +0.40 },  // modular, repeatable workflow
-            Q3:  { amp: +0.35 },  // digital & structured data flows
-            Q5:  { fric: -0.50 }, // high cost-of-error (protective)
-            Q7:  { fric: -0.50 }, // heavy compliance/regulatory sign-off (protective)
-            Q8:  { fric: -0.45 }, // deep client trust/relationship selling (protective)
-            Q9:  { amp: +0.40 },  // API/toolchain automation-friendly
-            Q10: { amp: +0.45 },  // team already integrating AI
-            Q13: { fric: -0.35 }, // novel/non-routine problem solving (protective)
-            Q15: { fric: -0.30 }, // high-variance multimodal inputs (protective)
-            Q16: { amp: -0.50 },  // physical/field work/dexterity (protective via negative amp)
-            Q17: { amp: +0.35 },  // tight feedback loops/benchmarks
-            Q18: { fric: -0.40 }, // privacy/security constraints (protective)
-            Q19: { fric: -0.30 }, // legacy systems hinder automation (protective)
-            Q20: { fric: -0.35 }, // seniority/decision authority (protective)
-            Q21: { fric: -0.30 }, // geo/legal/union constraints (protective)
+            // Q5 & Q6 have REVERSED scales in HTML - need negative amp
+            Q5:  { amp: -0.50 },  // Task decomposability: 5=Very Complex (protective)
+            Q6:  { amp: -0.45 },  // Task standardization: 5=Highly Variable (protective)
 
-            // Tier B/C defaults for any other questions
-            Q14: { amp: +0.15 },
+            // Friction/protective factors (higher value = LESS automation risk)
+            Q7:  { fric: -0.50 }, // Context dependency: high context = protective
+            Q8:  { amp: +0.45 },  // Feedback loop speed: fast feedback helps AI learn faster!
+            Q9:  { fric: -0.40 }, // Tacit knowledge: more tacit = protective
+            Q10: { fric: -0.45 }, // Human relationships: more relationships = protective
+            Q11: { fric: -0.85 }, // Union/labor protections: strong unions = protective
+            Q12: { amp: -0.60 },  // Physical presence: more physical = protective
+            Q13: { fric: -0.35 }, // Trust requirements: high trust needs = protective
+            Q16: { amp: -0.50 },  // Labor market tightness: hard to hire = protective
+            Q18: { fric: -0.40 }, // Skill transferability: transferable = worker can adapt (protective)
+            Q19: { fric: -0.30 }, // AI complementarity: amplify mode = protective
+            Q20: { fric: -0.35 }, // Adaptability: fast learner = protective
+            Q21: { fric: -0.30 }, // Job performance: top performers = protective
         };
 
         // Code raw answers to numeric x_i, aiming for symmetric effects
@@ -2348,8 +2348,10 @@
         function kEff(baseK, answers) {
             let sumK = 0;
             const K_WEIGHTS = {
-                Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q9: +0.12, Q10:+0.12,
-                Q5: -0.20, Q7: -0.20, Q8: -0.15, Q12:-0.15, Q16:-0.20, Q18:-0.15
+                // Accelerators (higher = faster/earlier automation)
+                Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q8: +0.12, Q14: +0.10, Q15: +0.12, Q17: +0.12,
+                // Decelerators (higher = slower/later automation)
+                Q5: +0.20, Q6: +0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15, Q16: -0.20, Q18: -0.15, Q19: -0.10, Q20: -0.10, Q21: -0.10
             };
             for (const [qid, raw] of Object.entries(answers)) {
                 const x = codeAnswer(qid, raw);
