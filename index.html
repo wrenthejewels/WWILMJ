@@ -1428,9 +1428,38 @@
                 </div>
                 <input type="text" class="custom-input" id="custom-role" placeholder="Or type your specific role (e.g., Machine Learning Engineer, Product Manager)">
             </div>
-            
+
             <div class="setup-section">
-                <h3>Step 2: AI Displacement Risk Assessment</h3>
+                <h3>Step 2: Your Seniority Level</h3>
+                <div class="question-group">
+                    <p>Higher seniority levels involve more strategic decision-making and are typically harder to automate</p>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="seniority-1" name="seniority" value="1" checked>
+                            <label for="seniority-1">Entry Level</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="seniority-2" name="seniority" value="2">
+                            <label for="seniority-2">Mid-Level</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="seniority-3" name="seniority" value="3">
+                            <label for="seniority-3">Senior</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="seniority-4" name="seniority" value="4">
+                            <label for="seniority-4">Lead/Principal</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="seniority-5" name="seniority" value="5">
+                            <label for="seniority-5">Executive/C-Suite</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>Step 3: AI Displacement Risk Assessment</h3>
 
                 <div class="section-category">
                     <h4>AI Technical Readiness</h4>
@@ -2278,6 +2307,10 @@
             const personalAdapt = (getQuestionValue(18) + getQuestionValue(19) +
                                   getQuestionValue(20) + getQuestionValue(21)) / 4;
 
+            // Get seniority level (1=Entry, 2=Mid, 3=Senior, 4=Lead, 5=Executive)
+            const seniorityChecked = document.querySelector('input[name="seniority"]:checked');
+            const seniority = seniorityChecked ? parseFloat(seniorityChecked.value) : 1;
+
             const h0 = 0.015 + (aiReadiness / 5) * 0.12 + (firmReadiness / 5) * 0.05 - (friction / 5) * 0.08;
             const theta0 = 1 + (taskAdapt / 5) * 5 + (friction / 5) * 3 - (aiReadiness / 5) * 2;
             const gamma = 0.4 + (firmReadiness / 5) * 1.5 + (aiReadiness / 5) * 0.8 - (friction / 5) * 0.6;
@@ -2293,6 +2326,7 @@
                 kappa: Math.max(0.1, Math.min(1, kappa)),
                 aiGrowth: Math.max(0.1, Math.min(2, aiGrowth)),
                 friction: Math.max(0.5, Math.min(10, frictionValue)),
+                seniority: seniority,
                 aiReadiness: aiReadiness,
                 taskAdapt: taskAdapt,
                 friction_score: friction,
@@ -2487,8 +2521,13 @@
                 // Friction acts as a multiplicative damper (not additive blocker)
                 const frictionMultiplier = 1 / (1 + currentParams.kappa * h / 5);
 
+                // Seniority multiplier - higher seniority = harder to automate
+                // Entry(1): 1.0x, Mid(2): 0.85x, Senior(3): 0.7x, Lead(4): 0.55x, Executive(5): 0.4x
+                // 15% reduction per level reflects corporate pyramid + strategic decision-making
+                const seniorityMultiplier = 1 - (currentParams.seniority - 1) * 0.15;
+
                 // Return clamped hazard (max 0.95 to prevent numerical issues)
-                return Math.min(0.95, rawHazard * frictionMultiplier);
+                return Math.min(0.95, rawHazard * frictionMultiplier * seniorityMultiplier);
             }
         }
 
