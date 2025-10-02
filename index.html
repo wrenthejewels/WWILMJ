@@ -2289,6 +2289,76 @@
             return checked ? parseFloat(checked.value) : 3;
         }
 
+        // Per-question log-hazard multipliers
+        const QUESTION_WEIGHTS = {
+            // Existing big levers
+            Q1:  { amp: +0.80 },  // digital/routine outputs
+            Q4:  { amp: +0.55 },  // core output aligns with model strengths
+            Q6:  { amp: +0.45 },  // low oversight/cheap errors/fast validation
+            Q11: { fric: -0.85 }, // regulation/licensure/liability barrier
+            Q12: { amp: -0.60 },  // in-person/physical/trust moat (protective)
+
+            // Additional levers to weight more strongly
+            Q2:  { amp: +0.40 },  // modular, repeatable workflow
+            Q3:  { amp: +0.35 },  // digital & structured data flows
+            Q5:  { fric: -0.50 }, // high cost-of-error (protective)
+            Q7:  { fric: -0.50 }, // heavy compliance/regulatory sign-off (protective)
+            Q8:  { fric: -0.45 }, // deep client trust/relationship selling (protective)
+            Q9:  { amp: +0.40 },  // API/toolchain automation-friendly
+            Q10: { amp: +0.45 },  // team already integrating AI
+            Q13: { fric: -0.35 }, // novel/non-routine problem solving (protective)
+            Q15: { fric: -0.30 }, // high-variance multimodal inputs (protective)
+            Q16: { amp: -0.50 },  // physical/field work/dexterity (protective via negative amp)
+            Q17: { amp: +0.35 },  // tight feedback loops/benchmarks
+            Q18: { fric: -0.40 }, // privacy/security constraints (protective)
+            Q19: { fric: -0.30 }, // legacy systems hinder automation (protective)
+            Q20: { fric: -0.35 }, // seniority/decision authority (protective)
+            Q21: { fric: -0.30 }, // geo/legal/union constraints (protective)
+
+            // Tier B/C defaults for any other questions
+            Q14: { amp: +0.15 },
+        };
+
+        // Code raw answers to numeric x_i, aiming for symmetric effects
+        // Likert 1..5 -> -2..+2; booleans -> +/-1; fallback 0.
+        function codeAnswer(qid, raw) {
+            if (typeof raw === 'number' && raw >= 1 && raw <= 5) return raw - 3;
+            if (raw === true) return +1;
+            if (raw === false) return -1;
+            return 0;
+        }
+
+        // Compute hazard multipliers from all answers
+        function computeHazardMultipliers(answers) {
+            let sumAmp = 0, sumFric = 0;
+            for (const [qid, raw] of Object.entries(answers)) {
+                const w = QUESTION_WEIGHTS[qid];
+                if (!w) continue;
+                const x = codeAnswer(qid, raw);
+                if (w.amp)  sumAmp  += w.amp  * x;
+                if (w.fric) sumFric += w.fric * x;
+            }
+            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+            sumAmp  = clamp(sumAmp,  -2.0, +2.0);  // ≈ 0.14× .. 7.4×
+            sumFric = clamp(sumFric, -2.0, +2.0);
+            return { ampMult: Math.exp(sumAmp), fricMult: Math.exp(sumFric) };
+        }
+
+        // Optional timing shift via capability gate steepness k
+        function kEff(baseK, answers) {
+            let sumK = 0;
+            const K_WEIGHTS = {
+                Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q9: +0.12, Q10:+0.12,
+                Q5: -0.20, Q7: -0.20, Q8: -0.15, Q12:-0.15, Q16:-0.20, Q18:-0.15
+            };
+            for (const [qid, raw] of Object.entries(answers)) {
+                const x = codeAnswer(qid, raw);
+                if (K_WEIGHTS[qid]) sumK += K_WEIGHTS[qid] * x;
+            }
+            sumK = Math.max(-1.0, Math.min(+1.0, sumK));
+            return baseK * Math.exp(sumK);
+        }
+
         function analyzeRole() {
             if (!selectedRole) {
                 return;
@@ -2298,52 +2368,69 @@
                 (document.getElementById('custom-role').value || 'Custom Role') :
                 document.querySelector(`.preset-btn[data-role="${selectedRole}"]`).textContent.trim();
 
-            const aiReadiness = (getQuestionValue(1) + getQuestionValue(2) + 
-                                getQuestionValue(3) + getQuestionValue(4)) / 4;
-            
-            const taskAdapt = (getQuestionValue(5) + getQuestionValue(6) + getQuestionValue(7) + 
-                              getQuestionValue(8) + getQuestionValue(9)) / 5;
-            
-            const friction = (getQuestionValue(10) + getQuestionValue(11) + 
-                            getQuestionValue(12) + getQuestionValue(13)) / 4;
-            
-            const firmReadiness = (getQuestionValue(14) + getQuestionValue(15) + 
-                                  getQuestionValue(16) + getQuestionValue(17)) / 4;
-            
-            const personalAdapt = (getQuestionValue(18) + getQuestionValue(19) +
-                                  getQuestionValue(20) + getQuestionValue(21)) / 4;
+            // Collect all answers
+            const answers = {};
+            for (let i = 1; i <= 21; i++) {
+                answers[`Q${i}`] = getQuestionValue(i);
+            }
 
             // Get seniority level (1=Entry, 2=Mid, 3=Senior, 4=Lead, 5=Executive)
             const seniorityChecked = document.querySelector('input[name="seniority"]:checked');
             const seniority = seniorityChecked ? parseFloat(seniorityChecked.value) : 1;
 
-            const h0 = 0.015 + (aiReadiness / 5) * 0.12 + (firmReadiness / 5) * 0.05 - (friction / 5) * 0.08;
-            let theta0 = 1 + (taskAdapt / 5) * 5 + (friction / 5) * 3 - (aiReadiness / 5) * 2;
-            const gamma = 0.4 + (firmReadiness / 5) * 1.5 + (aiReadiness / 5) * 0.8 - (friction / 5) * 0.6;
-            const kappa = 0.2 + (friction / 5) * 0.7 + (personalAdapt / 5) * 0.3;
-            const aiGrowth = 0.3 + (aiReadiness / 5) * 0.9 + (firmReadiness / 5) * 0.5;
-            const frictionValue = 1 + (friction / 5) * 7 + (personalAdapt / 5) * 2;
+            // Compute hazard multipliers from question weights
+            const { ampMult, fricMult } = computeHazardMultipliers(answers);
+
+            // Compute section scores for display purposes only (not used in hazard calculation)
+            const aiReadiness = (getQuestionValue(1) + getQuestionValue(2) +
+                                getQuestionValue(3) + getQuestionValue(4)) / 4;
+
+            const taskAdapt = (getQuestionValue(5) + getQuestionValue(6) + getQuestionValue(7) +
+                              getQuestionValue(8) + getQuestionValue(9)) / 5;
+
+            const friction = (getQuestionValue(10) + getQuestionValue(11) +
+                            getQuestionValue(12) + getQuestionValue(13)) / 4;
+
+            const firmReadiness = (getQuestionValue(14) + getQuestionValue(15) +
+                                  getQuestionValue(16) + getQuestionValue(17)) / 4;
+
+            const personalAdapt = (getQuestionValue(18) + getQuestionValue(19) +
+                                  getQuestionValue(20) + getQuestionValue(21)) / 4;
+
+            // Baseline parameters (will be modified by question multipliers)
+            const h0_base = 0.015;
+            let theta0 = 3.0;  // Baseline threshold
+            const gamma = 0.8;  // Baseline steepness
+            const kappa = 0.3;  // Baseline friction damping
+            const aiGrowth = 0.5;
+            const frictionValue = 3.0;
 
             // Increase threshold for higher seniority - AI needs to be more capable to automate senior roles
             // Entry(1): 1.0x, Mid(2): 1.2x, Senior(3): 1.4x, Lead(4): 1.6x, Executive(5): 1.75x
-            // More modest increases - senior roles converge in required AI capability
             const seniorityThresholdMultipliers = [1.0, 1.2, 1.4, 1.6, 1.75];
             theta0 = theta0 * seniorityThresholdMultipliers[seniority - 1];
 
+            // Apply optional timing shift (capability gate steepness adjustment)
+            const gammaEffective = kEff(gamma, answers);
+
             currentParams = {
                 name: roleName,
-                h0: Math.max(0.01, Math.min(0.25, h0)),
+                h0: h0_base,
                 theta0: Math.max(0.5, Math.min(15, theta0)),
-                gamma: Math.max(0.3, Math.min(3, gamma)),
-                kappa: Math.max(0.1, Math.min(1, kappa)),
-                aiGrowth: Math.max(0.1, Math.min(2, aiGrowth)),
-                friction: Math.max(0.5, Math.min(10, frictionValue)),
+                gamma: Math.max(0.3, Math.min(3, gammaEffective)),
+                kappa: kappa,
+                aiGrowth: aiGrowth,
+                friction: frictionValue,
                 seniority: seniority,
                 aiReadiness: aiReadiness,
                 taskAdapt: taskAdapt,
                 friction_score: friction,
                 firmReadiness: firmReadiness,
-                personalAdapt: personalAdapt
+                personalAdapt: personalAdapt,
+                // Store multipliers for hazard calculation
+                ampMult: ampMult,
+                fricMult: fricMult,
+                answers: answers
             };
 
             if (currentScenario === 'ai2027') {
@@ -2500,60 +2587,157 @@
             const industryPace = parseFloat(document.getElementById('industry-pace').value);
 
             // Compute scaling grows exponentially per year
-            // Research shows 3.4-5x/year for leading labs, compounding annually
             const computeEffect = Math.pow(computeMultiplier, t);
             const industryEffect = industryPace;
 
-            // A(t) and compute effects multiply - both are exponential
-            // This reflects empirical scaling laws where compute + algorithmic progress compound
+            // Combined AI capability growth
             const combinedCapability = a * computeEffect * industryEffect;
-
-            // COMPLETELY REDESIGNED for true exponential takeoff
-            // Example at t=1 with maxed sliders: 64 * 5 * 2 = 640x capability
-            // At t=2: 64² * 5² * 2 = 204,800x capability!
 
             // Capability ratio: how much AI capability exceeds job requirements threshold
             const capabilityRatio = combinedCapability / currentParams.theta0;
 
-            // Once capability ratio > 1, automation hazard grows exponentially
-            // gamma controls steepness (higher = faster takeoff)
-            // Using direct exponential for the hazard itself, not sigmoid
+            // Base hazard calculation (three-phase)
+            let baseHazard;
             if (capabilityRatio < 0.1) {
                 // Below threshold: minimal hazard
-                return 0.001;
+                baseHazard = 0.001;
             } else if (capabilityRatio < 1) {
                 // Approaching threshold: linear growth
-                return 0.01 * capabilityRatio;
+                baseHazard = 0.01 * capabilityRatio;
             } else {
                 // Above threshold: EXPONENTIAL TAKEOFF
-                // Each doubling of capability ratio increases hazard dramatically
-                const excessCapability = Math.log(capabilityRatio); // How many doublings past threshold
-                const rawHazard = 0.02 * Math.exp(currentParams.gamma * excessCapability);
+                const excessCapability = Math.log(capabilityRatio);
+                baseHazard = currentParams.h0 * Math.exp(currentParams.gamma * excessCapability);
 
-                // Friction acts as a multiplicative damper (not additive blocker)
+                // Friction acts as a multiplicative damper
                 const frictionMultiplier = 1 / (1 + currentParams.kappa * h / 5);
 
                 // Seniority multiplier - higher seniority = harder to automate
-                // Entry(1): 1.0x, Mid(2): 0.8x, Senior(3): 0.6x, Lead(4): 0.45x, Executive(5): 0.35x
-                // Progressive reduction: 20%, 20%, 15%, 10% - diminishing as you go higher
-                // Reflects that senior+ roles converge in automation difficulty
-                const seniorityReductions = [0, 0.2, 0.4, 0.55, 0.65]; // cumulative reduction
+                const seniorityReductions = [0, 0.2, 0.4, 0.55, 0.65];
                 const seniorityMultiplier = 1 - seniorityReductions[currentParams.seniority - 1];
 
-                // Return clamped hazard (max 0.95 to prevent numerical issues)
-                return Math.min(0.95, rawHazard * frictionMultiplier * seniorityMultiplier);
+                baseHazard = baseHazard * frictionMultiplier * seniorityMultiplier;
             }
+
+            // Apply per-question hazard multipliers
+            const questionMultiplier = currentParams.ampMult * currentParams.fricMult;
+            const finalHazard = baseHazard * questionMultiplier;
+
+            // Return clamped hazard (max 0.95 to prevent numerical issues)
+            return Math.min(0.95, finalHazard);
+        }
+
+        // Cumulative risk from hazard series using survival function
+        function cumulativeRiskFromHazard(hSeries, dtYears) {
+            let cum = 0;
+            return hSeries.map(h => {
+                cum += h * dtYears;
+                return 1 - Math.exp(-cum);
+            });
+        }
+
+        // Calibration tests - run these to verify question weights have expected impact
+        function runCalibrationTests() {
+            const tests = [];
+
+            // Helper to compute risk by 2030 (t=5.35 years from 2024.65)
+            const computeRisk2030 = (answers) => {
+                const { ampMult, fricMult } = computeHazardMultipliers(answers);
+                const savedParams = currentParams;
+                currentParams = {
+                    h0: 0.015,
+                    theta0: 3.0,
+                    gamma: 0.8,
+                    kappa: 0.3,
+                    friction: 3.0,
+                    seniority: 1,
+                    ampMult: ampMult,
+                    fricMult: fricMult
+                };
+                const risk = calculateDisplacementProbability(5.35);
+                currentParams = savedParams;
+                return risk;
+            };
+
+            // Neutral baseline: all answers = 3
+            const neutralAnswers = {};
+            for (let i = 1; i <= 21; i++) neutralAnswers[`Q${i}`] = 3;
+
+            // Test 1: Q1 min->max should increase Risk by 2030 by ≥ +12 percentage points
+            const q1MinAnswers = { ...neutralAnswers, Q1: 1 };
+            const q1MaxAnswers = { ...neutralAnswers, Q1: 5 };
+            const riskQ1Min = computeRisk2030(q1MinAnswers);
+            const riskQ1Max = computeRisk2030(q1MaxAnswers);
+            const q1Delta = (riskQ1Max - riskQ1Min) * 100;
+            tests.push({
+                name: 'Q1 min->max increases Risk by 2030 by ≥12pp',
+                pass: q1Delta >= 12,
+                actual: q1Delta.toFixed(1) + 'pp',
+                expected: '≥12pp'
+            });
+
+            // Test 2: Q11 low->high should reduce Risk by 2030 by ≥ -10 points (protective)
+            const highRiskBase = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
+            const q11LowAnswers = { ...highRiskBase, Q11: 1 };
+            const q11HighAnswers = { ...highRiskBase, Q11: 5 };
+            const riskQ11Low = computeRisk2030(q11LowAnswers);
+            const riskQ11High = computeRisk2030(q11HighAnswers);
+            const q11Delta = (riskQ11High - riskQ11Low) * 100;
+            tests.push({
+                name: 'Q11 low->high reduces Risk by 2030 by ≥-10pp',
+                pass: q11Delta <= -10,
+                actual: q11Delta.toFixed(1) + 'pp',
+                expected: '≤-10pp'
+            });
+
+            // Test 3: Q1+Q4+Q6 max yields ≥2.5× hazard vs neutral
+            const maxRiskAnswers = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
+            const { ampMult: neutralAmpMult, fricMult: neutralFricMult } = computeHazardMultipliers(neutralAnswers);
+            const { ampMult: maxAmpMult, fricMult: maxFricMult } = computeHazardMultipliers(maxRiskAnswers);
+            const neutralMult = neutralAmpMult * neutralFricMult;
+            const maxMult = maxAmpMult * maxFricMult;
+            const multRatio = maxMult / neutralMult;
+            tests.push({
+                name: 'Q1+Q4+Q6 max yields ≥2.5× hazard vs neutral',
+                pass: multRatio >= 2.5,
+                actual: multRatio.toFixed(2) + '×',
+                expected: '≥2.5×'
+            });
+
+            // Test 4: Protective stack (Q5+Q7+Q8+Q16 high) suppresses hazard by ≥50%
+            const protectiveAnswers = { ...neutralAnswers, Q5: 5, Q7: 5, Q8: 5, Q16: 5 };
+            const { ampMult: protAmpMult, fricMult: protFricMult } = computeHazardMultipliers(protectiveAnswers);
+            const protMult = protAmpMult * protFricMult;
+            const suppression = (1 - protMult / neutralMult) * 100;
+            tests.push({
+                name: 'Protective stack suppresses hazard by ≥50%',
+                pass: suppression >= 50,
+                actual: suppression.toFixed(1) + '%',
+                expected: '≥50%'
+            });
+
+            // Log results to console
+            console.log('=== CALIBRATION TEST RESULTS ===');
+            tests.forEach(t => {
+                const status = t.pass ? '✓ PASS' : '✗ FAIL';
+                console.log(`${status} - ${t.name}`);
+                console.log(`  Expected: ${t.expected}, Actual: ${t.actual}`);
+            });
+            const allPassed = tests.every(t => t.pass);
+            console.log(`\nOverall: ${allPassed ? '✓ ALL TESTS PASSED' : '✗ SOME TESTS FAILED'}`);
+
+            return tests;
         }
 
         function calculateDisplacementProbability(t) {
             const n = 100;
             const dt = t / n;
             let integral = 0;
-            
+
             for (let i = 0; i <= n; i++) {
                 const s = i * dt;
                 const rate = hazardRate(s);
-                
+
                 if (i === 0 || i === n) {
                     integral += rate;
                 } else if (i % 2 === 1) {
@@ -2562,7 +2746,7 @@
                     integral += 2 * rate;
                 }
             }
-            
+
             integral = integral * dt / 3;
             return 1 - Math.exp(-integral);
         }
@@ -2661,6 +2845,11 @@
             if (customBtn) {
                 customBtn.click();
             }
+
+            // Run calibration tests on load
+            setTimeout(() => {
+                runCalibrationTests();
+            }, 1000);
         });
     </script>
 </body>
