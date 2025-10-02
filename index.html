@@ -1311,37 +1311,6 @@
         </div>
     </header>
     <div class="container">
-        <div class="content-wrapper narrow-content">
-            <article class="model-explanation">
-                <span class="eyebrow">How this works</span>
-                <h2>The stacked hazard job loss model</h2>
-                <p>This publication distills a stacked hazard framework for thinking about automation risk.</p>
-                <div class="equation-callout">
-                    <span class="callout-label">Survival relationship</span>
-                    <code>P<sub>loss</sub>(t) = 1 - S(t) = 1 - exp(-&int;<sub>0</sub><sup>t</sup> I<sub>total</sub>(s) ds)</code>
-                </div>
-                <div class="equation-callout">
-                    <span class="callout-label">Total hazard</span>
-                    <code>I<sub>total</sub>(s) = I<sub>AI</sub>(s) + I<sub>macro</sub>(s) + I<sub>firm</sub>(s) + I<sub>role</sub>(s) + I<sub>personal</sub>(s)</code>
-                </div>
-                <p>Right now the interactive experience concentrates on the AI hazard term. As you answer the prompts the curve shifts to reflect capability readiness, friction, and adaptability.</p>
-                <div class="equation-callout">
-                    <span class="callout-label">AI hazard component</span>
-                    <code>I<sub>AI</sub>(s) = h<sub>AI</sub> / (1 + exp(-k [A(s) - I<sub>0</sub> - b H(s) - c T<sub>adapt</sub>(s)]))</code>
-                </div>
-                <ul class="factor-grid">
-                    <li><strong>A(s)</strong> capability growth in your field</li>
-                    <li><strong>H(s)</strong> organizational and regulatory friction</li>
-                    <li><strong>T<sub>adapt</sub>(s)</strong> how easily tasks can shift to AI</li>
-                    <li><strong>h<sub>AI</sub></strong> scaling constant for overall intensity</li>
-                    <li><strong>I<sub>0</sub></strong> baseline adoption threshold</li>
-                    <li><strong>k</strong> steepness of the adoption curve</li>
-                    <li><strong>b, c</strong> sensitivity to friction and adaptability</li>
-                </ul>
-                <p class="note">Macro, firm, role, and personal hazards stay at zero for now - the layout is ready for those chapters once the research solidifies.</p>
-            </article>
-        </div>
-
         <div class="content-wrapper">
             <div class="scenario-selector">
                 <button class="scenario-btn active" onclick="setScenario('custom')">Custom Analysis</button>
@@ -1356,8 +1325,8 @@
                 <li><strong>Still substantial probability:</strong> Superhuman coding could arrive as early as 2027</li>
                 <li><strong>ASI timeline:</strong> Artificial Superintelligence potentially 1-2 years after superhuman coding</li>
                 <li><strong>Exponential algorithmic progress:</strong> Self-improving AI systems accelerate R&D 5-8x once superhuman coding is achieved</li>
-                <li><strong>Technical assumptions:</strong> AI capability doubling every 4-7 months, compute scaling at 2.25x annually</li>
-                <li><strong>Key mechanism:</strong> Expert-human-level AI systems automate AI research itself, creating rapid recursive improvement</li>
+                <li><strong>Technical assumptions:</strong> AI capability doubling every 5-6 months, compute scaling at 3.4x annually (leading AI labs)</li>
+                <li><strong>Key mechanism:</strong> Expert-human-level AI systems automate AI research itself, creating rapid recursive improvement through multiplicative scaling effects</li>
             </ul>
             <p class="note"><em>Note: The team has lengthened their median timeline by ~1.5 years based on recent AI progress. This still represents an aggressive scenario with substantial uncertainty.</em></p>
             </div>
@@ -2115,28 +2084,34 @@
 
             <section class="ai-equation">
                 <div class="section-intro">
-                    <span class="eyebrow">Model math</span>
-                    <h3>AI hazard function</h3>
-                    <p>Tune the sliders to explore how different progress assumptions bend the hazard curve. Faster capability compounding or lower friction pulls the timeline forward.</p>
+                    <span class="eyebrow">How this works</span>
+                    <h3>The stacked hazard job loss model</h3>
+                    <p>This publication distills a stacked hazard framework for thinking about automation risk. Tune the sliders above to explore how different progress assumptions bend the hazard curve—faster capability compounding or lower friction pulls the timeline forward.</p>
                 </div>
                 <div class="equation-callout">
                     <span class="callout-label">Survival relationship</span>
-                    <code>P<sub>loss</sub>(t) = 1 - S(t) = 1 - exp(-&int;<sub>0</sub><sup>t</sup> I<sub>AI</sub>(s) ds)</code>
+                    <code>P<sub>loss</sub>(t) = 1 - S(t) = 1 - exp(-&int;<sub>0</sub><sup>t</sup> I<sub>total</sub>(s) ds)</code>
                 </div>
                 <div class="equation-callout">
-                    <span class="callout-label">Hazard form</span>
-                    <code>I<sub>AI</sub>(s) = h<sub>AI</sub> / (1 + exp(-k [A(s) - I<sub>0</sub> - b H(s) - c T<sub>adapt</sub>(s)]))</code>
+                    <span class="callout-label">Total hazard (stacked framework)</span>
+                    <code>I<sub>total</sub>(s) = I<sub>AI</sub>(s) + I<sub>macro</sub>(s) + I<sub>firm</sub>(s) + I<sub>role</sub>(s) + I<sub>personal</sub>(s)</code>
+                </div>
+                <p>Right now the interactive experience concentrates on the AI hazard term. As you answer the prompts the curve shifts to reflect capability readiness, friction, and adaptability.</p>
+                <div class="equation-callout">
+                    <span class="callout-label">AI hazard component</span>
+                    <code>I<sub>AI</sub>(s) = h<sub>AI</sub> / (1 + exp(-k [A(s) · C(s) - I<sub>0</sub> - b H(s) - c T<sub>adapt</sub>(s)]))</code>
                 </div>
                 <ul class="factor-grid factor-grid--compact">
-                    <li><strong>A(s)</strong> capability runway for your role</li>
-                    <li><strong>H(s)</strong> cultural or regulatory drag</li>
-                    <li><strong>T<sub>adapt</sub>(s)</strong> adaptability of day-to-day tasks</li>
-                    <li><strong>h<sub>AI</sub></strong> overall intensity scaling</li>
-                    <li><strong>I<sub>0</sub></strong> adoption threshold to clear</li>
-                    <li><strong>k</strong> steepness controlling how fast adoption accelerates</li>
-                    <li><strong>b, c</strong> sensitivity to friction and task adaptability</li>
+                    <li><strong>A(s)</strong> AI capability growth (exp. doubling every 5-7 months)</li>
+                    <li><strong>C(s)</strong> compute scaling effect (3.4-5x/year for leading labs)</li>
+                    <li><strong>H(s)</strong> organizational and regulatory friction</li>
+                    <li><strong>T<sub>adapt</sub>(s)</strong> how easily tasks can shift to AI</li>
+                    <li><strong>h<sub>AI</sub></strong> scaling constant for overall intensity</li>
+                    <li><strong>I<sub>0</sub></strong> baseline adoption threshold</li>
+                    <li><strong>k</strong> steepness of the adoption curve</li>
+                    <li><strong>b, c</strong> sensitivity to friction and adaptability</li>
                 </ul>
-                <p class="note">We keep the math faithful while presenting it like a clean margin note in a long-form essay.</p>
+                <p class="note">Macro, firm, role, and personal hazards stay at zero for now—the layout is ready for those chapters once the research solidifies. Compute and algorithmic improvements compound multiplicatively, reflecting empirical scaling laws.</p>
             </section>
             <div class="results">
                 <div class="result-card" id="median-card">
@@ -2170,7 +2145,7 @@
 
         const ai2027Assumptions = {
             aiDoublingMonths: 6,
-            computeScaling: 2.25,
+            computeScaling: 3.4,
             superhumanCoderModal: 2027,
             superhumanCoderMedian: 2030,
             asiMedian: 2031
@@ -2187,9 +2162,9 @@
             if (scenario === 'ai2027') {
                 warning.classList.add('active');
                 document.getElementById('ai-doubling').value = 6;
-                document.getElementById('compute-scaling').value = 2.25;
+                document.getElementById('compute-scaling').value = 3.4;
                 document.getElementById('ai-doubling-value').textContent = '6 mo';
-                document.getElementById('compute-scaling-value').textContent = '2.25x';
+                document.getElementById('compute-scaling-value').textContent = '3.40x';
             } else {
                 warning.classList.remove('active');
             }
@@ -2426,14 +2401,20 @@
             const h = H(t);
             const computeMultiplier = parseFloat(document.getElementById('compute-scaling').value);
             const industryPace = parseFloat(document.getElementById('industry-pace').value);
-            
-            const computeEffect = Math.pow(computeMultiplier, t / 2);
+
+            // Compute scaling now grows exponentially per year (not every 2 years)
+            // Research shows 3.4-5x/year for leading labs, compounding annually
+            const computeEffect = Math.pow(computeMultiplier, t);
             const industryEffect = industryPace;
-            
-            const exponent = -currentParams.gamma * 
-                (a * Math.log(computeEffect * industryEffect) - 
+
+            // A(t) and compute effects multiply - both are exponential
+            // This reflects empirical scaling laws where compute + algorithmic progress compound
+            const combinedCapability = a * computeEffect;
+
+            const exponent = -currentParams.gamma *
+                (Math.log(combinedCapability * industryEffect) -
                  currentParams.theta0 - currentParams.kappa * h);
-            
+
             return currentParams.h0 / (1 + Math.exp(exponent));
         }
 
