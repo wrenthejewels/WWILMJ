@@ -2300,9 +2300,9 @@
             Q15: { amp: +0.30 },  // Labor cost pressure: higher pressure = more automation incentive
             Q17: { amp: +0.35 },  // IT infrastructure: modern systems = easier automation
 
-            // Q5 & Q6 have REVERSED scales in HTML - need negative amp
-            Q5:  { amp: -0.50 },  // Task decomposability: 5=Very Complex (protective)
-            Q6:  { amp: -0.45 },  // Task standardization: 5=Highly Variable (protective)
+            // Q5 & Q6 have REVERSED scales in HTML but original weights were correct
+            Q5:  { fric: -0.50 }, // Task decomposability: 5=Very Complex (protective)
+            Q6:  { amp: +0.45 },  // Task standardization: 1=Highly Standard (risky)
 
             // Friction/protective factors (higher value = LESS automation risk)
             Q7:  { fric: -0.50 }, // Context dependency: high context = protective
@@ -2351,7 +2351,7 @@
                 // Accelerators (higher = faster/earlier automation)
                 Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q8: +0.12, Q14: +0.10, Q15: +0.12, Q17: +0.12,
                 // Decelerators (higher = slower/later automation)
-                Q5: +0.20, Q6: +0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15, Q16: -0.20, Q18: -0.15, Q19: -0.10, Q20: -0.10, Q21: -0.10
+                Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15, Q16: -0.20, Q18: -0.15, Q19: -0.10, Q20: -0.10, Q21: -0.10
             };
             for (const [qid, raw] of Object.entries(answers)) {
                 const x = codeAnswer(qid, raw);
