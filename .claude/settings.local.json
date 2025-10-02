@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git log:*)",
+      "Bash(git reset:*)",
+      "Bash(dir:*)",
+      "Read(//c/Users/clayw/**)",
+      "WebSearch",
+      "Bash(git revert:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
