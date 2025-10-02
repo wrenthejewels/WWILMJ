@@ -38,16 +38,6 @@
             text-align: center;
         }
 
-        .content-wrapper {
-            width: 65%;
-            margin: 0 auto;
-            padding: 20px 40px;
-        }
-
-        .narrow-content {
-            width: 100%;
-            margin: 0 auto;
-        }
         
         h1 {
             color: white;
@@ -179,6 +169,18 @@
 
         .expand-icon.rotated {
             transform: rotate(180deg);
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 16px;
+        }
+
+        @media (max-width: 1000px) {
+            .question-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .additional-questions {
@@ -546,6 +548,7 @@
             }
 
             .content-wrapper {
+                width: 95%;
                 padding: 30px 15px;
             }
 
@@ -787,9 +790,14 @@
             max-width: 32ch;
         }
 
-        .content-wrapper,
+        .content-wrapper {
+            width: 85%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
         .narrow-content {
-            max-width: 720px;
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -1293,11 +1301,13 @@
                 </ul>
                 <p class="note">Macro, firm, role, and personal hazards stay at zero for now - the layout is ready for those chapters once the research solidifies.</p>
             </article>
-        </div>
+
+        <div class="content-wrapper">
             <div class="scenario-selector">
                 <button class="scenario-btn active" onclick="setScenario('custom')">Custom Analysis</button>
                 <button class="scenario-btn" onclick="setScenario('ai2027')">AI 2027 Scenario</button>
             </div>
+        </div>
 
         <div class="content-wrapper">
             <div class="ai2027-warning" id="ai2027-warning">
@@ -1371,7 +1381,8 @@
 
                 <div class="section-category">
                     <h4>AI Technical Readiness</h4>
-                    
+
+                    <div class="question-grid">
                     <div class="question-group">
                         <h5>1. Current AI Performance</h5>
                         <p>How well can AI already perform core tasks in your field?</p>
@@ -1479,11 +1490,13 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <div class="section-category">
                     <h4>Task Structure & Adaptability</h4>
 
+                    <div class="question-grid">
                     <div class="question-group">
                         <h5>5. Task Decomposability</h5>
                         <p>Can your work be broken into discrete, measurable tasks?</p>
@@ -1618,11 +1631,13 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <div class="section-category">
                     <h4>Human & Organizational Factors</h4>
 
+                    <div class="question-grid">
                     <div class="question-group">
                         <h5>10. Human Judgment & Relationships</h5>
                         <p>How critical are human relationships, empathy, and trust in your role?</p>
@@ -1730,11 +1745,13 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <div class="section-category">
                     <h4>Company & Industry Context</h4>
 
+                    <div class="question-grid">
                     <div class="question-group">
                         <h5>14. Company AI Adoption Readiness</h5>
                         <p>How prepared is your organization for AI integration?</p>
@@ -1842,11 +1859,13 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <div class="section-category">
                     <h4>Personal Adaptability</h4>
 
+                    <div class="question-grid">
                     <div class="question-group">
                         <h5>18. Skill Transferability</h5>
                         <p>How transferable are your core skills to other roles/industries?</p>
@@ -1953,6 +1972,7 @@
                                 <label for="q21-5">Top Performer</label>
                             </div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
