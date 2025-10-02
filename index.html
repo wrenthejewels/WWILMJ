@@ -2409,10 +2409,15 @@
 
             // A(t) and compute effects multiply - both are exponential
             // This reflects empirical scaling laws where compute + algorithmic progress compound
-            const combinedCapability = a * computeEffect;
+            const combinedCapability = a * computeEffect * industryEffect;
+
+            // CRITICAL: Use combinedCapability directly (not log) to preserve exponential growth
+            // Once AI crosses threshold, capabilities compound explosively (64x/year at 2mo doubling + 5x compute = 320x/year)
+            // The sigmoid keeps it bounded but the exponential term creates rapid takeoff once threshold is crossed
+            const capabilityPressure = combinedCapability / 10; // Scale factor for numerical stability
 
             const exponent = -currentParams.gamma *
-                (Math.log(combinedCapability * industryEffect) -
+                (capabilityPressure -
                  currentParams.theta0 - currentParams.kappa * h);
 
             return currentParams.h0 / (1 + Math.exp(exponent));
