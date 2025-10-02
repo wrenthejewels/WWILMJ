@@ -1458,7 +1458,7 @@
                         </div>
                         <div class="radio-option">
                             <input type="radio" id="seniority-5" name="seniority" value="5">
-                            <label for="seniority-5">Executive/C-Suite</label>
+                            <label for="seniority-5">Executive</label>
                         </div>
                     </div>
                 </div>
@@ -2325,8 +2325,10 @@
             const frictionValue = 1 + (friction / 5) * 7 + (personalAdapt / 5) * 2;
 
             // Increase threshold for higher seniority - AI needs to be more capable to automate senior roles
-            // Entry(1): 1.0x, Mid(2): 1.4x, Senior(3): 1.8x, Lead(4): 2.2x, Executive(5): 2.6x
-            theta0 = theta0 * (1 + (seniority - 1) * 0.4);
+            // Entry(1): 1.0x, Mid(2): 1.2x, Senior(3): 1.4x, Lead(4): 1.6x, Executive(5): 1.75x
+            // More modest increases - senior roles converge in required AI capability
+            const seniorityThresholdMultipliers = [1.0, 1.2, 1.4, 1.6, 1.75];
+            theta0 = theta0 * seniorityThresholdMultipliers[seniority - 1];
 
             currentParams = {
                 name: roleName,
@@ -2532,10 +2534,11 @@
                 const frictionMultiplier = 1 / (1 + currentParams.kappa * h / 5);
 
                 // Seniority multiplier - higher seniority = harder to automate
-                // Entry(1): 1.0x, Mid(2): 0.75x, Senior(3): 0.5x, Lead(4): 0.3x, Executive(5): 0.15x
-                // 25% reduction per level reflects corporate pyramid + strategic decision-making
-                // Also increases threshold to delay when automation becomes viable
-                const seniorityMultiplier = 1 - (currentParams.seniority - 1) * 0.25;
+                // Entry(1): 1.0x, Mid(2): 0.8x, Senior(3): 0.6x, Lead(4): 0.45x, Executive(5): 0.35x
+                // Progressive reduction: 20%, 20%, 15%, 10% - diminishing as you go higher
+                // Reflects that senior+ roles converge in automation difficulty
+                const seniorityReductions = [0, 0.2, 0.4, 0.55, 0.65]; // cumulative reduction
+                const seniorityMultiplier = 1 - seniorityReductions[currentParams.seniority - 1];
 
                 // Return clamped hazard (max 0.95 to prevent numerical issues)
                 return Math.min(0.95, rawHazard * frictionMultiplier * seniorityMultiplier);
