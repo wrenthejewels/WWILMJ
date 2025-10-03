@@ -919,6 +919,34 @@
             gap: 4px;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: #1f1c18;
+            color: #ffffff;
+            border: 1px solid #1f1c18;
+            border-radius: 999px;
+            padding: 12px 28px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(31, 28, 24, 0.15);
+        }
+
+        .header-btn:hover {
+            background: #3f392f;
+            border-color: #3f392f;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(31, 28, 24, 0.25);
+        }
+
         .publication-title {
             font-family: 'Playfair Display', 'Georgia', serif;
             font-size: 1.4rem;
@@ -1307,8 +1335,7 @@
         }
 
         .result-card.critical {
-            border-color: #a9533a;
-            box-shadow: 0 24px 60px rgba(169, 83, 58, 0.25);
+            /* Removed red/orange background styling */
         }
 
         .footer-note {
@@ -1334,6 +1361,11 @@
                 justify-content: flex-start;
             }
 
+            .header-btn {
+                padding: 10px 20px;
+                font-size: 0.8rem;
+            }
+
             .container {
                 padding: 0 20px 80px;
             }
@@ -1357,6 +1389,10 @@
                 <span class="publication-title">Don't Lose Your Job</span>
                 <span class="publication-tagline">Forecasting work in the age of AI</span>
                 <a href="https://x.com/wrenclay" target="_blank" class="author-link">Clay Wren</a>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="window.location.href='#calculator'">Calculator</button>
+                <button class="header-btn" onclick="window.location.href='#guide'">Guide</button>
             </div>
         </div>
     </header>
