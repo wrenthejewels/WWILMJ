@@ -2615,7 +2615,7 @@
         function A(t) {
             const doublingMonths = parseFloat(document.getElementById('ai-doubling').value);
             const doublingRate = Math.log(2) / (doublingMonths / 12);
-            return Math.exp(doublingRate * t);
+            return Math.exp(doublingRate * 2 * t);
         }
 
         function H(t) {
