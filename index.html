@@ -2391,8 +2391,8 @@
             return { ampMult: Math.exp(sumAmp), fricMult: Math.exp(sumFric) };
         }
 
-        // Calculate implementation delay in years (0.5 - 3 years)
-        function calculateImplementationDelay(answers) {
+        // Calculate implementation delay in years (0.5 - 3 years), scaled by seniority
+        function calculateImplementationDelay(answers, seniority) {
             let delayScore = 0;
             for (const [qid, weight] of Object.entries(IMPLEMENTATION_WEIGHTS)) {
                 const raw = answers[qid];
@@ -2404,8 +2404,15 @@
             const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
             delayScore = clamp(delayScore, -2.0, +2.0);
             // Map -2 to 3 years, 0 to 1.75 years, +2 to 0.5 years
-            const delay = 1.75 - (delayScore * 1.25);
-            return Math.max(0.5, Math.min(3.0, delay));
+            let delay = 1.75 - (delayScore * 1.25);
+            delay = Math.max(0.5, Math.min(3.0, delay));
+
+            // Scale by seniority - higher seniority = more delay
+            // Entry: 1.0x, Mid: 1.2x, Senior: 1.4x, Lead: 1.6x, Executive: 1.8x
+            const seniorityDelayMultipliers = [1.0, 1.2, 1.4, 1.6, 1.8];
+            delay *= seniorityDelayMultipliers[seniority - 1];
+
+            return delay;
         }
 
         // Optional timing shift via capability gate steepness k
@@ -2413,9 +2420,10 @@
             let sumK = 0;
             const K_WEIGHTS = {
                 // Accelerators (higher = faster/earlier automation)
-                Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q8: +0.12, Q14: +0.10, Q15: +0.12, Q17: +0.12,
+                Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q8: +0.12,
                 // Decelerators (higher = slower/later automation)
-                Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15, Q16: -0.20, Q18: -0.15, Q19: -0.10, Q20: -0.10, Q21: -0.10
+                Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15, Q18: -0.15, Q19: -0.10, Q20: -0.10, Q21: -0.10
+                // Q14-Q17 REMOVED - now only affect implementation delay
             };
             for (const [qid, raw] of Object.entries(answers)) {
                 const x = codeAnswer(qid, raw);
@@ -2479,8 +2487,8 @@
             // Apply optional timing shift (capability gate steepness adjustment)
             const gammaEffective = kEff(gamma, answers);
 
-            // Calculate implementation delay
-            const implementationDelay = calculateImplementationDelay(answers);
+            // Calculate implementation delay (scaled by seniority)
+            const implementationDelay = calculateImplementationDelay(answers, seniority);
 
             currentParams = {
                 name: roleName,
@@ -2592,7 +2600,7 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: 'Technical Feasibility',
+                        label: 'Technical Feasibility of Automation',
                         data: [],
                         borderColor: '#2a5298',
                         backgroundColor: 'rgba(42, 82, 152, 0.1)',
