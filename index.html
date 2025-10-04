@@ -2430,7 +2430,8 @@
         }
 
         // Calculate re-employment probability (0-1 scale)
-        function calculateReemploymentProbability(answers) {
+        // Dependent on technical feasibility timing and seniority
+        function calculateReemploymentProbability(answers, seniority, medianTechYears) {
             let reemployScore = 0;
             for (const [qid, weight] of Object.entries(REEMPLOYMENT_WEIGHTS)) {
                 const raw = answers[qid];
@@ -2439,9 +2440,24 @@
             }
             const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
             reemployScore = clamp(reemployScore, -2.0, +2.0);
-            // Map -2 to 0.2 (20% chance), 0 to 0.6 (60%), +2 to 1.0 (100%)
-            const probability = 0.6 + (reemployScore * 0.2);
-            return clamp(probability, 0.2, 1.0);
+
+            // Base probability from adaptability factors
+            let probability = 0.6 + (reemployScore * 0.2);
+
+            // Penalize based on how soon automation happens (sooner = harder to find work)
+            // If median is <3 years: -30%, 3-7 years: -15%, 7-12 years: -5%, >12 years: 0%
+            let timingPenalty = 0;
+            if (medianTechYears < 3) timingPenalty = 0.30;
+            else if (medianTechYears < 7) timingPenalty = 0.15;
+            else if (medianTechYears < 12) timingPenalty = 0.05;
+            probability -= timingPenalty;
+
+            // Modest seniority boost (everyone struggles, but experience helps a bit)
+            // Entry: 1.0x, Mid: 1.05x, Senior: 1.08x, Lead: 1.10x, Executive: 1.12x
+            const seniorityBoosts = [1.0, 1.05, 1.08, 1.10, 1.12];
+            probability *= seniorityBoosts[seniority - 1];
+
+            return clamp(probability, 0.1, 0.85); // Cap at 85% - no one is guaranteed
         }
 
         // Optional timing shift via capability gate steepness k (affects BLUE curve only)
@@ -2521,9 +2537,6 @@
             // Calculate implementation delay (scaled by seniority)
             const implementationDelay = calculateImplementationDelay(answers, seniority);
 
-            // Calculate re-employment probability
-            const reemploymentProbability = calculateReemploymentProbability(answers);
-
             currentParams = {
                 name: roleName,
                 h0: h0_base,
@@ -2543,9 +2556,8 @@
                 fricMult: fricMult,
                 answers: answers,
                 // Implementation delay for actual job loss
-                implementationDelay: implementationDelay,
-                // Re-employment probability
-                reemploymentProbability: reemploymentProbability
+                implementationDelay: implementationDelay
+                // Re-employment probability calculated in updateResults (needs medianTech)
             };
 
             if (currentScenario === 'ai2027') {
@@ -2955,13 +2967,18 @@
             document.getElementById('risk-2031').textContent =
                 `${(Math.max(0, risk2031) * 100).toFixed(1)}%`;
 
-            // Re-employment likelihood
-            const reemployProb = currentParams.reemploymentProbability || 0.6;
+            // Re-employment likelihood (calculated here with medianTech timing)
+            const reemployProb = calculateReemploymentProbability(
+                currentParams.answers,
+                currentParams.seniority,
+                medianTech
+            );
             const reemployPct = (reemployProb * 100).toFixed(0);
             let reemployLabel = 'Moderate';
-            if (reemployProb >= 0.8) reemployLabel = 'High';
-            else if (reemployProb >= 0.65) reemployLabel = 'Good';
-            else if (reemployProb < 0.4) reemployLabel = 'Low';
+            if (reemployProb >= 0.7) reemployLabel = 'Good';
+            else if (reemployProb >= 0.5) reemployLabel = 'Moderate';
+            else if (reemployProb >= 0.3) reemployLabel = 'Low';
+            else reemployLabel = 'Very Low';
             document.getElementById('reemployment-value').textContent =
                 `${reemployLabel} (${reemployPct}%)`;
         }
