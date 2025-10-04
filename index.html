@@ -2656,7 +2656,7 @@
                 const frictionMultiplier = 1 / (1 + currentParams.kappa * h / 5);
 
                 // Seniority multiplier - higher seniority = harder to automate
-                const seniorityReductions = [0, 0.2, 0.4, 0.55, 0.65];
+                const seniorityReductions = [0, 0.25, 0.45, 0.60, 0.70];
                 const seniorityMultiplier = 1 - seniorityReductions[currentParams.seniority - 1];
 
                 baseHazard = baseHazard * frictionMultiplier * seniorityMultiplier;
