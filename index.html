@@ -2449,8 +2449,8 @@
             const frictionValue = 3.0;
 
             // Increase threshold for higher seniority - AI needs to be more capable to automate senior roles
-            // Entry(1): 1.0x, Mid(2): 1.49x, Senior(3): 1.74x, Lead(4): 1.99x, Executive(5): 2.17x
-            const seniorityThresholdMultipliers = [1.0, 1.49, 1.74, 1.99, 2.17];
+            // Entry(1): 1.0x, Mid(2): 1.61x, Senior(3): 2.00x, Lead(4): 2.11x, Executive(5): 2.43x
+            const seniorityThresholdMultipliers = [1.0, 1.61, 2.00, 2.11, 2.43];
             theta0 = theta0 * seniorityThresholdMultipliers[seniority - 1];
 
             // Apply optional timing shift (capability gate steepness adjustment)
