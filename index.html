@@ -2600,25 +2600,25 @@
             if (risk25 < 10) {
                 events.push({
                     date: (currentYear + risk25).toFixed(1),
-                    description: '25% automation risk'
+                    description: '25% risk AI can technically automate role'
                 });
             }
             if (risk50 < 15) {
                 events.push({
                     date: (currentYear + risk50).toFixed(1),
-                    description: '50% automation risk'
+                    description: '50% risk AI can technically automate role'
                 });
             }
             if (risk75 < 20) {
                 events.push({
                     date: (currentYear + risk75).toFixed(1),
-                    description: '75% automation risk'
+                    description: '75% risk AI can technically automate role'
                 });
             }
             if (risk90 < 25) {
                 events.push({
                     date: (currentYear + risk90).toFixed(1),
-                    description: '90% automation risk'
+                    description: '90% risk AI can technically automate role'
                 });
             }
             
@@ -2981,6 +2981,9 @@
             else reemployLabel = 'Very Low';
             document.getElementById('reemployment-value').textContent =
                 `${reemployLabel} (${reemployPct}%)`;
+
+            // Update personal timeline table
+            updatePersonalTimeline();
         }
 
         document.getElementById('ai-doubling')?.addEventListener('input', function() {
