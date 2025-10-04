@@ -2254,6 +2254,10 @@
                     <h4>Risk by 2031</h4>
                     <div class="result-value" id="risk-2031">-</div>
                 </div>
+                <div class="result-card" id="reemployment-card">
+                    <h4>Re-employment Likelihood</h4>
+                    <div class="result-value" id="reemployment-value">-</div>
+                </div>
             </div>
                 </div>
             </div>
@@ -2330,14 +2334,14 @@
             return checked ? parseFloat(checked.value) : 3;
         }
 
-        // Per-question log-hazard multipliers for TECHNICAL FEASIBILITY
+        // Per-question log-hazard multipliers for TECHNICAL FEASIBILITY (Blue Curve)
+        // ONLY factors that determine when AI CAN technically do the job
         const QUESTION_WEIGHTS = {
             // High-risk amplifiers (higher value = MORE automation risk)
             Q1:  { amp: +0.80 },  // AI performance: better AI = more risk
             Q2:  { amp: +0.40 },  // Data availability: more data = easier automation
             Q3:  { amp: +0.35 },  // Benchmark clarity: clear metrics = easier automation
             Q4:  { amp: +0.55 },  // Task digitization: more digital = more automatable
-            // Q14-Q17 REMOVED - now only affect implementation delay
 
             // Q5 & Q6 have REVERSED scales in HTML but original weights were correct
             Q5:  { fric: -0.50 }, // Task decomposability: 5=Very Complex (protective)
@@ -2351,21 +2355,29 @@
             Q11: { fric: -0.85 }, // Union/labor protections: strong unions = protective
             Q12: { amp: -0.60 },  // Physical presence: more physical = protective
             Q13: { fric: -0.35 }, // Trust requirements: high trust needs = protective
-            // Q16 REMOVED - labor market tightness now affects implementation delay
-            Q18: { fric: -0.40 }, // Skill transferability: transferable = worker can adapt (protective)
-            Q19: { fric: -0.30 }, // AI complementarity: amplify mode = protective
-            Q20: { fric: -0.35 }, // Adaptability: fast learner = protective
-            Q21: { fric: -0.30 }, // Job performance: top performers = protective
+            // Q14-Q17: Company/Industry context - affects implementation delay only
+            // Q18, Q20: Re-employment factors - affects job search success only
+            // Q19, Q21: Job retention factors - affects implementation delay only
         };
 
-        // Implementation delay weights (Q14-Q17) - delays actual job loss from technical feasibility
+        // Implementation delay weights - delays actual job loss from technical feasibility (Green Curve)
         // Formula: delay = 1.75 - (delayScore * 1.25)
         // To get MORE delay when value is LOW, we need POSITIVE weight (converts negative coded value to negative score)
         const IMPLEMENTATION_WEIGHTS = {
+            // Company/Industry Context (Q14-Q17)
             Q14: +0.40,  // Company AI adoption: 1=Resistant (more delay), 5=Leading Edge (less delay)
             Q15: +0.30,  // Labor cost pressure: 1=Not Sensitive (more delay), 5=Extremely Sensitive (less delay)
             Q16: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay) - REVERSED, needs negative weight
             Q17: +0.35,  // IT infrastructure: 1=Very Outdated (more delay), 5=Cutting Edge (less delay)
+            // Job Retention Factors (Q19, Q21)
+            Q19: -0.25,  // AI complementarity: 5=Amplify Only (more delay), 1=Replace Only (less delay) - employer keeps you longer
+            Q21: -0.25,  // Job performance: 5=Top 10% (more delay), 1=Below Average (less delay) - top performers retained longer
+        };
+
+        // Re-employment probability weights (Q18, Q20) - affects ability to find new job
+        const REEMPLOYMENT_WEIGHTS = {
+            Q18: +0.50,  // Skill transferability: 5=Highly Transferable (higher re-employment), 1=Highly Specific (lower)
+            Q20: +0.50,  // Adaptability: 5=Very Fast (higher re-employment), 1=Very Slow (lower)
         };
 
         // Code raw answers to numeric x_i, aiming for symmetric effects
@@ -2417,15 +2429,32 @@
             return delay;
         }
 
-        // Optional timing shift via capability gate steepness k
+        // Calculate re-employment probability (0-1 scale)
+        function calculateReemploymentProbability(answers) {
+            let reemployScore = 0;
+            for (const [qid, weight] of Object.entries(REEMPLOYMENT_WEIGHTS)) {
+                const raw = answers[qid];
+                const x = codeAnswer(qid, raw);
+                reemployScore += weight * x;
+            }
+            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+            reemployScore = clamp(reemployScore, -2.0, +2.0);
+            // Map -2 to 0.2 (20% chance), 0 to 0.6 (60%), +2 to 1.0 (100%)
+            const probability = 0.6 + (reemployScore * 0.2);
+            return clamp(probability, 0.2, 1.0);
+        }
+
+        // Optional timing shift via capability gate steepness k (affects BLUE curve only)
         function kEff(baseK, answers) {
             let sumK = 0;
             const K_WEIGHTS = {
                 // Accelerators (higher = faster/earlier automation)
                 Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q8: +0.12,
                 // Decelerators (higher = slower/later automation)
-                Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15, Q18: -0.15, Q19: -0.10, Q20: -0.10, Q21: -0.10
-                // Q14-Q17 REMOVED - now only affect implementation delay
+                Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15
+                // Q14-Q17: Company/Industry - affects GREEN curve only
+                // Q18, Q20: Re-employment - affects re-employment metric only
+                // Q19, Q21: Job retention - affects GREEN curve only
             };
             for (const [qid, raw] of Object.entries(answers)) {
                 const x = codeAnswer(qid, raw);
@@ -2492,6 +2521,9 @@
             // Calculate implementation delay (scaled by seniority)
             const implementationDelay = calculateImplementationDelay(answers, seniority);
 
+            // Calculate re-employment probability
+            const reemploymentProbability = calculateReemploymentProbability(answers);
+
             currentParams = {
                 name: roleName,
                 h0: h0_base,
@@ -2511,7 +2543,9 @@
                 fricMult: fricMult,
                 answers: answers,
                 // Implementation delay for actual job loss
-                implementationDelay: implementationDelay
+                implementationDelay: implementationDelay,
+                // Re-employment probability
+                reemploymentProbability: reemploymentProbability
             };
 
             if (currentScenario === 'ai2027') {
@@ -2920,6 +2954,16 @@
                 `${(Math.max(0, risk2030) * 100).toFixed(1)}%`;
             document.getElementById('risk-2031').textContent =
                 `${(Math.max(0, risk2031) * 100).toFixed(1)}%`;
+
+            // Re-employment likelihood
+            const reemployProb = currentParams.reemploymentProbability || 0.6;
+            const reemployPct = (reemployProb * 100).toFixed(0);
+            let reemployLabel = 'Moderate';
+            if (reemployProb >= 0.8) reemployLabel = 'High';
+            else if (reemployProb >= 0.65) reemployLabel = 'Good';
+            else if (reemployProb < 0.4) reemployLabel = 'Low';
+            document.getElementById('reemployment-value').textContent =
+                `${reemployLabel} (${reemployPct}%)`;
         }
 
         document.getElementById('ai-doubling')?.addEventListener('input', function() {
