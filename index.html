@@ -2422,8 +2422,8 @@
             delay = Math.max(0.5, Math.min(3.0, delay));
 
             // Scale by seniority - higher seniority = more delay
-            // Entry: 1.0x, Mid: 1.2x, Senior: 1.4x, Lead: 1.6x, Executive: 1.8x
-            const seniorityDelayMultipliers = [1.0, 1.2, 1.4, 1.6, 1.8];
+            // Entry: 0.5x (green curve closer to blue), Mid: 1.2x, Senior: 1.4x, Lead: 1.6x, Executive: 1.8x
+            const seniorityDelayMultipliers = [0.5, 1.2, 1.4, 1.6, 1.8];
             delay *= seniorityDelayMultipliers[seniority - 1];
 
             return delay;
