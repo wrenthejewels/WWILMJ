@@ -2858,12 +2858,8 @@
                 high < 50 ? `${high.toFixed(1)} years` : 'Beyond 2050';
             document.getElementById('risk-2030').textContent = 
                 `${(risk2030 * 100).toFixed(1)}%`;
-            document.getElementById('risk-2031').textContent = 
+            document.getElementById('risk-2031').textContent =
                 `${(risk2031 * 100).toFixed(1)}%`;
-            
-            document.getElementById('risk5-card').classList.toggle('critical', risk2030 > 0.5);
-            document.getElementById('risk10-card').classList.toggle('critical', risk2031 > 0.7);
-            document.getElementById('median-card').classList.toggle('critical', median < 5);
         }
 
         document.getElementById('ai-doubling')?.addEventListener('input', function() {
