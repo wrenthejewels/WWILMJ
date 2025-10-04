@@ -2359,11 +2359,13 @@
         };
 
         // Implementation delay weights (Q14-Q17) - delays actual job loss from technical feasibility
+        // Formula: delay = 1.75 - (delayScore * 1.25)
+        // To get MORE delay when value is LOW, we need POSITIVE weight (converts negative coded value to negative score)
         const IMPLEMENTATION_WEIGHTS = {
-            Q14: -0.40,  // Company AI adoption: resistant = more delay
-            Q15: -0.30,  // Labor cost pressure: low pressure = more delay
-            Q16: +0.35,  // Labor market tightness: hard to hire = more delay (protective)
-            Q17: -0.35,  // IT infrastructure: outdated = more delay
+            Q14: +0.40,  // Company AI adoption: 1=Resistant (more delay), 5=Leading Edge (less delay)
+            Q15: +0.30,  // Labor cost pressure: 1=Not Sensitive (more delay), 5=Extremely Sensitive (less delay)
+            Q16: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay) - REVERSED, needs negative weight
+            Q17: +0.35,  // IT infrastructure: 1=Very Outdated (more delay), 5=Cutting Edge (less delay)
         };
 
         // Code raw answers to numeric x_i, aiming for symmetric effects
