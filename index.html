@@ -2235,7 +2235,6 @@
                     <li><strong>k</strong> steepness of the adoption curve</li>
                     <li><strong>b, c</strong> sensitivity to friction and adaptability</li>
                 </ul>
-                <p class="note">Macro, firm, role, and personal hazards stay at zero for now—the layout is ready for those chapters once the research solidifies. Compute and algorithmic improvements compound multiplicatively, reflecting empirical scaling laws.</p>
             </section>
             <div class="results">
                 <div class="result-card" id="median-card">
@@ -2449,8 +2448,8 @@
             const frictionValue = 3.0;
 
             // Increase threshold for higher seniority - AI needs to be more capable to automate senior roles
-            // Entry(1): 1.0x, Mid(2): 1.38x, Senior(3): 1.61x, Lead(4): 1.84x, Executive(5): 2.01x
-            const seniorityThresholdMultipliers = [1.0, 1.38, 1.61, 1.84, 2.01];
+            // Entry(1): 1.0x, Mid(2): 1.49x, Senior(3): 1.74x, Lead(4): 1.99x, Executive(5): 2.17x
+            const seniorityThresholdMultipliers = [1.0, 1.49, 1.74, 1.99, 2.17];
             theta0 = theta0 * seniorityThresholdMultipliers[seniority - 1];
 
             // Apply optional timing shift (capability gate steepness adjustment)
