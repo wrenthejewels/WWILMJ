@@ -975,6 +975,13 @@
             background: transparent;
         }
 
+        .equation-display {
+            font-size: 1.1rem;
+            color: #3b3326;
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
         .factor-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -2057,16 +2064,16 @@
                 </div>
                 <div class="equation-callout">
                     <span class="callout-label">Survival relationship</span>
-                    <code>P<sub>loss</sub>(t) = 1 - S(t) = 1 - exp(-&int;<sub>0</sub><sup>t</sup> I<sub>total</sub>(s) ds)</code>
+                    <div class="equation-display">$$P_{\text{loss}}(t) = 1 - S(t) = 1 - \exp\left(-\int_0^t I_{\text{total}}(s) \, ds\right)$$</div>
                 </div>
                 <div class="equation-callout">
                     <span class="callout-label">Total hazard (stacked framework)</span>
-                    <code>I<sub>total</sub>(s) = I<sub>AI</sub>(s) + I<sub>macro</sub>(s) + I<sub>firm</sub>(s) + I<sub>role</sub>(s) + I<sub>personal</sub>(s)</code>
+                    <div class="equation-display">$$I_{\text{total}}(s) = I_{\text{AI}}(s) + I_{\text{macro}}(s) + I_{\text{firm}}(s) + I_{\text{role}}(s) + I_{\text{personal}}(s)$$</div>
                 </div>
                 <p>Right now the interactive experience concentrates on the AI hazard term. As you answer the prompts the curve shifts to reflect capability readiness, friction, and adaptability.</p>
                 <div class="equation-callout">
                     <span class="callout-label">AI hazard component</span>
-                    <code>I<sub>AI</sub>(s) = h<sub>AI</sub> / (1 + exp(-k [A(s) · C(s) - I<sub>0</sub> - b H(s) - c T<sub>adapt</sub>(s)]))</code>
+                    <div class="equation-display">$$I_{\text{AI}}(s) = \frac{h_{\text{AI}}}{1 + \exp(-k [A(s) \cdot C(s) - I_0 - b H(s) - c T_{\text{adapt}}(s)])}$$</div>
                 </div>
                 <ul class="factor-grid factor-grid--compact">
                     <li><strong>A(s)</strong> AI capability growth (exp. doubling every 5-7 months)</li>
@@ -2084,6 +2091,18 @@
         </div>
     </div>
 
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let selectedRole = null;
