@@ -41,15 +41,20 @@ H_r(t) = H_{50,0} / (2^(months_elapsed / D_eff) × f(r))
 Where:
 - **H_{50,0}** = 50 minutes (baseline task time, March 2025)
 - **months_elapsed** = t × 12 (time in months)
-- **D_eff** = D_base / (computeMultiplier × domainPace)
+- **D_eff** = D_base × computeFriction × industryFriction
 - **D_base** = 7 months (METR baseline doubling time)
 - **f(r)** = ln(r) / ln(0.5) (reliability adjustment factor)
 - **r** = 0.95 (95% reliability target, default)
 
 **Effective Doubling Time:**
 ```
-D_eff = 7 / (computeMultiplier × domainPace)
+D_eff = D_base × computeFriction × industryFriction
 ```
+
+Where:
+- **computeFriction** = resolvedComputeMultiplier() (slider value, default 1.0)
+- **industryFriction** = resolvedDomainPace() (slider value, default 1.0)
+- Higher friction → longer doubling time → slower automation
 
 **Reliability Factor:**
 ```
@@ -148,11 +153,13 @@ Where:
 - Q2: +0.40  [Data Availability - more data = easier automation]
 - Q3: +0.35  [Benchmark Clarity - clear metrics = easier automation]
 - Q4: +0.55  [Task Digitization - more digital = more automatable]
-- Q6: +0.45  [Task Standardization - standardized = risky]
 - Q8: +0.45  [Feedback Loop Speed - fast feedback helps AI learn]
 
+**Task Structure (reversed scales in HTML):**
+- Q5: fric -0.50  [Task Decomposability - 5=Very Complex (protective), 1=Highly Structured (risky)]
+- Q6: amp +0.45  [Task Standardization - 5=Highly Variable (protective), 1=Highly Standardized (risky)]
+
 **Protective Factors (fric):**
-- Q5: -0.50  [Task Decomposability - complex = protective]
 - Q7: -0.50  [Context Dependency - high context = protective]
 - Q9: -0.40  [Tacit Knowledge - more tacit = protective]
 - Q10: -0.45 [Human Relationships - more relationships = protective]
@@ -161,6 +168,8 @@ Where:
 
 **Reverse Scale (amp):**
 - Q12: -0.60 [Physical Presence - more physical = protective]
+
+**Note:** Q5 and Q6 have reversed scales in the HTML interface compared to other questions, but the weights are correctly applied to the underlying values.
 
 ---
 
@@ -237,8 +246,11 @@ probability = clamp(probability, 0.1, 0.85)
 
 ---
 
-## 9. Domain Pace Calculation
+## 9. Domain Pace Calculation (Industry Friction)
 
+The domain pace calculation determines industry-specific friction that affects the effective doubling time.
+
+**Inferred Base Pace:**
 ```
 pace = clamp(1.0 + adjustments, 0.6, 1.8)
 ```
@@ -251,6 +263,22 @@ pace = clamp(1.0 + adjustments, 0.6, 1.8)
 - +0.10 × (norm(Q6) - 0.5)  [Task standardization]
 
 Where: norm(x) = clamp((x - 1) / 4, 0, 1)
+
+**Resolved Domain Pace (from slider):**
+```
+resolvedDomainPace() = (sliderValue / baseline) × basePace
+```
+- Slider range: 0.5 to 2.0 (default 1.0)
+- Higher value = more friction = slower automation
+- This multiplies D_eff (longer doubling time)
+
+**Compute Multiplier (from slider):**
+```
+resolvedComputeMultiplier() = (sliderValue / baseline) × baseMultiplier
+```
+- Slider range: 1.5 to 5.0 (default 3.4)
+- Higher value = more barriers = slower AI progress
+- This also multiplies D_eff (longer doubling time)
 
 ---
 
@@ -562,6 +590,13 @@ OLD: A_explicit → ∞ as t → ∞
 NEW: A(t) ∈ [0, 1] always
 ```
 
+❌ **Division for Effective Doubling:**
+```
+OLD: D_eff = D_base / (computeMultiplier × domainPace)
+NEW: D_eff = D_base × computeFriction × industryFriction  [multiplication]
+```
+Note: The NEW model treats sliders as friction/barriers that slow down automation by INCREASING doubling time.
+
 ### New Components
 
 ✅ **METR Grounding:**
@@ -595,7 +630,7 @@ NEW: A(t) ∈ [0, 1] always
 
 **Step 1: METR Capability**
 ```
-D_eff = 7 / (1.0 × 1.0) = 7 months
+D_eff = 7 × 1.0 × 1.0 = 7 months
 months = 5 × 12 = 60
 f(0.95) = 14.4
 

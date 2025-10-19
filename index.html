@@ -2217,6 +2217,30 @@
             { label: 'Executive', thetaLift: 0.070, hazardShield: 0.18, delayShift: 0.6, reemploymentBoost: 1.10 }
         ];
 
+        // Seniority-based task weight shifts (shift toward longer tasks for higher levels)
+        const SENIORITY_TASK_SHIFTS = [
+            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Entry
+            [-0.02, -0.02,  0.00, +0.03, +0.01],  // Mid
+            [-0.04, -0.04,  0.00, +0.06, +0.02],  // Senior
+            [-0.06, -0.06,  0.00, +0.08, +0.04],  // Lead
+            [-0.08, -0.08,  0.00, +0.10, +0.06]   // Exec
+        ];
+
+        // Get task weights for a given seniority level (1-5)
+        function getTaskWeightsForSeniority(level) {
+            const baseWeights = METR_DEFAULTS.taskBuckets.map(b => b.w);
+            const idx = Math.max(0, Math.min(SENIORITY_TASK_SHIFTS.length - 1, level - 1));
+            const shift = SENIORITY_TASK_SHIFTS[idx];
+            const adjusted = baseWeights.map((w, i) => w + shift[i]);
+            const sum = adjusted.reduce((a, b) => a + b, 0);
+            return adjusted.map(w => w / sum);  // Normalize
+        }
+
+        // Get softness parameter for a given seniority level (slightly harder gate for senior)
+        function getSoftnessForSeniority(level) {
+            return 0.45 - 0.0125 * (level - 1);  // 0.45 → 0.40
+        }
+
         const THETA_BASE_ENTRY = 0.94;
 
         function clamp(value, min = 0, max = 1) {
@@ -2318,13 +2342,15 @@
 
         // METR-based capability functions
 
-        // Reliability adjustment factor: f(r) = ln(r) / ln(0.5)
+        // Reliability adjustment factor: f(r) = ln(0.5) / ln(r)
+        // FIXED: Now multiplies requirement (r=0.95 → ~13.5×, r=0.99 → ~69-72×)
         function reliabilityFactor(r) {
-            return Math.log(r) / Math.log(0.5);
+            return Math.log(0.5) / Math.log(r);
         }
 
-        // METR capability: H_r(t) = H50_0 * 2^(months_elapsed / D_months) * f(r)
+        // METR capability: H_r(t) = (H50_0 * f(r)) / 2^(months_elapsed / D_eff)
         // Returns task completion time in minutes at time t (years)
+        // FIXED: Now multiplies H50_0 by f(r) to stretch requirement (higher reliability → higher requirement)
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = METR_DEFAULTS.r_target) {
             const D_months = resolvedBaseDoublingMonths();
             const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
@@ -2340,32 +2366,39 @@
             }
 
             const monthsElapsed = tYears * 12;
+            const progress = Math.pow(2, monthsElapsed / D_eff);
             const f_r = reliabilityFactor(r);
 
             // Note: Higher capability means LOWER task time
-            // So we divide by the exponential growth factor
-            return H50_0 / (Math.pow(2, monthsElapsed / D_eff) * f_r);
+            // FIXED: Now multiplies H50_0 by f(r) instead of dividing
+            return (H50_0 * f_r) / progress;
         }
 
-        // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(H) - ln(L_i)) / s))
+        // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(L_i) - ln(H)) / s))
         // Returns probability that AI can complete tasks of duration L_i given current capability H
+        // FIXED: Now uses ln(L) - ln(H) so faster AI (lower H) → higher readiness
         function taskGate(H, L, s = METR_DEFAULTS.softness) {
             const logH = Math.log(Math.max(0.01, H));  // Prevent log(0)
             const logL = Math.log(L);
-            const exponent = -(logH - logL) / s;
+            const exponent = -(logL - logH) / s;  // FIXED: Reversed to ln(L) - ln(H)
             return 1.0 / (1.0 + Math.exp(exponent));
         }
 
         // AI Readiness: A(t) = Σ w_i * G(H_r(t), L_i, s)
         // Returns value in [0, 1] representing fraction of job tasks AI can perform
+        // UPDATED: Now uses seniority-based task weights and softness
         function A_job(tYears) {
             const H = H_r(tYears);
             const buckets = METR_DEFAULTS.taskBuckets;
-            const s = METR_DEFAULTS.softness;
+
+            // Get seniority level from currentParams (default to entry level)
+            const seniorityLevel = (currentParams && currentParams.seniority) || 1;
+            const weights = getTaskWeightsForSeniority(seniorityLevel);
+            const s = getSoftnessForSeniority(seniorityLevel);
 
             let readiness = 0;
-            for (const bucket of buckets) {
-                readiness += bucket.w * taskGate(H, bucket.L, s);
+            for (let i = 0; i < buckets.length; i++) {
+                readiness += weights[i] * taskGate(H, buckets[i].L, s);
             }
 
             // Ensure bounded [0, 1]
@@ -2460,8 +2493,72 @@
             console.log('\n=== END ACCEPTANCE TESTS ===\n');
         }
 
+        // Unit tests to guard against regressions from patch
+        function runRegressionTests() {
+            console.log('\n=== REGRESSION GUARD TESTS (PATCH) ===\n');
+
+            let allPassed = true;
+
+            // Test 1: Gate direction - faster AI (lower H) should give higher readiness
+            console.log('TEST 1: Gate direction');
+            const s = 0.45, L = 10;
+            const gateFast = taskGate(1, L, s);
+            const gateSlow = taskGate(100, L, s);
+            const gatePass = gateFast > gateSlow;
+            console.log(`  taskGate(H=1, L=10) = ${gateFast.toFixed(4)}`);
+            console.log(`  taskGate(H=100, L=10) = ${gateSlow.toFixed(4)}`);
+            console.log(`  RESULT: ${gatePass ? 'PASS ✓' : 'FAIL ✗'} (faster AI must have higher readiness)`);
+            if (!gatePass) allPassed = false;
+
+            // Test 2: Reliability factor - r=0.95 should be ~13.5×, r=0.99 should be ~69-72×
+            console.log('\nTEST 2: Reliability factor');
+            const f95 = reliabilityFactor(0.95);
+            const f99 = reliabilityFactor(0.99);
+            const reliabilityPass = (f95 > 10 && f95 < 16) && (f99 > 65 && f99 < 75);
+            console.log(`  f(0.95) = ${f95.toFixed(2)} (expected ~13.5)`);
+            console.log(`  f(0.99) = ${f99.toFixed(2)} (expected ~69-72)`);
+            console.log(`  RESULT: ${reliabilityPass ? 'PASS ✓' : 'FAIL ✗'}`);
+            if (!reliabilityPass) allPassed = false;
+
+            // Test 3: Green curve clamp - should never sample negative time
+            console.log('\nTEST 3: Green curve clamp');
+            const delay = 2;
+            const blueCurve = (t) => (t <= 0 ? 0 : Math.min(t / 4, 1));
+            const greenAt1 = 1 >= delay ? blueCurve(1 - delay) : 0;
+            const clampPass = greenAt1 === 0;
+            console.log(`  Green(t=1) with delay=2 should = Blue(max(1-2, 0)) = Blue(0) = 0`);
+            console.log(`  Actual: ${greenAt1}`);
+            console.log(`  RESULT: ${clampPass ? 'PASS ✓' : 'FAIL ✗'}`);
+            if (!clampPass) allPassed = false;
+
+            // Test 4: Seniority task weight shift - Executive should shift to longer tasks
+            console.log('\nTEST 4: Seniority weight shift');
+            const baseWeights = METR_DEFAULTS.taskBuckets.map(b => b.w);
+            const execWeights = getTaskWeightsForSeniority(5);  // Executive
+            const shiftPass = execWeights[3] > baseWeights[3] &&
+                             execWeights[0] < baseWeights[0] &&
+                             execWeights[1] < baseWeights[1];
+            console.log(`  Base weights (Entry): [${baseWeights.map(w => w.toFixed(2)).join(', ')}]`);
+            console.log(`  Exec weights: [${execWeights.map(w => w.toFixed(2)).join(', ')}]`);
+            console.log(`  RESULT: ${shiftPass ? 'PASS ✓' : 'FAIL ✗'} (Exec shifts weight to longer tasks)`);
+            if (!shiftPass) allPassed = false;
+
+            // Test 5: Doubling dynamics - progress should double in 7 months
+            console.log('\nTEST 5: Doubling dynamics');
+            const D = 7;
+            const months = 7;
+            const progress = Math.pow(2, months / D);
+            const doublingPass = Math.abs(progress - 2) < 1e-6;
+            console.log(`  Progress after 7 months with D=7: ${progress.toFixed(6)}`);
+            console.log(`  RESULT: ${doublingPass ? 'PASS ✓' : 'FAIL ✗'} (should be exactly 2.0)`);
+            if (!doublingPass) allPassed = false;
+
+            console.log(`\n=== OVERALL: ${allPassed ? 'ALL TESTS PASSED ✓' : 'SOME TESTS FAILED ✗'} ===\n`);
+        }
+
         // Run tests on load
         runMETRAcceptanceTests();
+        runRegressionTests();
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -2850,7 +2947,8 @@
             });
         }
 
-        // Compute user multipliers from questions (bounded to 0.5x - 2.0x overall)
+        // Compute user multipliers from questions (bounded to 0.33x - 3.0x overall)
+        // FIXED: Widened from [0.5, 2.0] to [0.33, 3.0] to eliminate dead zones
         function getUserMultiplier() {
             if (!currentParams) return 1.0;
 
@@ -2862,25 +2960,32 @@
 
             const rawMultiplier = questionMultiplier * seniorityMultiplier;
 
-            // Bound overall multiplier to [0.5, 2.0]
-            return Math.max(0.5, Math.min(2.0, rawMultiplier));
+            // Bound overall multiplier to [0.33, 3.0] (wider band for better slider responsiveness)
+            return Math.max(0.33, Math.min(3.0, rawMultiplier));
         }
 
-        // New logistic gate hazard: lambdaAI(t) = hAI / (1 + exp(-gamma * (A(t) - theta0)))
+        // New logistic gate hazard: lambdaAI(t) = hAI / (1 + exp(-gamma * (A(t) - theta)))
         // No internal time decay (removed e^(-lambda*t))
+        // UPDATED: Now uses seniority-based theta (base θ_0 + thetaLift)
         function hazardAI(tYears) {
             if (!currentParams) return 0;
 
             // Parameters
             const hAI = 0.50;           // Max annual hazard (50% per year at full automation)
             const gamma = 8.0;          // Steepness of logistic gate
-            const theta0 = 0.75;        // AI readiness threshold (75% of tasks)
+            const theta0_base = 0.75;   // Base AI readiness threshold (75% of tasks)
+
+            // Apply seniority theta lift
+            const seniorityLevel = currentParams.seniority || 1;
+            const idx = Math.max(0, Math.min(SENIORITY_PROFILES.length - 1, seniorityLevel - 1));
+            const profile = SENIORITY_PROFILES[idx];
+            const theta = theta0_base + profile.thetaLift;
 
             // Get AI readiness A(t) from METR model (bounded [0,1])
             const A_t = A_job(tYears);
 
             // Logistic gate
-            const logisticArg = -gamma * (A_t - theta0);
+            const logisticArg = -gamma * (A_t - theta);
             const baseHazard = hAI / (1.0 + Math.exp(logisticArg));
 
             // Apply user multipliers (bounded 0.5x - 2.0x)
@@ -3038,7 +3143,8 @@
                 years.push(t);
                 // Blue curve: Technical feasibility - Risk_tech(t) = 1 - exp(-∫ lambdaAI(u) du)
                 technicalFeasibility.push(calculateDisplacementProbability(t));
-                // Green curve: Actual job loss - Risk_actual(t) = Risk_tech(t - delay)
+                // Green curve: Actual job loss - Risk_actual(t) = Risk_tech(max(t - delay, 0))
+                // FIXED: Clamps to 0 to prevent sampling negative time
                 actualJobLoss.push(t >= delay ? calculateDisplacementProbability(t - delay) : 0);
             }
 

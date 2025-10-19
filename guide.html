@@ -414,13 +414,13 @@
                         </div>
                         <p>The base hazard now activates only when surplus capability shows up. We let explicit capability double every $d$ months, blend in a slow tacit ramp, compare that job mix to the quality bar $\theta$, and raise any surplus to the power $\gamma$. A decay term $e^{-\lambda s}$ and the familiar friction multipliers keep adoption grounded.</p>
                         <ul class='detail-list'>
-                            <li><strong>Explicit capability $A_{\text{explicit}}(t)$:</strong> $$2^{t/(d/12)}$$ with default $d = 7$ months (METR). The compute and industry sliders just shorten $d$—no extra exponentials.</li>
-                            <li><strong>Tacit capability $A_{\text{tacit}}(t)$:</strong> $$1 + \delta_{\text{tacit}} t$$ with \delta_{\text{tacit}} = 0.07 so apprenticeship-heavy work inches forward.</li>
+                            <li><strong>Explicit capability $A_{\text{explicit}}(t)$:</strong> $$2^{t/(d/12)}$$ with default $d = 7$ months (METR). The compute and industry sliders shorten $d$ to reflect faster progress.</li>
+                            <li><strong>Tacit capability $A_{\text{tacit}}(t)$:</strong> $$1 + \delta_{\text{tacit}} t$$ with \delta_{\text{tacit}} = 0.07 so apprenticeship-heavy work advances more slowly.</li>
                             <li><strong>Job mix $A_{\text{job}}(t)$:</strong> $$s_e A_{\text{explicit}}(t) + (1 - s_e)A_{\text{tacit}}(t)$$ where $s_e$ comes from the digitization and standardization answers.</li>
                             <li><strong>Coverage bar $\theta$:</strong> starts around $0.94$ for entry roles; each seniority step lifts the bar by roughly +1.5 to +7 points before automation clears it.</li>
-                            <li><strong>Friction decay $\lambda$:</strong> inferred between $0.005$ and $0.05$ per year from rollout questions instead of the old fixed 0.02.</li>
-                            <li><strong>Surplus sensitivity $\gamma$:</strong> same steepness control as before—larger values make the hazard spike once surplus appears.</li>
-                            <li><strong>Residual multipliers $M_{\text{fric}}(s)$:</strong> questionnaire scores still map to adoption drag and a gentle seniority shield; the "Why this moves" panel surfaces both.</li>
+                            <li><strong>Friction decay $\lambda$:</strong> inferred between $0.005$ and $0.05$ per year from rollout questions, capturing how quickly organizational barriers diminish.</li>
+                            <li><strong>Surplus sensitivity $\gamma$:</strong> controls how sharply the hazard rises once AI capability exceeds the coverage threshold—larger values produce a steeper S-curve.</li>
+                            <li><strong>Residual multipliers $M_{\text{fric}}(s)$:</strong> questionnaire scores map to adoption drag and a gentle seniority shield; the "Why this moves" panel shows how your answers affect the timeline.</li>
                         </ul>
                         <p>We run Simpson's rule over that hazard curve to deliver the technical-feasibility probability you see in the chart.</p>
                     </section>
@@ -435,9 +435,9 @@
                             <li><strong>Human moat (Q10-Q13):</strong> relationship intensity, unions, physical presence, and trust demands all load the friction side and slow the curve.</li>
                             <li><strong>Firm and personal context (Q14-Q21):</strong> company levers shape implementation delay, and adaptability questions (Q18, Q20) drive re-employment probability rather than the hazard directly.</li>
                         </ul>
-                        <p>We also tweak the gate steepness $\gamma$ via a lighter-weight pass inside <code>kEff</code>. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. That captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
+                        <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
-                            <p><strong>Calibration check:</strong> every page load reruns unit tests. Pushing Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q5, Q7, Q8, Q16 high) suppresses the hazard by about $50\%$. If a future edit drifts, the console will flag it.</p>
+                            <p><strong>Calibration:</strong> the model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q5, Q7, Q8, Q16 high) suppresses the hazard by about $50\%$.</p>
                         </div>
                     </section>
 
