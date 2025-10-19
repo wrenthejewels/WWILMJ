@@ -402,12 +402,12 @@
                 <div class='article-body'>
                     <section>
                         <h2>What the calculator actually simulates</h2>
-                        <p>The experience you see on the main page sits on top of a stacked hazard model. Each year carries some probability that your role is displaced; integrate those annual hazards and you get the cumulative chance that automation has arrived. The blue curve on the chart is the survival complement for technical feasibility, and it comes straight from that integration.</p>
+                        <p>The experience you see on the main page starts from our stacked hazard template, but in this release every layer collapses into the AI hazard. Each year still carries some probability that your role is displaced; integrate that AI hazard and you get the cumulative chance that automation has arrived. The blue curve on the chart is the survival complement for technical feasibility, built directly from that integral.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Survival relationship</span>
                             <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
                         </div>
-                        <p>In this release the interactive focuses on the AI hazard term. We treat macro shocks, firm strategy, and personal agency as separate layers, but the simulator you are using keeps the spotlight on how quickly AI can credibly do the work and how much friction stands in its way.</p>
+                        <p>For now we set $\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s)$: the macro, firm, role, and personal hazard terms remain zeroed while we validate the METR-driven channel. The same AI hazard powers the blue curve, the green adoption curve after delay, and the "Your Risk Profile" cards.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
                             <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>

@@ -2057,7 +2057,7 @@
             <section class="ai-equation">
                 <div class="section-intro">
                     <span class="eyebrow">How this works</span>
-                    <h3>METR-powered stacked hazard model</h3>
+                    <h3>METR-powered hazard model</h3>
                     <p>This calculator uses METR's empirical 7-month AI capability doubling benchmark to forecast automation risk. The model maps AI capability growth to job task readiness, then computes displacement hazard through a logistic gate. Adjust sliders to see how faster capability growth or implementation barriers shift your timeline.</p>
                 </div>
 
@@ -2066,14 +2066,13 @@
                         <span class="callout-label">Survival relationship</span>
                         <div class="equation-display">$$P_{\text{loss}}(t) = 1 - S(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s) \, ds\right)$$</div>
                     </div>
-
                     <div class="equation-callout">
-                        <span class="callout-label">Total hazard (stacked framework)</span>
-                        <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
+                        <span class="callout-label">Integrated hazard (current release)</span>
+                        <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s)$$</div>
                     </div>
                 </div>
 
-                <p>The interactive calculator focuses on the AI hazard term (λ<sub>AI</sub>), which drives technical feasibility. Your questionnaire answers tune capability thresholds, friction multipliers, and implementation delays that shape the Blue (technical) and Green (actual adoption) curves.</p>
+                <p>The simulator now collapses the stacked template into the AI hazard: the same logistic gate drives both the blue and green curves and the "Your Risk Profile" metrics. Macro, firm, role, and personal hazard terms stay reserved for future layers.</p>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
 
@@ -2140,7 +2139,7 @@
                     <li><strong>H<sub>50,0</sub>:</strong> 50 minutes (baseline task time, March 2025)</li>
                     <li><strong>D:</strong> 7 months (METR doubling period)</li>
                     <li><strong>r:</strong> 0.95 (95% reliability target)</li>
-                    <li><strong>Task buckets:</strong> &lt;5m: 25%, 5–15m: 35%, 15–60m: 25%, 1–3h: 10%, &gt;3h: 5%</li>
+                    <li><strong>Task buckets:</strong> &lt;5m: 25%, 5-15m: 35%, 15-60m: 25%, 1-3h: 10%, &gt;3h: 5%</li>
                     <li><strong>s:</strong> 0.45 (logistic softness)</li>
                     <li><strong>θ<sub>0</sub>:</strong> 0.75 (75% readiness threshold)</li>
                     <li><strong>γ:</strong> 8.0 (hazard gate steepness)</li>
@@ -3345,12 +3344,12 @@
             if (typeof pace !== 'number' || !Number.isFinite(pace)) return '-';
             const multiplier = pace.toFixed(2);
             if (pace > 1.05) {
-                return `~${multiplier}x METR doubling time – slower capability transfer.`;
+                return `~${multiplier}x METR doubling time - slower capability transfer.`;
             }
             if (pace < 0.95) {
-                return `~${multiplier}x METR doubling time – faster than the trend.`;
+                return `~${multiplier}x METR doubling time - faster than the trend.`;
             }
-            return `~${multiplier}x METR doubling time – close to baseline.`;
+            return `~${multiplier}x METR doubling time - close to baseline.`;
         }
 
         function describeFriction(lambda) {
