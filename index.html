@@ -509,6 +509,21 @@
             font-weight: bold;
         }
 
+        .model-insights {
+            margin-top: 20px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            line-height: 1.4;
+        }
+
+        .model-insights p {
+            margin: 4px 0;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
         .progress-indicator {
             background: white;
             padding: 15px;
@@ -2054,6 +2069,12 @@
                     <div class="result-value" id="reemployment-value">-</div>
                 </div>
             </div>
+            <div class="model-insights">
+                <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
+                <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
+                <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
+                <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
+            </div>
             <section class="ai-equation">
                 <div class="section-intro">
                     <span class="eyebrow">How this works</span>
@@ -2068,22 +2089,22 @@
                     <span class="callout-label">Total hazard (stacked framework)</span>
                     <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
                 </div>
-                <p>Right now the interactive experience concentrates on the AI hazard term. As you answer the prompts the curve shifts to reflect capability readiness, friction, and adaptability.</p>
+                <p>Right now the interactive experience concentrates on the AI hazard term. Your answers reshape the explicit vs tacit mix, lift or lower the coverage bar θ, and tune the rollout friction λ, so the curve tracks surplus capability instead of runaway exponentials.</p>
                 <div class="equation-callout">
                     <span class="callout-label">AI hazard component</span>
-                    <div class="equation-display">$$\lambda_{\text{AI}}(s) = \frac{h_{\text{AI}}}{1 + \exp\{-\gamma [A(s) - \theta_0 - \kappa H(s) - \beta T_{\text{adapt}}(s)]\}}$$</div>
+                    <div class="equation-display">$$\lambda_{\text{AI}}(s) = F_0 e^{-\lambda s} \cdot \Big[\max\!\big(0, \tfrac{A_{\text{job}}(s)}{\theta} - 1\big)\Big]^{\gamma} \cdot M_{\text{fric}}(s)$$</div>
                 </div>
                 <ul class="factor-grid factor-grid--compact">
                     <li><strong>s:</strong> Time (years)</li>
-                    <li><strong>λ<sub>AI</sub>(s):</strong> AI hazard (annual chance of AI displacement)</li>
-                    <li><strong>A(s):</strong> AI readiness for your tasks (capability, reliability, cost)</li>
-                    <li><strong>H(s):</strong> Human/organizational friction</li>
-                    <li><strong>T<sub>adapt</sub>(s):</strong> Task adaptability</li>
-                    <li><strong>θ<sub>0</sub>:</strong> Baseline adoption threshold</li>
-                    <li><strong>γ:</strong> Steepness of the adoption curve</li>
-                    <li><strong>κ:</strong> Sensitivity to friction</li>
-                    <li><strong>β:</strong> Sensitivity to adaptability</li>
-                    <li><strong>h<sub>AI</sub>:</strong> Hazard scaling factor</li>
+                    <li><strong>λ<sub>AI</sub>(s):</strong> AI hazard (annual displacement pressure)</li>
+                    <li><strong>A<sub>job</sub>(s):</strong> Capability mix = s<sub>e</sub>A<sub>explicit</sub>(s) + (1 - s<sub>e</sub>)A<sub>tacit</sub>(s)</li>
+                    <li><strong>A<sub>explicit</sub>(s):</strong> 2^{s/(d/12)} anchored to METR’s 7-month doubling</li>
+                    <li><strong>A<sub>tacit</sub>(s):</strong> 1 + δ<sub>tacit</sub>s (slow tacit skill drift)</li>
+                    <li><strong>θ:</strong> Quality/coverage bar (mid-90s default, seniority adds a few points)</li>
+                    <li><strong>γ:</strong> Sensitivity to surplus capability ((A<sub>job</sub>/θ - 1)^γ)</li>
+                    <li><strong>λ:</strong> Adoption friction decay inferred from rollout answers</li>
+                    <li><strong>M<sub>fric</sub>(s):</strong> Remaining friction/implementation multipliers</li>
+                    <li><strong>F<sub>0</sub>:</strong> Baseline hazard scale</li>
                 </ul>
             </section>
                 </div>
@@ -2108,6 +2129,109 @@
         let selectedRole = null;
         let currentParams = null;
         let chart = null;
+
+        const baseDoublingMonths = 7;
+        const deltaTacit = 0.07;
+        const computeSliderBaseline = 3.4;
+        const domainPaceSliderBaseline = 1.0;
+
+        function clamp(value, min = 0, max = 1) {
+            return Math.min(max, Math.max(min, value));
+        }
+
+        function norm(value) {
+            return clamp(value / 4, 0, 1);
+        }
+
+        function avg(questionKeys, answers) {
+            if (!Array.isArray(questionKeys) || questionKeys.length === 0) {
+                return 3;
+            }
+            const total = questionKeys.reduce((sum, key) => {
+                const val = answers && typeof answers[key] === 'number' ? answers[key] : 3;
+                return sum + val;
+            }, 0);
+            return total / questionKeys.length;
+        }
+
+        function inferredExplicitness(answers) {
+            // TODO: wire to questionnaire state once answers persist outside analyzeRole
+            const sPos = avg(['Q1', 'Q3', 'Q4', 'Q5', 'Q6', 'Q8'], answers);
+            const sNeg = avg(['Q7', 'Q9'], answers);
+            return clamp(0.65 * norm(sPos) - 0.35 * norm(sNeg) + 0.10, 0, 1);
+        }
+
+        function inferredFrictionDecay(answers) {
+            // TODO: wire to questionnaire state once answers persist outside analyzeRole
+            const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
+            let lam = 0.02;
+            lam += 0.01 * norm(get('Q14')) + 0.01 * norm(get('Q17')) + 0.005 * norm(get('Q15')) + 0.005 * norm(get('Q16'));
+            lam -= 0.01 * norm(get('Q12')) + 0.01 * norm(get('Q10'));
+            return clamp(lam, 0.005, 0.05);
+        }
+
+        function inferredPace(answers) {
+            // TODO: wire to questionnaire state once answers persist outside analyzeRole
+            const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
+            let pace = 1.0;
+            pace += 0.20 * norm(get('Q2')) + 0.15 * norm(get('Q17')) + 0.15 * norm(get('Q14')) + 0.10 * norm(get('Q8')) + 0.10 * norm(get('Q6'));
+            return clamp(pace, 0.6, 1.8);
+        }
+
+        function resolvedComputeMultiplier() {
+            const slider = document.getElementById('compute-scaling');
+            const sliderValue = slider ? parseFloat(slider.value) : computeSliderBaseline;
+            const normalized = sliderValue / computeSliderBaseline;
+            const base = currentParams && typeof currentParams.computeMultiplier === 'number'
+                ? currentParams.computeMultiplier
+                : 1.0;
+            return base * normalized;
+        }
+
+        function resolvedDomainPace() {
+            const slider = document.getElementById('industry-pace');
+            const sliderValue = slider ? parseFloat(slider.value) : domainPaceSliderBaseline;
+            const normalized = sliderValue / domainPaceSliderBaseline;
+            const base = currentParams && typeof currentParams.domainPace === 'number'
+                ? currentParams.domainPace
+                : 1.0;
+            return base * normalized;
+        }
+            const slider = document.getElementById('industry-pace');
+            return slider ? parseFloat(slider.value) : 1.0;
+        }
+
+        function resolvedBaseDoublingMonths() {
+            if (currentParams && typeof currentParams.doublingMonths === 'number') {
+                return currentParams.doublingMonths;
+            }
+            const slider = document.getElementById('ai-doubling');
+            return slider ? parseFloat(slider.value) : baseDoublingMonths;
+        }
+
+        function dEff() {
+            const computeMultiplier = resolvedComputeMultiplier();
+            const domainPace = resolvedDomainPace();
+            const doublingMonths = resolvedBaseDoublingMonths();
+            return doublingMonths / (computeMultiplier * domainPace);
+        }
+
+        function A_explicit(tYears) {
+            return Math.pow(2, tYears / (dEff() / 12));
+        }
+
+        function A_tacit(tYears) {
+            return 1 + deltaTacit * tYears;
+        }
+
+        function A_job(tYears) {
+            const se = currentParams && typeof currentParams.s_e === 'number' ? currentParams.s_e : 0.5;
+            return se * A_explicit(tYears) + (1 - se) * A_tacit(tYears);
+        }
+
+        console.log('[sanity] 5yr explicit growth @7mo doubling:', Math.pow(2, (5 * 12) / baseDoublingMonths).toFixed(0));
+        console.log('[sanity] dEff shorten check (1.0→1.5 compute):', { baseMonths: baseDoublingMonths, shortenedMonths: (baseDoublingMonths / 1.5).toFixed(2), shortenFactor: (1 / 1.5).toFixed(2) });
+        console.log('[sanity] Expectation:', 'Higher s_e or lower θ pulls risk earlier; higher λ pushes it later.');
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -2323,16 +2447,18 @@
 
             // Baseline parameters (will be modified by question multipliers)
             const h0_base = 0.015;
-            let theta0 = 3.0;  // Baseline threshold
-            const gamma = 0.8;  // Baseline steepness
-            const kappa = 0.3;  // Baseline friction damping
-            const aiGrowth = 0.5;
+            const thetaBase = 0.95;  // default required quality/coverage (95%)
+            const gamma = 1.2;  // Capability sensitivity to surplus
+            const kappa = 0.3;  // Baseline friction damping retained for other multipliers
             const frictionValue = 3.0;
 
-            // Increase threshold for higher seniority - AI needs to be more capable to automate senior roles
-            // Entry(1): 1.0x, Mid(2): 1.61x, Senior(3): 2.00x, Lead(4): 2.11x, Executive(5): 2.43x
-            const seniorityThresholdMultipliers = [1.0, 1.61, 2.00, 2.11, 2.43];
-            theta0 = theta0 * seniorityThresholdMultipliers[seniority - 1];
+            const seniorityThresholdMultipliers = [1.00, 1.02, 1.04, 1.05, 1.07];
+            const theta = thetaBase * seniorityThresholdMultipliers[seniority - 1];
+
+            const s_e = inferredExplicitness(answers);
+            const lambda = inferredFrictionDecay(answers);
+            const domainPace = inferredPace(answers);
+            const doublingMonths = parseFloat(document.getElementById('ai-doubling').value) || baseDoublingMonths;
 
             // Apply optional timing shift (capability gate steepness adjustment)
             const gammaEffective = kEff(gamma, answers);
@@ -2343,24 +2469,25 @@
             currentParams = {
                 name: roleName,
                 h0: h0_base,
-                theta0: Math.max(0.5, Math.min(15, theta0)),
-                gamma: Math.max(0.3, Math.min(3, gammaEffective)),
+                theta: Math.max(0.6, Math.min(1.4, theta)),
+                gamma: Math.max(0.8, Math.min(2.5, gammaEffective)),
                 kappa: kappa,
-                aiGrowth: aiGrowth,
                 friction: frictionValue,
                 seniority: seniority,
+                s_e: s_e,
+                lambda: lambda,
+                domainPace: domainPace,
+                computeMultiplier: 1.0,
+                doublingMonths: Math.max(2, Math.min(24, doublingMonths)),
                 aiReadiness: aiReadiness,
                 taskAdapt: taskAdapt,
                 friction_score: friction,
                 firmReadiness: firmReadiness,
                 personalAdapt: personalAdapt,
-                // Store multipliers for hazard calculation
                 ampMult: ampMult,
                 fricMult: fricMult,
                 answers: answers,
-                // Implementation delay for actual job loss
                 implementationDelay: implementationDelay
-                // Re-employment probability calculated in updateResults (needs medianTech)
             };
             document.getElementById('role-display').textContent = currentParams.name;
             document.getElementById('ai-readiness-display').textContent = 
@@ -2498,61 +2625,31 @@
             });
         }
 
-        function A(t) {
-            const doublingMonths = parseFloat(document.getElementById('ai-doubling').value);
-            const doublingRate = Math.log(2) / (doublingMonths / 12);
-            return Math.exp(doublingRate * 2 * t);
-        }
-
-        function H(t) {
-            return currentParams.friction * Math.exp(-t * 0.02);
-        }
-
-        function hazardRate(t) {
-            const a = A(t);
-            const h = H(t);
-            const computeMultiplier = parseFloat(document.getElementById('compute-scaling').value);
-            const industryPace = parseFloat(document.getElementById('industry-pace').value);
-
-            // Compute scaling grows exponentially per year
-            const computeEffect = Math.pow(computeMultiplier, t);
-            const industryEffect = industryPace;
-
-            // Combined AI capability growth
-            const combinedCapability = a * computeEffect * industryEffect;
-
-            // Capability ratio: how much AI capability exceeds job requirements threshold
-            const capabilityRatio = combinedCapability / currentParams.theta0;
-
-            // Base hazard calculation (three-phase)
-            let baseHazard;
-            if (capabilityRatio < 0.1) {
-                // Below threshold: minimal hazard
-                baseHazard = 0.001;
-            } else if (capabilityRatio < 1) {
-                // Approaching threshold: linear growth
-                baseHazard = 0.01 * capabilityRatio;
-            } else {
-                // Above threshold: EXPONENTIAL TAKEOFF
-                const excessCapability = Math.log(capabilityRatio);
-                baseHazard = currentParams.h0 * Math.exp(currentParams.gamma * excessCapability);
-
-                // Friction acts as a multiplicative damper
-                const frictionMultiplier = 1 / (1 + currentParams.kappa * h / 5);
-
-                // Seniority multiplier - higher seniority = harder to automate
-                const seniorityReductions = [0, 0.45, 0.65, 0.85, 0.95];
-                const seniorityMultiplier = 1 - seniorityReductions[currentParams.seniority - 1];
-
-                baseHazard = baseHazard * frictionMultiplier * seniorityMultiplier;
-            }
-
-            // Apply per-question hazard multipliers
+        function otherFrictionMultipliers(tYears) {
+            if (!currentParams) return 1;
             const questionMultiplier = currentParams.ampMult * currentParams.fricMult;
-            const finalHazard = baseHazard * questionMultiplier;
+            const frictionStock = currentParams.friction;
+            const drag = 1 / (1 + currentParams.kappa * frictionStock / 5);
+            const seniorityReductions = [0, 0.08, 0.12, 0.18, 0.22];
+            const idx = Math.max(0, Math.min(seniorityReductions.length - 1, (currentParams.seniority || 1) - 1));
+            const seniorityMultiplier = 1 - seniorityReductions[idx];
+            return questionMultiplier * drag * seniorityMultiplier;
+        }
 
-            // Return clamped hazard (max 0.95 to prevent numerical issues)
-            return Math.min(0.95, finalHazard);
+        function hazardAI(tYears) {
+            if (!currentParams) return 0;
+            const theta = currentParams.theta || 1;
+            const gamma = currentParams.gamma || 1;
+            const F0 = currentParams.h0 || 0.01;
+            const lambda = currentParams.lambda || 0.02;
+            const capRatio = A_job(tYears) / theta;
+            const surplus = Math.max(0, capRatio - 1);
+            if (surplus <= 0) {
+                return 0;
+            }
+            const base = F0 * Math.exp(-lambda * tYears) * Math.pow(surplus, gamma);
+            const hazard = base * otherFrictionMultipliers(tYears);
+            return Math.min(0.95, hazard);
         }
 
         // Cumulative risk from hazard series using survival function
@@ -2574,11 +2671,16 @@
                 const savedParams = currentParams;
                 currentParams = {
                     h0: 0.015,
-                    theta0: 3.0,
-                    gamma: 0.8,
+                    theta: 0.95,
+                    gamma: 1.2,
                     kappa: 0.3,
                     friction: 3.0,
                     seniority: 1,
+                    s_e: inferredExplicitness(answers),
+                    lambda: inferredFrictionDecay(answers),
+                    domainPace: inferredPace(answers),
+                    computeMultiplier: 1.0,
+                    doublingMonths: baseDoublingMonths,
                     ampMult: ampMult,
                     fricMult: fricMult
                 };
@@ -2664,7 +2766,7 @@
 
             for (let i = 0; i <= n; i++) {
                 const s = i * dt;
-                const rate = hazardRate(s);
+                const rate = hazardAI(s);
 
                 if (i === 0 || i === n) {
                     integral += rate;
@@ -2722,6 +2824,58 @@
             return mid;
         }
 
+        function describeExplicitness(se) {
+            if (typeof se !== 'number') return '-';
+            let note;
+            if (se >= 0.7) {
+                note = 'heavy explicit work pulls timelines forward.';
+            } else if (se <= 0.35) {
+                note = 'tacit-heavy mix slows capability transfer.';
+            } else {
+                note = 'mixed tasks keep the acceleration moderate.';
+            }
+            return `${se.toFixed(2)} — ${note}`;
+        }
+
+        function describeTheta(theta, seniority) {
+            if (typeof theta !== 'number') return '-';
+            const pct = theta * 100;
+            const delta = pct - 95;
+            let note;
+            if (delta > 3) {
+                note = `seniority level ${seniority || 1} adds +${delta.toFixed(0)} pts to the coverage bar.`;
+            } else if (delta < -3) {
+                note = `${Math.abs(delta).toFixed(0)} pts below the METR baseline coverage bar.`;
+            } else {
+                note = 'baseline ~95% coverage requirement.';
+            }
+            return `${pct.toFixed(0)}% — ${note}`;
+        }
+
+        function describePace(pace) {
+            if (typeof pace !== 'number') return '-';
+            const multiplier = pace.toFixed(2);
+            if (pace > 1.05) {
+                return `~${multiplier}× METR — capability ramps faster than trend.`;
+            } else if (pace < 0.95) {
+                return `~${multiplier}× METR — slower domain learning drag.`;
+            }
+            return `~${multiplier}× METR — close to METR baseline pace.`;
+        }
+
+        function describeFriction(lambda) {
+            if (typeof lambda !== 'number') return '-';
+            let band;
+            if (lambda >= 0.035) {
+                band = 'fast rollout';
+            } else if (lambda <= 0.015) {
+                band = 'slow rollout';
+            } else {
+                band = 'medium rollout';
+            }
+            return `λ = ${lambda.toFixed(3)} — ${band} damping.`;
+        }
+
         function updateResults() {
             const delay = currentParams.implementationDelay || 0;
 
@@ -2758,6 +2912,11 @@
             else reemployLabel = 'Very Low';
             document.getElementById('reemployment-value').textContent =
                 `${reemployLabel} (${reemployPct}%)`;
+
+            document.getElementById('insight-explicitness').textContent = describeExplicitness(currentParams.s_e);
+            document.getElementById('insight-theta').textContent = describeTheta(currentParams.theta, currentParams.seniority);
+            document.getElementById('insight-pace').textContent = describePace(currentParams.domainPace);
+            document.getElementById('insight-friction').textContent = describeFriction(currentParams.lambda);
 
             // Update personal timeline table
             updatePersonalTimeline();

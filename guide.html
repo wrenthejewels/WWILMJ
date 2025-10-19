@@ -410,17 +410,17 @@
                         <p>In this release the interactive focuses on the AI hazard term. We treat macro shocks, firm strategy, and personal agency as separate layers, but the simulator you are using keeps the spotlight on how quickly AI can credibly do the work and how much friction stands in its way.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
-                            <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \min\!\left[0.95,\; h_{\text{base}}(s)\, \exp\Bigg(\sum w_{\text{amp}} x_i\Bigg)\, \exp\Bigg(\sum w_{\text{fric}} x_i\Bigg)\right]$$</div>
+                            <div class='equation-display'>$$\lambda_{\text{AI}}(s) = F_0 e^{-\lambda s} \cdot \Big[\max\!\big(0, \tfrac{A_{\text{job}}(s)}{\theta} - 1\big)\Big]^{\gamma} M_{\text{fric}}(s)$$</div>
                         </div>
-                        <p>The base hazard is a three-phase curve. When capability is \(&lt;10\%\) of the threshold we pin hazard at 0.1%. It ramps linearly as AI closes the gap, and once capability exceeds the threshold we track $$h_{\text{base}}(s) = h_0 \left(\frac{A(s)}{\theta_0}\right)^{\gamma}$$ then damp it by organizational friction and seniority. A few levers matter inside that term:</p>
+                        <p>The base hazard now activates only when surplus capability shows up. We let explicit capability double every $d$ months, blend in a slow tacit ramp, compare that job mix to the quality bar $\theta$, and raise any surplus to the power $\gamma$. A decay term $e^{-\lambda s}$ and the familiar friction multipliers keep adoption grounded.</p>
                         <ul class='detail-list'>
-                            <li><strong>Capability growth $A(t)$:</strong> the AI doubling slider sets $$A(t)=\exp\!\left(\frac{24 \ln 2}{\text{doubling months}} \, t\right)$$ so shorter doubling times bend the blue curve forward.</li>
-                            <li><strong>Compute scaling:</strong> capability is multiplied by $(\text{multiplier})^{t}$ each year to reflect compute-led efficiency gains.</li>
-                            <li><strong>Industry pace:</strong> a constant multiplier captures diffusion pressure from your sector.</li>
-                            <li><strong>Friction term $H(t)$:</strong> answers initialize $H(0)$ and it decays as $$H(t) = H(0)\, e^{-0.02 t}$$ so stubborn organizations eventually soften.</li>
-                            <li><strong>Threshold $\theta_0$:</strong> we start at $3.0$ for entry roles and scale it by $[1.00, 1.61, 2.00, 2.11, 2.43]$ as seniority climbs, forcing higher capability before leaders are threatened.</li>
-                            <li><strong>Seniority damper:</strong> once above threshold we multiply by $(1 - r_s)$ where $r_s \in \{0, 0.45, 0.65, 0.85, 0.95\}$ from entry through executive to reflect retention bias.</li>
-                            <li><strong>Friction multiplier:</strong> the hazard is further reduced by $$\frac{1}{1 + \kappa \tfrac{H(t)}{5}}$$ with $\kappa = 0.3$, so persistent friction buys time.</li>
+                            <li><strong>Explicit capability $A_{\text{explicit}}(t)$:</strong> $$2^{t/(d/12)}$$ with default $d = 7$ months (METR). The compute and industry sliders just shorten $d$—no extra exponentials.</li>
+                            <li><strong>Tacit capability $A_{\text{tacit}}(t)$:</strong> $$1 + \delta_{\text{tacit}} t$$ with \delta_{\text{tacit}} = 0.07 so apprenticeship-heavy work inches forward.</li>
+                            <li><strong>Job mix $A_{\text{job}}(t)$:</strong> $$s_e A_{\text{explicit}}(t) + (1 - s_e)A_{\text{tacit}}(t)$$ where $s_e$ comes from the digitization and standardization answers.</li>
+                            <li><strong>Coverage bar $\theta$:</strong> defaults to $0.95$ (95% quality/coverage) and only nudges by $[1.00, 1.02, 1.04, 1.05, 1.07]$ as seniority rises.</li>
+                            <li><strong>Friction decay $\lambda$:</strong> inferred between $0.005$ and $0.05$ per year from rollout questions instead of the old fixed 0.02.</li>
+                            <li><strong>Surplus sensitivity $\gamma$:</strong> same steepness control as before—larger values make the hazard spike once surplus appears.</li>
+                            <li><strong>Residual multipliers $M_{\text{fric}}(s)$:</strong> questionnaire scores still map to adoption drag and a mild seniority damper; you now see those reported under “Why this moves.”</li>
                         </ul>
                         <p>We run Simpson's rule over that hazard curve to deliver the technical-feasibility probability you see in the chart.</p>
                     </section>
@@ -461,7 +461,7 @@
                             <li><strong>Personal timeline:</strong> we surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
                             <li><strong>Re-employment label:</strong> the probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
                         </ul>
-                        <p>Use the growth sliders to stress-test assumptions. Faster AI doubling or heavier compute scaling pivots both curves left. Increasing friction answers or dialing up implementation drag leaves the blue curve anchored but pushes the green curve out, telling you whether you are dealing with imminent technical substitution or a slower organizational grind.</p>
+                        <p>Use the growth sliders to stress-test assumptions. Shorter doubling settings or faster inferred pace shrink $d$ and pivot both curves left. Answers that raise $s_e$ or ease the coverage bar $\theta$ have the same effect, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out, signaling a slower adoption grind.</p>
                     </section>
 
                     <section>
