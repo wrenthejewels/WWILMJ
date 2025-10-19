@@ -2703,8 +2703,9 @@
             Q11: { fric: -0.60 }, // Physical Presence (FIXED: now fric− channel)
             Q12: { fric: -0.35 }, // Trust Requirements
             // Q13-Q16: Company/Industry context - affects implementation delay only
-            // Q17, Q19, Q20: Re-employment factors - affects job search success only
-            // Q18: Job retention factor - affects implementation delay only
+            // Q17, Q19: Re-employment factors - affects job search success only
+            // Q18, Q20: Job retention factors - affects implementation delay only
+            // Q20: Also affects re-employment (dual purpose)
         };
 
         // Implementation delay weights - delays actual job loss from technical feasibility (Green Curve)
@@ -2716,8 +2717,9 @@
             Q14: +0.30,  // Labor cost pressure: 1=Not Sensitive (more delay), 5=Extremely Sensitive (less delay)
             Q15: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay)
             Q16: +0.35,  // IT infrastructure: 1=Very Outdated (more delay), 5=Cutting Edge (less delay)
-            // Job Retention Factor (Q18)
+            // Job Retention Factors (Q18, Q20)
             Q18: -0.25,  // AI complementarity: 5=Amplify Only (more delay), 1=Replace Only (less delay) - employer keeps you longer
+            Q20: -0.35,  // Job performance: 5=Top 10% (more delay), 1=Below Average (less delay) - top performers retained longer
         };
 
         // Re-employment probability weights (Q17, Q19, Q20) - affects ability to find new job
@@ -2808,8 +2810,8 @@
                 // Decelerators (higher = slower/later automation)
                 Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q11: -0.15, Q12: -0.15
                 // Q13-Q16: Company/Industry - affects GREEN curve only
-                // Q17, Q19, Q20: Re-employment - affects re-employment metric only
-                // Q18: Job retention - affects GREEN curve only
+                // Q17, Q19: Re-employment - affects re-employment metric only
+                // Q18, Q20: Job retention - affects GREEN curve only (Q20 also affects re-employment)
             };
             for (const [qid, raw] of Object.entries(answers)) {
                 const x = codeAnswer(qid, raw);
