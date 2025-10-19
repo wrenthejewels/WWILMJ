@@ -2135,6 +2135,16 @@
         const computeSliderBaseline = 3.4;
         const domainPaceSliderBaseline = 1.0;
 
+        const SENIORITY_PROFILES = [
+            { label: 'Entry', thetaLift: 0.00, hazardShield: 0.00, delayShift: -0.4, reemploymentBoost: 1.00 },
+            { label: 'Mid-Level', thetaLift: 0.015, hazardShield: 0.05, delayShift: -0.1, reemploymentBoost: 1.03 },
+            { label: 'Senior', thetaLift: 0.035, hazardShield: 0.10, delayShift: 0.2, reemploymentBoost: 1.06 },
+            { label: 'Lead/Principal', thetaLift: 0.055, hazardShield: 0.14, delayShift: 0.4, reemploymentBoost: 1.08 },
+            { label: 'Executive', thetaLift: 0.070, hazardShield: 0.18, delayShift: 0.6, reemploymentBoost: 1.10 }
+        ];
+
+        const THETA_BASE_ENTRY = 0.94;
+
         function clamp(value, min = 0, max = 1) {
             return Math.min(max, Math.max(min, value));
         }
@@ -2352,27 +2362,21 @@
         }
 
         // Calculate implementation delay in years (0.5 - 3 years), scaled by seniority
-        function calculateImplementationDelay(answers, seniority) {
+        function calculateImplementationDelay(answers, seniority, seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0]) {
             let delayScore = 0;
             for (const [qid, weight] of Object.entries(IMPLEMENTATION_WEIGHTS)) {
                 const raw = answers[qid];
                 const x = codeAnswer(qid, raw);
                 delayScore += weight * x;
             }
-            // Map delayScore to 0.5-3 year range
-            // Negative score = more delay, positive = less delay
             const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
             delayScore = clamp(delayScore, -2.0, +2.0);
-            // Map -2 to 3 years, 0 to 1.75 years, +2 to 0.5 years
             let delay = 1.75 - (delayScore * 1.25);
             delay = Math.max(0.5, Math.min(3.0, delay));
-
-            // Scale by seniority - higher seniority = more delay
-            // Entry: 0.8x (green curve closer to blue), Mid: 1.2x, Senior: 1.4x, Lead: 1.6x, Executive: 1.8x
-            const seniorityDelayMultipliers = [0.8, 1.2, 1.4, 1.6, 1.8];
-            delay *= seniorityDelayMultipliers[seniority - 1];
-
-            return delay;
+            if (seniorityProfile) {
+                delay += seniorityProfile.delayShift;
+            }
+            return Math.max(0.4, Math.min(4.0, delay));
         }
 
         // Calculate re-employment probability (0-1 scale)
@@ -2398,10 +2402,8 @@
             else if (medianTechYears < 12) timingPenalty = 0.05;
             probability -= timingPenalty;
 
-            // Modest seniority boost (everyone struggles, but experience helps a bit)
-            // Entry: 1.0x, Mid: 1.05x, Senior: 1.08x, Lead: 1.10x, Executive: 1.12x
-            const seniorityBoosts = [1.0, 1.05, 1.08, 1.10, 1.12];
-            probability *= seniorityBoosts[seniority - 1];
+            const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
+            probability *= seniorityProfile.reemploymentBoost;
 
             return clamp(probability, 0.1, 0.85); // Cap at 85% - no one is guaranteed
         }
@@ -2466,13 +2468,14 @@
 
             // Baseline parameters (will be modified by question multipliers)
             const h0_base = 0.015;
-            const thetaBase = 0.95;  // default required quality/coverage (95%)
+            const thetaBase = THETA_BASE_ENTRY;  // entry-level coverage bar ~94%
             const gamma = 1.2;  // Capability sensitivity to surplus
             const kappa = 0.3;  // Baseline friction damping retained for other multipliers
             const frictionValue = 3.0;
 
-            const seniorityThresholdMultipliers = [1.00, 1.02, 1.04, 1.05, 1.07];
-            const theta = thetaBase * seniorityThresholdMultipliers[seniority - 1];
+            const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
+            const theta = thetaBase + seniorityProfile.thetaLift;
+            const thetaEffective = Math.max(0.6, Math.min(1.4, theta));
 
             const s_e = inferredExplicitness(answers);
             const lambda = inferredFrictionDecay(answers);
@@ -2483,16 +2486,18 @@
             const gammaEffective = kEff(gamma, answers);
 
             // Calculate implementation delay (scaled by seniority)
-            const implementationDelay = calculateImplementationDelay(answers, seniority);
+            const implementationDelay = calculateImplementationDelay(answers, seniority, seniorityProfile);
 
             currentParams = {
                 name: roleName,
                 h0: h0_base,
-                theta: Math.max(0.6, Math.min(1.4, theta)),
+                theta: thetaEffective,
                 gamma: Math.max(0.8, Math.min(2.5, gammaEffective)),
                 kappa: kappa,
                 friction: frictionValue,
                 seniority: seniority,
+                seniorityLabel: seniorityProfile.label,
+                seniorityProfile: seniorityProfile,
                 s_e: s_e,
                 lambda: lambda,
                 domainPace: domainPace,
@@ -2649,9 +2654,10 @@
             const questionMultiplier = currentParams.ampMult * currentParams.fricMult;
             const frictionStock = currentParams.friction;
             const drag = 1 / (1 + currentParams.kappa * frictionStock / 5);
-            const seniorityReductions = [0, 0.08, 0.12, 0.18, 0.22];
-            const idx = Math.max(0, Math.min(seniorityReductions.length - 1, (currentParams.seniority || 1) - 1));
-            const seniorityMultiplier = 1 - seniorityReductions[idx];
+            const profiles = SENIORITY_PROFILES;
+            const idx = Math.max(0, Math.min(profiles.length - 1, (currentParams.seniority || 1) - 1));
+            const profile = profiles[idx] || profiles[0];
+            const seniorityMultiplier = 1 - (profile.hazardShield || 0);
             return questionMultiplier * drag * seniorityMultiplier;
         }
 
@@ -2853,23 +2859,29 @@
             } else {
                 note = 'mixed tasks keep the acceleration moderate.';
             }
-            return `${se.toFixed(2)} — ${note}`;
+            return `${se.toFixed(2)} - ${note}`;
         }
 
         function describeTheta(theta, seniority) {
             if (typeof theta !== 'number') return '-';
+            const profiles = SENIORITY_PROFILES;
+            const baselineProfile = profiles[0] || { thetaLift: 0, label: 'Entry' };
+            const baselinePct = (THETA_BASE_ENTRY + (baselineProfile.thetaLift || 0)) * 100;
+            const idx = Math.max(0, Math.min(profiles.length - 1, (seniority || 1) - 1));
+            const profile = profiles[idx] || baselineProfile;
             const pct = theta * 100;
-            const delta = pct - 95;
+            const lift = pct - baselinePct;
             let note;
-            if (delta > 3) {
-                note = `seniority level ${seniority || 1} adds +${delta.toFixed(0)} pts to the coverage bar.`;
-            } else if (delta < -3) {
-                note = `${Math.abs(delta).toFixed(0)} pts below the METR baseline coverage bar.`;
+            if (lift > 2) {
+                note = `${profile.label} raises the coverage bar by ~${lift.toFixed(1)} pts.`;
+            } else if (lift < -2) {
+                note = `${profile.label} sits below the entry coverage bar by ~${Math.abs(lift).toFixed(1)} pts.`;
             } else {
-                note = 'baseline ~95% coverage requirement.';
+                note = `${profile.label} holds roughly the entry-level coverage bar.`;
             }
-            return `${pct.toFixed(0)}% — ${note}`;
+            return `${pct.toFixed(1)}% - ${note}`;
         }
+
 
         function describePace(pace) {
             if (typeof pace !== 'number') return '-';
@@ -2892,7 +2904,7 @@
             } else {
                 band = 'medium rollout';
             }
-            return `λ = ${lambda.toFixed(3)} — ${band} damping.`;
+            return `lambda = ${lambda.toFixed(3)} - ${band} damping.`;
         }
 
         function updateResults() {

@@ -417,10 +417,10 @@
                             <li><strong>Explicit capability $A_{\text{explicit}}(t)$:</strong> $$2^{t/(d/12)}$$ with default $d = 7$ months (METR). The compute and industry sliders just shorten $d$—no extra exponentials.</li>
                             <li><strong>Tacit capability $A_{\text{tacit}}(t)$:</strong> $$1 + \delta_{\text{tacit}} t$$ with \delta_{\text{tacit}} = 0.07 so apprenticeship-heavy work inches forward.</li>
                             <li><strong>Job mix $A_{\text{job}}(t)$:</strong> $$s_e A_{\text{explicit}}(t) + (1 - s_e)A_{\text{tacit}}(t)$$ where $s_e$ comes from the digitization and standardization answers.</li>
-                            <li><strong>Coverage bar $\theta$:</strong> defaults to $0.95$ (95% quality/coverage) and only nudges by $[1.00, 1.02, 1.04, 1.05, 1.07]$ as seniority rises.</li>
+                            <li><strong>Coverage bar $\theta$:</strong> starts around $0.94$ for entry roles; each seniority step lifts the bar by roughly +1.5 to +7 points before automation clears it.</li>
                             <li><strong>Friction decay $\lambda$:</strong> inferred between $0.005$ and $0.05$ per year from rollout questions instead of the old fixed 0.02.</li>
                             <li><strong>Surplus sensitivity $\gamma$:</strong> same steepness control as before—larger values make the hazard spike once surplus appears.</li>
-                            <li><strong>Residual multipliers $M_{\text{fric}}(s)$:</strong> questionnaire scores still map to adoption drag and a mild seniority damper; you now see those reported under “Why this moves.”</li>
+                            <li><strong>Residual multipliers $M_{\text{fric}}(s)$:</strong> questionnaire scores still map to adoption drag and a gentle seniority shield; the "Why this moves" panel surfaces both.</li>
                         </ul>
                         <p>We run Simpson's rule over that hazard curve to deliver the technical-feasibility probability you see in the chart.</p>
                     </section>
@@ -446,10 +446,10 @@
                         <p>The green actual job-loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q14 through Q17 look at adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q19 and Q21 reward complementary work and strong performance.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Delay function</span>
-                            <div class='equation-display'>$$\text{delay} = \big(1.75 - 1.25\, s_{\text{delay}}\big)\, m_{\text{seniority}}, \quad s_{\text{delay}} \in [-2,2],\; m_{\text{seniority}} \in \{0.8,1.2,1.4,1.6,1.8\}$$</div>
+                            <div class='equation-display'>$$\text{delay} = \operatorname{clip}(1.75 - 1.25 s_{\text{delay}}, 0.5, 3.0) + \Delta_{\text{seniority}},\quad s_{\text{delay}} \in [-2,2],\; \Delta_{\text{seniority}} \in \{-0.4,-0.1,+0.2,+0.4,+0.6\}$$</div>
                         </div>
-                        <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can collapse the gap toward $0.5$ years, while defensive environments stretch it beyond three. Senior leaders get another bump because their multiplier reaches $1.8\times$.</p>
-                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, add or subtract up to $20$ points based on transferable skills and learning speed, subtract up to $30$ points if the median technical hazard lands within three years, and then apply a small seniority boost (up to $12\%$). The result is clamped between $10\%$ and $85\%$ &mdash; nobody is guaranteed, but nobody is written off.</p>
+                        <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can collapse the gap toward $0.5$ years, while defensive environments stretch it beyond three. Senior leaders pick up additive shifts (up to +0.6 years) because coordinated change takes longer at the top.</p>
+                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, add or subtract up to $20$ points based on transferable skills and learning speed, subtract up to $30$ points if the median technical hazard lands within three years, and then apply the seniority boost from the profile (roughly +0% to +10%). The result is clamped between $10\%$ and $85\%$ &mdash; nobody is guaranteed, but nobody is written off.</p>
                     </section>
 
                     <section>
