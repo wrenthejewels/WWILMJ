@@ -2292,7 +2292,8 @@
             // Higher value = faster compute growth = faster AI progress
             const sliderValue = slider ? parseFloat(slider.value) : computeSliderBaseline;
             // Invert: higher compute growth should DIVIDE doubling time (faster progress)
-            const inverted = (computeSliderBaseline * 2) / sliderValue;
+            // Formula: baseline / sliderValue ensures default (3.4) returns 1.0
+            const inverted = computeSliderBaseline / sliderValue;
             const base = currentParams && typeof currentParams.computeMultiplier === 'number'
                 ? currentParams.computeMultiplier
                 : 1.0;
