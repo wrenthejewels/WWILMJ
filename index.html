@@ -2052,6 +2052,7 @@
                 <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
                 <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
                 <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
+                <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
             </div>
             <section class="ai-equation">
                 <div class="section-intro">
@@ -2283,7 +2284,12 @@
             pace += 0.15 * (norm(get('Q13')) - 0.5);
             pace += 0.10 * (norm(get('Q8')) - 0.5);
             pace += 0.10 * (norm(get('Q6')) - 0.5);
-            return clamp(pace, 0.6, 1.8);
+            pace -= 0.18 * (norm(get('Q7')) - 0.5);
+            pace -= 0.20 * (norm(get('Q9')) - 0.5);
+            pace -= 0.24 * (norm(get('Q10')) - 0.5);
+            pace -= 0.28 * (norm(get('Q11')) - 0.5);
+            pace -= 0.16 * (norm(get('Q12')) - 0.5);
+            return clamp(pace, 0.5, 2.0);
         }
 
         function resolvedComputeMultiplier() {
@@ -2309,7 +2315,8 @@
             const base = currentParams && typeof currentParams.domainPace === 'number'
                 ? currentParams.domainPace
                 : 1.0;
-            return base * normalized;  // Higher friction → larger multiplier → slower automation
+            const combined = base * normalized;
+            return clamp(combined, 0.4, 3.0);
         }
 
         function resolvedBaseDoublingMonths() {
@@ -2356,8 +2363,11 @@
             const f_r = reliabilityFactor(r);
 
             // Note: Higher capability means LOWER task time
-            // FIXED: Now multiplies H50_0 by f(r) instead of dividing
-            return (H50_0 * f_r) / progress;
+            const domainPenalty = currentParams && typeof currentParams.domainPenalty === 'number'
+                ? currentParams.domainPenalty
+                : 1.0;
+            const baselineMinutes = H50_0 * domainPenalty;  // Domain mismatch stretches METR baseline
+            return (baselineMinutes * f_r) / progress;
         }
 
         // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(L_i) - ln(H)) / s))
@@ -2628,6 +2638,7 @@
             // Helper to compute risk by 2030
             const computeRisk2030 = (answers) => {
                 const { ampMult, fricMult } = computeHazardMultipliers(answers);
+                const mismatch = computeDomainMismatch(answers);
                 const savedParams = currentParams;
                 currentParams = {
                     h0: 0.015, theta: 0.75, gamma: 1.2, kappa: 0.3, friction: 3.0,
@@ -2635,6 +2646,7 @@
                     s_e: inferredExplicitness(answers), lambda: inferredFrictionDecay(answers),
                     domainPace: inferredPace(answers), computeMultiplier: 1.0,
                     doublingMonths: baseDoublingMonths, ampMult: ampMult, fricMult: fricMult,
+                    domainPenalty: mismatch.penalty, domainAlignment: mismatch.alignment,
                     answers: answers, implementationDelay: 0
                 };
                 const risk = calculateDisplacementProbability(5.35);
@@ -2709,6 +2721,31 @@
             // Q18, Q20: Job retention factors - affects implementation delay only
             // Q20: Also affects re-employment (dual purpose)
         };
+
+        const DOMAIN_ALIGNMENT_WEIGHTS = {
+            Q4: +0.28,  // Task digitization
+            Q5: +0.24,  // Task decomposability
+            Q6: +0.22,  // Task standardization
+            Q7: -0.32,  // Context dependency
+            Q9: -0.28,  // Tacit knowledge
+            Q10: -0.34, // Human judgment & relationships
+            Q11: -0.38, // Physical presence
+            Q12: -0.24  // Trust and compliance load
+        };
+
+        function computeDomainMismatch(answers) {
+            let weightedSum = 0;
+            for (const [qid, weight] of Object.entries(DOMAIN_ALIGNMENT_WEIGHTS)) {
+                const raw = answers && Object.prototype.hasOwnProperty.call(answers, qid) ? answers[qid] : 3;
+                const x = codeAnswer(qid, raw);
+                weightedSum += weight * x;
+            }
+            weightedSum = Math.max(-3.0, Math.min(3.0, weightedSum));
+            const penalty = clamp(Math.exp(-weightedSum), 0.5, 3.0);
+            const alignment = clamp(0.5 + 0.18 * weightedSum, 0, 1);
+            return { penalty, alignment, weightedSum };
+        }
+
 
         // Implementation delay weights - delays actual job loss from technical feasibility (Green Curve)
         // Formula: delay = 1.75 - (delayScore * 1.25)
@@ -2859,7 +2896,7 @@
                                   getQuestionValue(16) + getQuestionValue(17)) / 4;
 
             const personalAdapt = (getQuestionValue(18) + getQuestionValue(19) +
-                                  getQuestionValue(20) + getQuestionValue(21)) / 4;
+                                  getQuestionValue(20)) / 3;
 
             // Baseline parameters (will be modified by question multipliers)
             const h0_base = 0.015;
@@ -2875,6 +2912,7 @@
             const s_e = inferredExplicitness(answers);
             const lambda = inferredFrictionDecay(answers);
             const domainPace = inferredPace(answers);
+            const { penalty: domainPenalty, alignment: domainAlignment } = computeDomainMismatch(answers);
             const doublingMonths = parseFloat(document.getElementById('ai-doubling').value) || baseDoublingMonths;
 
             // Apply optional timing shift (capability gate steepness adjustment)
@@ -2896,6 +2934,8 @@
                 s_e: s_e,
                 lambda: lambda,
                 domainPace: domainPace,
+                domainPenalty: domainPenalty,
+                domainAlignment: domainAlignment,
                 computeMultiplier: 1.0,
                 doublingMonths: Math.max(2, Math.min(24, doublingMonths)),
                 aiReadiness: aiReadiness,
@@ -3116,6 +3156,7 @@
             // Helper to compute risk by 2030 (t=5.35 years from 2024.65)
             const computeRisk2030 = (answers) => {
                 const { ampMult, fricMult } = computeHazardMultipliers(answers);
+                const mismatch = computeDomainMismatch(answers);
                 const savedParams = currentParams;
                 currentParams = {
                     h0: 0.015,
@@ -3130,7 +3171,9 @@
                     computeMultiplier: 1.0,
                     doublingMonths: baseDoublingMonths,
                     ampMult: ampMult,
-                    fricMult: fricMult
+                    fricMult: fricMult,
+                    domainPenalty: mismatch.penalty,
+                    domainAlignment: mismatch.alignment
                 };
                 const risk = calculateDisplacementProbability(5.35);
                 currentParams = savedParams;
@@ -3299,14 +3342,15 @@
 
 
         function describePace(pace) {
-            if (typeof pace !== 'number') return '-';
+            if (typeof pace !== 'number' || !Number.isFinite(pace)) return '-';
             const multiplier = pace.toFixed(2);
             if (pace > 1.05) {
-                return `~${multiplier}× METR — capability ramps faster than trend.`;
-            } else if (pace < 0.95) {
-                return `~${multiplier}× METR — slower domain learning drag.`;
+                return `~${multiplier}x METR doubling time – slower capability transfer.`;
             }
-            return `~${multiplier}× METR — close to METR baseline pace.`;
+            if (pace < 0.95) {
+                return `~${multiplier}x METR doubling time – faster than the trend.`;
+            }
+            return `~${multiplier}x METR doubling time – close to baseline.`;
         }
 
         function describeFriction(lambda) {
@@ -3320,6 +3364,22 @@
                 band = 'medium rollout';
             }
             return `lambda = ${lambda.toFixed(3)} - ${band} damping.`;
+        }
+
+        function describeAlignment(alignment, penalty) {
+            if (typeof alignment !== 'number' || typeof penalty !== 'number' || !Number.isFinite(penalty)) {
+                return '-';
+            }
+            const alignmentPct = alignment * 100;
+            let note;
+            if (alignment >= 0.7) {
+                note = 'close to METR software tasks.';
+            } else if (alignment >= 0.4) {
+                note = 'mixed workflows; slower transfer from METR.';
+            } else {
+                note = 'tacit/physical heavy; METR trend damped.';
+            }
+            return `${alignmentPct.toFixed(0)}% aligned, horizon penalty ${penalty.toFixed(2)}x - ${note}`;
         }
 
         function updateResults() {
@@ -3361,8 +3421,11 @@
 
             document.getElementById('insight-explicitness').textContent = describeExplicitness(currentParams.s_e);
             document.getElementById('insight-theta').textContent = describeTheta(currentParams.theta, currentParams.seniority);
-            document.getElementById('insight-pace').textContent = describePace(currentParams.domainPace);
+            const paceForDisplay = resolvedDomainPace();
+            document.getElementById('insight-pace').textContent = describePace(paceForDisplay);
             document.getElementById('insight-friction').textContent = describeFriction(currentParams.lambda);
+            document.getElementById('insight-alignment').textContent =
+                describeAlignment(currentParams.domainAlignment, currentParams.domainPenalty);
 
             // Update personal timeline table
             updatePersonalTimeline();

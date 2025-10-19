@@ -410,19 +410,17 @@
                         <p>In this release the interactive focuses on the AI hazard term. We treat macro shocks, firm strategy, and personal agency as separate layers, but the simulator you are using keeps the spotlight on how quickly AI can credibly do the work and how much friction stands in its way.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
-                            <div class='equation-display'>$$\lambda_{\text{AI}}(s) = F_0 e^{-\lambda s} \cdot \Big[\max\!\big(0, \tfrac{A_{\text{job}}(s)}{\theta} - 1\big)\Big]^{\gamma} M_{\text{fric}}(s)$$</div>
+                            <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>
                         </div>
-                        <p>The base hazard now activates only when surplus capability shows up. We let explicit capability double every $d$ months, blend in a slow tacit ramp, compare that job mix to the quality bar $\theta$, and raise any surplus to the power $\gamma$. A decay term $e^{-\lambda s}$ and the familiar friction multipliers keep adoption grounded.</p>
+                        <p>The hazard turns on once METR readiness clears the coverage bar. We let the METR 50% horizon shrink at the chosen doubling pace, stretch that horizon by a domain-alignment penalty for non-software work, pass it through METR's task buckets, and feed the resulting readiness into the logistic gate. Questionnaire multipliers only scale the hazard after that gate.</p>
                         <ul class='detail-list'>
-                            <li><strong>Explicit capability $A_{\text{explicit}}(t)$:</strong> $$2^{t/(d/12)}$$ with default $d = 7$ months (METR). The compute slider (defaulted to 3.4x annual growth per <a href="https://ai-2027.com/research/compute-forecast" target="_blank">AI 2027</a>) and industry sliders shorten $d$ to reflect faster progress.</li>
-                            <li><strong>Tacit capability $A_{\text{tacit}}(t)$:</strong> $$1 + \delta_{\text{tacit}} t$$ with \delta_{\text{tacit}} = 0.07 so apprenticeship-heavy work advances more slowly.</li>
-                            <li><strong>Job mix $A_{\text{job}}(t)$:</strong> $$s_e A_{\text{explicit}}(t) + (1 - s_e)A_{\text{tacit}}(t)$$ where $s_e$ comes from the digitization and standardization answers.</li>
-                            <li><strong>Coverage bar $\theta$:</strong> starts around $0.94$ for entry roles; each seniority step lifts the bar by roughly +1.5 to +7 points before automation clears it.</li>
-                            <li><strong>Friction decay $\lambda$:</strong> inferred between $0.005$ and $0.05$ per year from rollout questions, capturing how quickly organizational barriers diminish.</li>
-                            <li><strong>Surplus sensitivity $\gamma$:</strong> controls how sharply the hazard rises once AI capability exceeds the coverage threshold—larger values produce a steeper S-curve.</li>
-                            <li><strong>Residual multipliers $M_{\text{fric}}(s)$:</strong> questionnaire scores map to adoption drag and a gentle seniority shield; the "Why this moves" panel shows how your answers affect the timeline.</li>
+                            <li><strong>Task horizon $H_r(t)$:</strong> $$H_r(t) = \frac{H_{50,0} \cdot p_{\text{domain}} \cdot f(r)}{2^{(t \cdot 12)/D_{\text{eff}}}}$$ where $D_{\text{eff}}$ is the METR doubling time adjusted by compute growth and industry friction, $f(r)$ is the reliability stretch, and $p_{\text{domain}}\ge 1$ enlarges the horizon when your answers signal tacit or physical work.</li>
+                            <li><strong>Task buckets:</strong> five duration buckets reuse METR's software/reasoning anthology. Each bucket uses $$G_i(H) = \frac{1}{1 + \exp\!\left(-\frac{\ln H - \ln L_i}{s}\right)}$$ so faster models (lower $H$) lift readiness.</li>
+                            <li><strong>Readiness $A_{\text{job}}(t)$:</strong> $$A_{\text{job}}(t) = \sum_i w_i G_i(H_r(t))$$ with seniority shifting weight toward longer tasks and softening the logistic slope for leadership roles.</li>
+                            <li><strong>Coverage bar $\theta$:</strong> starts near $0.75$ for entry roles and rises with seniority via the profile you pick.</li>
+                            <li><strong>User multipliers $M_{\text{user}}(s)$:</strong> questionnaire responses exponentiate into amplifier and friction sums, apply a seniority shield, and are finally capped between $0.33\times$ and $3\times$.</li>
                         </ul>
-                        <p>We run Simpson's rule over that hazard curve to deliver the technical-feasibility probability you see in the chart.</p>
+                        <p>We still integrate the hazard with Simpson's rule to get the blue technical-feasibility curve.</p>
                     </section>
 
                     <section>
@@ -431,13 +429,13 @@
                         <p>The prompts cluster into four themes:</p>
                         <ul class='detail-list'>
                             <li><strong>AI readiness (Q1-Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
-                            <li><strong>Task structure (Q5-Q9):</strong> structured, decomposable tasks (Q5, Q6 high) accelerate adoption via the amplifier channel, while tacit knowledge (Q9) and context dependency (Q7) feed the protective friction channel. Rapid feedback loops (Q8) amplify risk by helping AI learn faster.</li>
-                            <li><strong>Human moat (Q10-Q12):</strong> relationship intensity, physical presence, and trust demands all load the friction side and slow the curve.</li>
+                            <li><strong>Task structure (Q5-Q9):</strong> structured, decomposable tasks (Q5, Q6 high) accelerate adoption via the amplifier channel, while tacit knowledge (Q9) and context dependency (Q7) feed the protective friction channel and the domain-alignment penalty. Rapid feedback loops (Q8) amplify risk by helping AI learn faster.</li>
+                            <li><strong>Human moat (Q10-Q12):</strong> relationship intensity, physical presence, and trust demands all load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
                             <li><strong>Firm and personal context (Q13-Q20):</strong> company levers shape implementation delay. Job performance (Q20) delays displacement for top performers while also helping re-employment. Adaptability questions (Q17, Q19) drive re-employment probability.</li>
                         </ul>
                         <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
-                            <p><strong>Calibration:</strong> the model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q7, Q9, Q11 high) suppresses the hazard by about $50\%$ and delays implementation by $\geq 0.7$ years.</p>
+                            <p><strong>Calibration:</strong> the model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q7, Q9, Q11 high) suppresses the hazard by about $50\%$, delays implementation by $\geq 0.7$ years, and pushes the domain penalty above $~2\times$ so readiness clears METR later.</p>
                         </div>
                     </section>
 
@@ -461,7 +459,7 @@
                             <li><strong>Personal timeline:</strong> we surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
                             <li><strong>Re-employment label:</strong> the probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
                         </ul>
-                        <p>Use the growth sliders to stress-test assumptions. Shorter doubling settings or faster inferred pace shrink $d$ and pivot both curves left. Answers that raise $s_e$ or ease the coverage bar $\theta$ have the same effect, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out, signaling a slower adoption grind.</p>
+                        <p>Use the growth sliders to stress-test assumptions. Shorter doubling settings or faster inferred pace shrink $d$ and pivot both curves left. Answers that raise $s_e$ or ease the coverage bar $\theta$ have the same effect, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out, signaling a slower adoption grind. High scores on Q7-Q12 also stretch $p_{\text{domain}}$, so even fast doubling must cover more ground before matching METR's software baselines.</p>
                     </section>
 
                     <section>
