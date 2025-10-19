@@ -77,21 +77,23 @@
             letter-spacing: 0.02em;
         }
 
-        .publication-tagline {
+        .publication-tagline,
+        .author-link {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            color: #5c564f;
             font-weight: 600;
         }
 
+        .publication-tagline {
+            color: #5c564f;
+        }
+
         .author-link {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
             color: #6ba3d4;
+            text-decoration: none;
             transition: color 0.3s;
-            font-weight: 600;
         }
 
         .author-link:hover {
@@ -100,7 +102,7 @@
 
         .header-actions {
             display: flex;
-            gap: 12px;
+            gap: 24px;
             align-items: center;
         }
 
@@ -140,15 +142,6 @@
             border-bottom: 1px solid #e6e0d4;
             margin-bottom: 48px;
         }
-
-        .article-hero .eyebrow {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: #1f1c18;
-            font-weight: 600;
-        }
-
         .article-hero h1 {
             font-family: 'Sora', sans-serif;
             font-size: clamp(2.8rem, 4vw, 3.6rem);
@@ -399,7 +392,6 @@
         <div class='content-wrapper'>
             <article class='guide-article'>
                 <header class='article-hero'>
-                    <span class='eyebrow'>Field guide</span>
                     <h1>Understanding the Job Automation Risk Calculator</h1>
                     <p class='lede'>This notebook walks through the hazard model that powers the calculator so you can interpret the curves, pressure-test scenarios, and translate the output into career choices.</p>
                     <div class='meta-line'>
@@ -438,10 +430,10 @@
                         <p>Every prompt in the wizard maps to a coded value $x_i$. Likert responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$, while yes or no toggles land at $\pm1$. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, so the combined multiplier ranges from about $0.14\times$ to $7.4\times$ the baseline hazard.</p>
                         <p>The prompts cluster into four themes:</p>
                         <ul class='detail-list'>
-                            <li><strong>AI readiness (Q1–Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
-                            <li><strong>Task structure (Q5–Q9):</strong> complex decomposition and tacit knowledge feed the protective friction channel, while rapid feedback loops and standardization accelerate adoption.</li>
-                            <li><strong>Human moat (Q10–Q13):</strong> relationship intensity, unions, physical presence, and trust demands all load the friction side and slow the curve.</li>
-                            <li><strong>Firm and personal context (Q14–Q21):</strong> company levers shape implementation delay, and adaptability questions (Q18, Q20) drive re-employment probability rather than the hazard directly.</li>
+                            <li><strong>AI readiness (Q1-Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
+                            <li><strong>Task structure (Q5-Q9):</strong> complex decomposition and tacit knowledge feed the protective friction channel, while rapid feedback loops and standardization accelerate adoption.</li>
+                            <li><strong>Human moat (Q10-Q13):</strong> relationship intensity, unions, physical presence, and trust demands all load the friction side and slow the curve.</li>
+                            <li><strong>Firm and personal context (Q14-Q21):</strong> company levers shape implementation delay, and adaptability questions (Q18, Q20) drive re-employment probability rather than the hazard directly.</li>
                         </ul>
                         <p>We also tweak the gate steepness $\gamma$ via a lighter-weight pass inside <code>kEff</code>. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. That captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
