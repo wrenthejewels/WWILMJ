@@ -427,17 +427,17 @@
 
                     <section>
                         <h2>How your answers move the curve</h2>
-                        <p>Every prompt in the wizard maps to a coded value $x_i$. Likert responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$, while yes or no toggles land at $\pm1$. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, so the combined multiplier ranges from about $0.14\times$ to $7.4\times$ the baseline hazard.</p>
+                        <p>Every prompt in the wizard maps to a coded value $x_i$. All sliders use the same coding rule: Likert 1..5 responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$ (i.e., $1\to -2, 3\to 0, 5\to +2$). Effects run in the correct direction via the weight's sign. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, multiply the results, apply seniority hazard shield, then bound the overall multiplier to $[0.33, 3.0]$ for responsiveness.</p>
                         <p>The prompts cluster into four themes:</p>
                         <ul class='detail-list'>
                             <li><strong>AI readiness (Q1-Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
-                            <li><strong>Task structure (Q5-Q9):</strong> complex decomposition and tacit knowledge feed the protective friction channel, while rapid feedback loops and standardization accelerate adoption.</li>
+                            <li><strong>Task structure (Q5-Q9):</strong> structured, decomposable tasks (Q5, Q6 high) accelerate adoption via the amplifier channel, while tacit knowledge (Q9) and context dependency (Q7) feed the protective friction channel. Rapid feedback loops (Q8) amplify risk by helping AI learn faster.</li>
                             <li><strong>Human moat (Q10-Q13):</strong> relationship intensity, unions, physical presence, and trust demands all load the friction side and slow the curve.</li>
                             <li><strong>Firm and personal context (Q14-Q21):</strong> company levers shape implementation delay, and adaptability questions (Q18, Q20) drive re-employment probability rather than the hazard directly.</li>
                         </ul>
                         <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
-                            <p><strong>Calibration:</strong> the model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q5, Q7, Q8, Q16 high) suppresses the hazard by about $50\%$.</p>
+                            <p><strong>Calibration:</strong> the model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q7, Q9, Q12 high) suppresses the hazard by about $50\%$ and delays implementation by $\geq 0.7$ years.</p>
                         </div>
                     </section>
 

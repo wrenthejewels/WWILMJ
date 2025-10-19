@@ -1497,11 +1497,11 @@
                         <p>Can your work be broken into discrete, measurable tasks?</p>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="q5-1" name="q5" value="5">
+                                <input type="radio" id="q5-1" name="q5" value="1">
                                 <label for="q5-1">Very Complex</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q5-2" name="q5" value="4">
+                                <input type="radio" id="q5-2" name="q5" value="2">
                                 <label for="q5-2">Complex</label>
                             </div>
                             <div class="radio-option">
@@ -1509,11 +1509,11 @@
                                 <label for="q5-3">Mixed</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q5-4" name="q5" value="2">
+                                <input type="radio" id="q5-4" name="q5" value="4">
                                 <label for="q5-4">Structured</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q5-5" name="q5" value="1">
+                                <input type="radio" id="q5-5" name="q5" value="5">
                                 <label for="q5-5">Highly Structured</label>
                             </div>
                         </div>
@@ -1524,11 +1524,11 @@
                         <p>How standardized are procedures/workflows in your role?</p>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="q6-1" name="q6" value="5">
+                                <input type="radio" id="q6-1" name="q6" value="1">
                                 <label for="q6-1">Highly Variable</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q6-2" name="q6" value="4">
+                                <input type="radio" id="q6-2" name="q6" value="2">
                                 <label for="q6-2">Variable</label>
                             </div>
                             <div class="radio-option">
@@ -1536,11 +1536,11 @@
                                 <label for="q6-3">Somewhat Standard</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q6-4" name="q6" value="2">
+                                <input type="radio" id="q6-4" name="q6" value="4">
                                 <label for="q6-4">Standardized</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q6-5" name="q6" value="1">
+                                <input type="radio" id="q6-5" name="q6" value="5">
                                 <label for="q6-5">Highly Standardized</label>
                             </div>
                         </div>
@@ -2556,9 +2556,140 @@
             console.log(`\n=== OVERALL: ${allPassed ? 'ALL TESTS PASSED ✓' : 'SOME TESTS FAILED ✗'} ===\n`);
         }
 
+        // WWILMJ PATCH: Regression tests to verify slider direction and weight normalization
+        function runPatchRegressionTests() {
+            console.log('\n=== WWILMJ PATCH REGRESSION TESTS ===\n');
+
+            let allPassed = true;
+
+            // Helper: Create neutral answers (all 3s)
+            const neutralAnswers = {};
+            for (let i = 1; i <= 21; i++) neutralAnswers[`Q${i}`] = 3;
+
+            // Test 1: Q5 direction - moving from 1→5 should INCREASE hazardMult
+            console.log('TEST 1: Q5 direction (decomposability)');
+            const q5Low = { ...neutralAnswers, Q5: 1 };  // Very Complex
+            const q5High = { ...neutralAnswers, Q5: 5 }; // Highly Structured
+            const { ampMult: ampQ5Low, fricMult: fricQ5Low } = computeHazardMultipliers(q5Low);
+            const { ampMult: ampQ5High, fricMult: fricQ5High } = computeHazardMultipliers(q5High);
+            const multQ5Low = ampQ5Low * fricQ5Low;
+            const multQ5High = ampQ5High * fricQ5High;
+            const q5Pass = multQ5High > multQ5Low;
+            console.log(`  Q5=1 (complex): hazardMult = ${multQ5Low.toFixed(3)}`);
+            console.log(`  Q5=5 (structured): hazardMult = ${multQ5High.toFixed(3)}`);
+            console.log(`  RESULT: ${q5Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should increase hazard)`);
+            if (!q5Pass) allPassed = false;
+
+            // Test 2: Q12 direction - moving from 1→5 should DECREASE hazardMult
+            console.log('\nTEST 2: Q12 direction (physical presence)');
+            const q12Low = { ...neutralAnswers, Q12: 1 };  // None
+            const q12High = { ...neutralAnswers, Q12: 5 }; // Essential
+            const { ampMult: ampQ12Low, fricMult: fricQ12Low } = computeHazardMultipliers(q12Low);
+            const { ampMult: ampQ12High, fricMult: fricQ12High } = computeHazardMultipliers(q12High);
+            const multQ12Low = ampQ12Low * fricQ12Low;
+            const multQ12High = ampQ12High * fricQ12High;
+            const q12Pass = multQ12High < multQ12Low;
+            console.log(`  Q12=1 (none): hazardMult = ${multQ12Low.toFixed(3)}`);
+            console.log(`  Q12=5 (essential): hazardMult = ${multQ12High.toFixed(3)}`);
+            console.log(`  RESULT: ${q12Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should decrease hazard)`);
+            if (!q12Pass) allPassed = false;
+
+            // Test 3: Q16 direction - moving from 1→5 should INCREASE delayYears
+            console.log('\nTEST 3: Q16 direction (labor market tightness)');
+            const q16Easy = { ...neutralAnswers, Q16: 1 };       // Very Easy to hire
+            const q16Difficult = { ...neutralAnswers, Q16: 5 };  // Very Difficult to hire
+            const delayEasy = calculateImplementationDelay(q16Easy, 1);
+            const delayDifficult = calculateImplementationDelay(q16Difficult, 1);
+            const q16Pass = delayDifficult > delayEasy;
+            console.log(`  Q16=1 (easy to hire): delay = ${delayEasy.toFixed(2)} years`);
+            console.log(`  Q16=5 (difficult to hire): delay = ${delayDifficult.toFixed(2)} years`);
+            console.log(`  RESULT: ${q16Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should increase delay)`);
+            if (!q16Pass) allPassed = false;
+
+            // Test 4: Calibration - Max(Q1,Q4,Q6)=5 vs all=3 should yield ≥2.5× hazard
+            console.log('\nTEST 4: High-risk amplifier stack (Q1+Q4+Q6 max)');
+            const maxRiskAnswers = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
+            const { ampMult: neutralAmp, fricMult: neutralFric } = computeHazardMultipliers(neutralAnswers);
+            const { ampMult: maxAmp, fricMult: maxFric } = computeHazardMultipliers(maxRiskAnswers);
+            const neutralMult = neutralAmp * neutralFric;
+            const maxMult = maxAmp * maxFric;
+            const multRatio = maxMult / neutralMult;
+            const calibPass = multRatio >= 2.5;
+            console.log(`  Neutral (all 3s): hazardMult = ${neutralMult.toFixed(3)}`);
+            console.log(`  Max risk (Q1,Q4,Q6=5): hazardMult = ${maxMult.toFixed(3)}`);
+            console.log(`  Ratio: ${multRatio.toFixed(2)}×`);
+            console.log(`  RESULT: ${calibPass ? 'PASS ✓' : 'FAIL ✗'} (should be ≥2.5×)`);
+            if (!calibPass) allPassed = false;
+
+            // Test 5: Protective stack - Q7=5, Q9=5, Q12=5, Q16=5 should suppress hazard ≤0.5× AND increase delay ≥0.7y
+            console.log('\nTEST 5: Protective stack (Q7+Q9+Q12 high friction, Q16 high)');
+            const protectiveAnswers = { ...neutralAnswers, Q7: 5, Q9: 5, Q12: 5, Q16: 5 };
+            const { ampMult: protAmp, fricMult: protFric } = computeHazardMultipliers(protectiveAnswers);
+            const protMult = protAmp * protFric;
+            const protRatio = protMult / neutralMult;
+            const neutralDelay = calculateImplementationDelay(neutralAnswers, 1);
+            const protDelay = calculateImplementationDelay(protectiveAnswers, 1);
+            const delayIncrease = protDelay - neutralDelay;
+            const protPass = protRatio <= 0.5 && delayIncrease >= 0.7;
+            console.log(`  Protective stack: hazardMult = ${protMult.toFixed(3)} (ratio: ${protRatio.toFixed(2)}×)`);
+            console.log(`  Neutral delay: ${neutralDelay.toFixed(2)}y, Protective delay: ${protDelay.toFixed(2)}y`);
+            console.log(`  Delay increase: ${delayIncrease.toFixed(2)}y`);
+            console.log(`  RESULT: ${protPass ? 'PASS ✓' : 'FAIL ✗'} (hazard ≤0.5× AND delay +≥0.7y)`);
+            if (!protPass) allPassed = false;
+
+            // Test 6: Q1 min→max swing should produce ≥12pp increase in 2030 risk
+            console.log('\nTEST 6: Q1 swing impact on 2030 risk');
+            // Helper to compute risk by 2030
+            const computeRisk2030 = (answers) => {
+                const { ampMult, fricMult } = computeHazardMultipliers(answers);
+                const savedParams = currentParams;
+                currentParams = {
+                    h0: 0.015, theta: 0.75, gamma: 1.2, kappa: 0.3, friction: 3.0,
+                    seniority: 1, seniorityProfile: SENIORITY_PROFILES[0],
+                    s_e: inferredExplicitness(answers), lambda: inferredFrictionDecay(answers),
+                    domainPace: inferredPace(answers), computeMultiplier: 1.0,
+                    doublingMonths: baseDoublingMonths, ampMult: ampMult, fricMult: fricMult,
+                    answers: answers, implementationDelay: 0
+                };
+                const risk = calculateDisplacementProbability(5.35);
+                currentParams = savedParams;
+                return risk;
+            };
+            const q1Min = { ...neutralAnswers, Q1: 1 };
+            const q1Max = { ...neutralAnswers, Q1: 5 };
+            const riskQ1Min = computeRisk2030(q1Min);
+            const riskQ1Max = computeRisk2030(q1Max);
+            const q1Delta = (riskQ1Max - riskQ1Min) * 100;
+            const q1SwingPass = q1Delta >= 12;
+            console.log(`  Q1=1: 2030 risk = ${(riskQ1Min * 100).toFixed(1)}%`);
+            console.log(`  Q1=5: 2030 risk = ${(riskQ1Max * 100).toFixed(1)}%`);
+            console.log(`  Delta: ${q1Delta.toFixed(1)}pp`);
+            console.log(`  RESULT: ${q1SwingPass ? 'PASS ✓' : 'FAIL ✗'} (should be ≥12pp)`);
+            if (!q1SwingPass) allPassed = false;
+
+            // Test 7: Q11 low→high swing should produce ≤−10pp change in 2030 risk
+            console.log('\nTEST 7: Q11 swing impact on 2030 risk');
+            const highRiskBase = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
+            const q11Low = { ...highRiskBase, Q11: 1 };
+            const q11High = { ...highRiskBase, Q11: 5 };
+            const riskQ11Low = computeRisk2030(q11Low);
+            const riskQ11High = computeRisk2030(q11High);
+            const q11Delta = (riskQ11High - riskQ11Low) * 100;
+            const q11SwingPass = q11Delta <= -10;
+            console.log(`  Q11=1 (weak protections): 2030 risk = ${(riskQ11Low * 100).toFixed(1)}%`);
+            console.log(`  Q11=5 (strong protections): 2030 risk = ${(riskQ11High * 100).toFixed(1)}%`);
+            console.log(`  Delta: ${q11Delta.toFixed(1)}pp`);
+            console.log(`  RESULT: ${q11SwingPass ? 'PASS ✓' : 'FAIL ✗'} (should be ≤−10pp)`);
+            if (!q11SwingPass) allPassed = false;
+
+            console.log(`\n=== PATCH TESTS: ${allPassed ? 'ALL PASSED ✓' : 'SOME FAILED ✗'} ===\n`);
+            return allPassed;
+        }
+
         // Run tests on load
         runMETRAcceptanceTests();
         runRegressionTests();
+        runPatchRegressionTests();
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -2590,25 +2721,22 @@
 
         // Per-question log-hazard multipliers for TECHNICAL FEASIBILITY (Blue Curve)
         // ONLY factors that determine when AI CAN technically do the job
+        // All sliders: 1→−2, 3→0, 5→+2 (coded uniformly). Direction comes from weight sign.
         const QUESTION_WEIGHTS = {
-            // High-risk amplifiers (higher value = MORE automation risk)
-            Q1:  { amp: +0.80 },  // AI performance: better AI = more risk
-            Q2:  { amp: +0.40 },  // Data availability: more data = easier automation
-            Q3:  { amp: +0.35 },  // Benchmark clarity: clear metrics = easier automation
-            Q4:  { amp: +0.55 },  // Task digitization: more digital = more automatable
-
-            // Q5 & Q6 have REVERSED scales in HTML but original weights were correct
-            Q5:  { fric: -0.50 }, // Task decomposability: 5=Very Complex (protective)
-            Q6:  { amp: +0.45 },  // Task standardization: 1=Highly Standard (risky)
-
-            // Friction/protective factors (higher value = LESS automation risk)
-            Q7:  { fric: -0.50 }, // Context dependency: high context = protective
-            Q8:  { amp: +0.45 },  // Feedback loop speed: fast feedback helps AI learn faster!
-            Q9:  { fric: -0.40 }, // Tacit knowledge: more tacit = protective
-            Q10: { fric: -0.45 }, // Human relationships: more relationships = protective
-            Q11: { fric: -0.85 }, // Union/labor protections: strong unions = protective
-            Q12: { amp: -0.60 },  // Physical presence: more physical = protective
-            Q13: { fric: -0.35 }, // Trust requirements: high trust needs = protective
+            // BLUE: Technical feasibility (amp increases risk, fric protects)
+            Q1:  { amp: +0.80 },  // Current AI Performance
+            Q2:  { amp: +0.40 },  // Data Availability
+            Q3:  { amp: +0.35 },  // Benchmark Clarity
+            Q4:  { amp: +0.55 },  // Task Digitization
+            Q5:  { amp: +0.50 },  // Task Decomposability (FIXED: now amp+ channel)
+            Q6:  { amp: +0.45 },  // Task Standardization
+            Q7:  { fric: -0.50 }, // Context Dependency
+            Q8:  { amp: +0.45 },  // Feedback Loop Speed
+            Q9:  { fric: -0.40 }, // Tacit Knowledge
+            Q10: { fric: -0.45 }, // Human Judgment & Relationships
+            Q11: { fric: -0.85 }, // Union/Labor Protections
+            Q12: { fric: -0.60 }, // Physical Presence (FIXED: now fric− channel)
+            Q13: { fric: -0.35 }, // Trust Requirements
             // Q14-Q17: Company/Industry context - affects implementation delay only
             // Q18, Q20: Re-employment factors - affects job search success only
             // Q19, Q21: Job retention factors - affects implementation delay only
@@ -2621,7 +2749,7 @@
             // Company/Industry Context (Q14-Q17)
             Q14: +0.40,  // Company AI adoption: 1=Resistant (more delay), 5=Leading Edge (less delay)
             Q15: +0.30,  // Labor cost pressure: 1=Not Sensitive (more delay), 5=Extremely Sensitive (less delay)
-            Q16: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay) - REVERSED, needs negative weight
+            Q16: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay)
             Q17: +0.35,  // IT infrastructure: 1=Very Outdated (more delay), 5=Cutting Edge (less delay)
             // Job Retention Factors (Q19, Q21)
             Q19: -0.25,  // AI complementarity: 5=Amplify Only (more delay), 1=Replace Only (less delay) - employer keeps you longer
@@ -2948,20 +3076,22 @@
         }
 
         // Compute user multipliers from questions (bounded to 0.33x - 3.0x overall)
-        // FIXED: Widened from [0.5, 2.0] to [0.33, 3.0] to eliminate dead zones
+        // PATCH: Apply seniority AFTER question product (hazardMult *= (1 - hazardShield))
+        // PATCH: Widened from [0.5, 2.0] to [0.33, 3.0] to eliminate dead zones
         function getUserMultiplier() {
             if (!currentParams) return 1.0;
 
+            // Step 1: Compute question-based hazard multiplier (ampMult * fricMult)
             const questionMultiplier = currentParams.ampMult * currentParams.fricMult;
+
+            // Step 2: Apply seniority hazard shield AFTER question multiplier
             const profiles = SENIORITY_PROFILES;
             const idx = Math.max(0, Math.min(profiles.length - 1, (currentParams.seniority || 1) - 1));
             const profile = profiles[idx] || profiles[0];
-            const seniorityMultiplier = 1 - (profile.hazardShield || 0);
+            const hazardMult = questionMultiplier * (1 - (profile.hazardShield || 0));
 
-            const rawMultiplier = questionMultiplier * seniorityMultiplier;
-
-            // Bound overall multiplier to [0.33, 3.0] (wider band for better slider responsiveness)
-            return Math.max(0.33, Math.min(3.0, rawMultiplier));
+            // Step 3: Bound overall multiplier to [0.33, 3.0] (wider band for better slider responsiveness)
+            return Math.max(0.33, Math.min(3.0, hazardMult));
         }
 
         // New logistic gate hazard: lambdaAI(t) = hAI / (1 + exp(-gamma * (A(t) - theta)))
