@@ -2025,8 +2025,8 @@
                 </div>
                 
                 <div class="control-group">
-                    <h3>Compute Scaling</h3>
-                    <p>Annual compute growth</p>
+                    <h3>AI Capability Barriers</h3>
+                    <p>More barriers → slower AI progress → later automation</p>
                     <div class="slider-container">
                         <input type="range" id="compute-scaling" min="1.5" max="5" step="0.1" value="3.4">
                         <span class="value-display" id="compute-scaling-value">3.4x</span>
@@ -2034,8 +2034,8 @@
                 </div>
 
                 <div class="control-group">
-                    <h3>Industry Automation Pace</h3>
-                    <p>Speed of automation in your specific industry</p>
+                    <h3>Industry Friction</h3>
+                    <p>More friction → slower adoption → later automation</p>
                     <div class="slider-container">
                         <input type="range" id="industry-pace" min="0.5" max="2" step="0.1" value="1">
                         <span class="value-display" id="industry-pace-value">1.0x</span>
@@ -2280,6 +2280,8 @@
 
         function resolvedComputeMultiplier() {
             const slider = document.getElementById('compute-scaling');
+            // Slider now represents barriers/friction (1.5 to 5, default 3.4)
+            // Higher value = more barriers = slower AI progress
             const sliderValue = slider ? parseFloat(slider.value) : computeSliderBaseline;
             const normalized = sliderValue / computeSliderBaseline;
             const base = currentParams && typeof currentParams.computeMultiplier === 'number'
@@ -2290,12 +2292,14 @@
 
         function resolvedDomainPace() {
             const slider = document.getElementById('industry-pace');
-            const sliderValue = slider ? parseFloat(slider.value) : domainPaceSliderBaseline;
-            const normalized = sliderValue / domainPaceSliderBaseline;
+            // Slider now represents friction (0.5 to 2.0, default 1.0)
+            // Higher friction = slower automation
+            const frictionValue = slider ? parseFloat(slider.value) : domainPaceSliderBaseline;
+            const normalized = frictionValue / domainPaceSliderBaseline;
             const base = currentParams && typeof currentParams.domainPace === 'number'
                 ? currentParams.domainPace
                 : 1.0;
-            return base * normalized;
+            return base * normalized;  // Higher friction → larger multiplier → slower automation
         }
 
         function resolvedBaseDoublingMonths() {
@@ -2323,11 +2327,17 @@
         // Returns task completion time in minutes at time t (years)
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = METR_DEFAULTS.r_target) {
             const D_months = resolvedBaseDoublingMonths();
-            const computeMultiplier = resolvedComputeMultiplier();
-            const domainPace = resolvedDomainPace();
+            const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
+            const industryFriction = resolvedDomainPace();  // Now represents friction
 
-            // Effective doubling time accounting for compute and domain pace
-            const D_eff = D_months / (computeMultiplier * domainPace);
+            // Effective doubling time: MULTIPLY by frictions (higher friction → longer doubling → slower automation)
+            const D_eff = D_months * computeFriction * industryFriction;
+
+            // Debug logging (only log occasionally to avoid spam)
+            if (tYears === 0 && Math.random() < 0.1) {
+                console.log('[H_r] D_months:', D_months, 'computeFriction:', computeFriction.toFixed(2),
+                           'industryFriction:', industryFriction.toFixed(2), '→ D_eff:', D_eff.toFixed(2), 'months');
+            }
 
             const monthsElapsed = tYears * 12;
             const f_r = reliabilityFactor(r);
@@ -3168,17 +3178,25 @@
         }
 
         document.getElementById('ai-doubling')?.addEventListener('input', function() {
-            document.getElementById('ai-doubling-value').textContent = this.value + ' mo';
+            const value = parseFloat(this.value);
+            document.getElementById('ai-doubling-value').textContent = value + ' mo';
+            console.log('[Slider] AI Doubling:', value, 'months → expect', value < 7 ? 'FASTER' : 'SLOWER', 'automation');
             updateChart();
         });
-        
+
         document.getElementById('compute-scaling')?.addEventListener('input', function() {
-            document.getElementById('compute-scaling-value').textContent = parseFloat(this.value).toFixed(2) + 'x';
+            const barrierValue = parseFloat(this.value);
+            document.getElementById('compute-scaling-value').textContent = barrierValue.toFixed(1) + 'x';
+            console.log('[Slider] AI Capability Barriers:', barrierValue.toFixed(1) + 'x',
+                       '→ expect', barrierValue > 3.4 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
         });
 
         document.getElementById('industry-pace')?.addEventListener('input', function() {
-            document.getElementById('industry-pace-value').textContent = parseFloat(this.value).toFixed(1) + 'x';
+            const frictionValue = parseFloat(this.value);
+            document.getElementById('industry-pace-value').textContent = frictionValue.toFixed(1) + 'x';
+            console.log('[Slider] Industry Friction:', frictionValue.toFixed(1) + 'x',
+                       '→ expect', frictionValue > 1.0 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
         });
 
