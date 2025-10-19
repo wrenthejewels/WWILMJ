@@ -2057,8 +2057,8 @@
             <section class="ai-equation">
                 <div class="section-intro">
                     <span class="eyebrow">How this works</span>
-                    <h3>METR-powered hazard model</h3>
-                    <p>This calculator uses METR's empirical 7-month AI capability doubling benchmark to forecast automation risk. The model maps AI capability growth to job task readiness, then computes displacement hazard through a logistic gate. Adjust sliders to see how faster capability growth or implementation barriers shift your timeline.</p>
+                    <h3>METR-powered stacked hazard model</h3>
+                    <p>This calculator uses METR's empirical 7-month AI capability doubling benchmark to forecast automation risk. The stacked framework keeps separate hazard channels for AI progress, macro shocks, firm strategy, role-level dynamics, and personal factors.</p>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
@@ -2067,12 +2067,18 @@
                         <div class="equation-display">$$P_{\text{loss}}(t) = 1 - S(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s) \, ds\right)$$</div>
                     </div>
                     <div class="equation-callout">
-                        <span class="callout-label">Integrated hazard (current release)</span>
-                        <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s)$$</div>
+                        <span class="callout-label">Total hazard (stacked framework)</span>
+                        <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
                     </div>
                 </div>
 
-                <p>The simulator now collapses the stacked template into the AI hazard: the same logistic gate drives both the blue and green curves and the "Your Risk Profile" metrics. Macro, firm, role, and personal hazard terms stay reserved for future layers.</p>
+                <p>In the current release, the charts and cards you see draw on three pieces:</p>
+                <ul class="detail-list">
+                    <li><strong>AI hazard:</strong> the blue curve shows the METR-based logistic gate for technical feasibility.</li>
+                    <li><strong>Adaptability delay:</strong> the green curve shifts the AI hazard by your implementation delay, so firm and personal friction slow the rollout instead of changing the capability threshold.</li>
+                    <li><strong>Re-employment likelihood:</strong> the dashboard summarizes how easily you can land somewhere new once displacement arrives.</li>
+                </ul>
+                <p>Macro, firm, role, and personal hazard layers remain placeholders for now; they stay at zero until we have validated datasets, but the stacked template is ready for those future additions.</p>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
 
@@ -2131,7 +2137,7 @@
                     </div>
                 </div>
 
-                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard—it's the Blue curve shifted right by implementation delay (Δ). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
+                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard-it's the Blue curve shifted right by implementation delay (Δ). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Model Defaults</h4>
 

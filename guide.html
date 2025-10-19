@@ -402,12 +402,17 @@
                 <div class='article-body'>
                     <section>
                         <h2>What the calculator actually simulates</h2>
-                        <p>The experience you see on the main page starts from our stacked hazard template, but in this release every layer collapses into the AI hazard. Each year still carries some probability that your role is displaced; integrate that AI hazard and you get the cumulative chance that automation has arrived. The blue curve on the chart is the survival complement for technical feasibility, built directly from that integral.</p>
+                        <p>The experience you see on the main page builds on a stacked hazard template: separate channels track AI capability, macro cycles, firm execution, role design, and personal leverage. The framework stays in place even when some channels are empty.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Survival relationship</span>
                             <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
                         </div>
-                        <p>For now we set $\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s)$: the macro, firm, role, and personal hazard terms remain zeroed while we validate the METR-driven channel. The same AI hazard powers the blue curve, the green adoption curve after delay, and the "Your Risk Profile" cards.</p>
+                        <p>In this release you are seeing $\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s)$: the macro, firm, role, and personal hazard channels are parked at zero until we have calibrated data. The AI hazard feeds the blue technical-feasibility curve, the green adoption curve after the implementation delay, and the re-employment card.</p>
+                        <ul class='detail-list'>
+                            <li><strong>AI hazard:</strong> METR task-length data map capability progress into the blue curve.</li>
+                            <li><strong>Adaptability delay:</strong> firm and personal answers shift the AI hazard forward in time to produce the green curve.</li>
+                            <li><strong>Re-employment likelihood:</strong> adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
+                        </ul>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
                             <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>
