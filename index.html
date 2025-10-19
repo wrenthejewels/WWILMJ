@@ -2686,10 +2686,7 @@
             return allPassed;
         }
 
-        // Run tests on load
-        runMETRAcceptanceTests();
-        runRegressionTests();
-        runPatchRegressionTests();
+        // Tests will be run after DOM is ready (see DOMContentLoaded handler below)
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -3443,10 +3440,13 @@
                 customBtn.click();
             }
 
-            // Run calibration tests on load
+            // Run tests after initial analysis completes
             setTimeout(() => {
+                runMETRAcceptanceTests();
+                runRegressionTests();
+                runPatchRegressionTests();
                 runCalibrationTests();
-            }, 1000);
+            }, 500);
         });
     </script>
     <script src="navigation.js"></script>
