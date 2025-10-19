@@ -304,10 +304,28 @@
             font-size: 1em;
         }
 
-        .profile-scores-grid {
+        .profile-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
+        }
+
+        .profile-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .profile-timeline {
+            border-left: 1px solid #ddd;
+            padding-left: 12px;
+        }
+
+        .profile-timeline h4 {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
         }
 
         .parameter-item {
@@ -483,13 +501,6 @@
         .result-value {
             font-size: 2em;
             font-weight: bold;
-        }
-
-        .result-subtitle {
-            font-size: 0.75em;
-            opacity: 0.85;
-            margin-top: 8px;
-            font-weight: normal;
         }
 
         .progress-indicator {
@@ -1945,32 +1956,39 @@
                 <div class="right-column" id="results-column">
 
             <div class="parameter-breakdown">
-                <h3>Your Risk Profile</h3>
+                <h3>Your Risk Profile & Timeline</h3>
 
-                <div class="profile-scores-grid">
-                    <div class="parameter-item">
-                        <span class="parameter-label">Role:</span>
-                        <span class="parameter-value" id="role-display">-</span>
+                <div class="profile-grid">
+                    <div class="profile-scores">
+                        <div class="parameter-item">
+                            <span class="parameter-label">Role:</span>
+                            <span class="parameter-value" id="role-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">AI Readiness:</span>
+                            <span class="parameter-value" id="ai-readiness-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Task Adaptability:</span>
+                            <span class="parameter-value" id="task-adapt-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Friction:</span>
+                            <span class="parameter-value" id="friction-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Firm Readiness:</span>
+                            <span class="parameter-value" id="firm-display">-</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span class="parameter-label">Personal Adapt:</span>
+                            <span class="parameter-value" id="personal-display">-</span>
+                        </div>
                     </div>
-                    <div class="parameter-item">
-                        <span class="parameter-label">AI Readiness:</span>
-                        <span class="parameter-value" id="ai-readiness-display">-</span>
-                    </div>
-                    <div class="parameter-item">
-                        <span class="parameter-label">Task Adaptability:</span>
-                        <span class="parameter-value" id="task-adapt-display">-</span>
-                    </div>
-                    <div class="parameter-item">
-                        <span class="parameter-label">Friction:</span>
-                        <span class="parameter-value" id="friction-display">-</span>
-                    </div>
-                    <div class="parameter-item">
-                        <span class="parameter-label">Firm Readiness:</span>
-                        <span class="parameter-value" id="firm-display">-</span>
-                    </div>
-                    <div class="parameter-item">
-                        <span class="parameter-label">Personal Adapt:</span>
-                        <span class="parameter-value" id="personal-display">-</span>
+
+                    <div class="profile-timeline">
+                        <h4>Your Timeline</h4>
+                        <div id="personal-timeline"></div>
                     </div>
                 </div>
 
@@ -2010,25 +2028,13 @@
             </div>
 
             <div class="results">
-                <div class="result-card" id="risk25-card">
-                    <h4>25% Automation Risk</h4>
-                    <div class="result-value" id="risk25-year">-</div>
-                    <div class="result-subtitle" id="risk25-subtitle"></div>
-                </div>
                 <div class="result-card" id="median-card">
-                    <h4>50% Automation Risk</h4>
+                    <h4>50% Job Loss Risk</h4>
                     <div class="result-value" id="median-year">-</div>
-                    <div class="result-subtitle" id="median-subtitle"></div>
-                </div>
-                <div class="result-card" id="risk75-card">
-                    <h4>75% Automation Risk</h4>
-                    <div class="result-value" id="risk75-year">-</div>
-                    <div class="result-subtitle" id="risk75-subtitle"></div>
                 </div>
                 <div class="result-card" id="high-card">
-                    <h4>90% Automation Risk</h4>
+                    <h4>90% Job Loss Risk</h4>
                     <div class="result-value" id="high-year">-</div>
-                    <div class="result-subtitle" id="high-subtitle"></div>
                 </div>
                 <div class="result-card" id="risk5-card">
                     <h4>Risk by 2030</h4>
@@ -2367,34 +2373,47 @@
         }
 
         function updatePersonalTimeline() {
+            const timeline = document.getElementById('personal-timeline');
+            const events = [];
+            
             const risk25 = findYearForProbability(0.25, currentParams);
             const risk50 = findYearForProbability(0.5, currentParams);
             const risk75 = findYearForProbability(0.75, currentParams);
             const risk90 = findYearForProbability(0.9, currentParams);
-
+            
             const currentYear = 2025.65;
-
-            // Update 25% risk card
-            document.getElementById('risk25-year').textContent =
-                risk25 < 50 ? `${(currentYear + risk25).toFixed(1)}` : 'Beyond 2050';
-            document.getElementById('risk25-subtitle').textContent =
-                risk25 < 50 ? `${risk25.toFixed(1)} years from now` : '';
-
-            // Update 50% risk card (median)
-            const medianYear = currentYear + risk50;
-            document.getElementById('median-subtitle').textContent =
-                risk50 < 50 ? `${risk50.toFixed(1)} years from now` : '';
-
-            // Update 75% risk card
-            document.getElementById('risk75-year').textContent =
-                risk75 < 50 ? `${(currentYear + risk75).toFixed(1)}` : 'Beyond 2050';
-            document.getElementById('risk75-subtitle').textContent =
-                risk75 < 50 ? `${risk75.toFixed(1)} years from now` : '';
-
-            // Update 90% risk card (high)
-            const highYear = currentYear + risk90;
-            document.getElementById('high-subtitle').textContent =
-                risk90 < 50 ? `${risk90.toFixed(1)} years from now` : '';
+            
+            if (risk25 < 10) {
+                events.push({
+                    date: (currentYear + risk25).toFixed(1),
+                    description: '25% risk AI can technically automate role'
+                });
+            }
+            if (risk50 < 15) {
+                events.push({
+                    date: (currentYear + risk50).toFixed(1),
+                    description: '50% risk AI can technically automate role'
+                });
+            }
+            if (risk75 < 20) {
+                events.push({
+                    date: (currentYear + risk75).toFixed(1),
+                    description: '75% risk AI can technically automate role'
+                });
+            }
+            if (risk90 < 25) {
+                events.push({
+                    date: (currentYear + risk90).toFixed(1),
+                    description: '90% risk AI can technically automate role'
+                });
+            }
+            
+            timeline.innerHTML = events.map(e => `
+                <div class="timeline-event">
+                    <span class="timeline-date">${e.date}</span>
+                    <span class="timeline-description">${e.description}</span>
+                </div>
+            `).join('');
         }
 
         function resetAnalysis() {
