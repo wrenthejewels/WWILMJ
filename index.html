@@ -2139,17 +2139,25 @@
             return Math.min(max, Math.max(min, value));
         }
 
+        function toScore(raw) {
+            if (typeof raw !== 'number' || Number.isNaN(raw)) return 2;
+            if (raw >= 1 && raw <= 5) {
+                return Math.max(0, Math.min(4, raw - 1));
+            }
+            return Math.max(0, Math.min(4, raw));
+        }
+
         function norm(value) {
-            return clamp(value / 4, 0, 1);
+            return clamp(toScore(value) / 4, 0, 1);
         }
 
         function avg(questionKeys, answers) {
             if (!Array.isArray(questionKeys) || questionKeys.length === 0) {
-                return 3;
+                return 2;
             }
             const total = questionKeys.reduce((sum, key) => {
                 const val = answers && typeof answers[key] === 'number' ? answers[key] : 3;
-                return sum + val;
+                return sum + toScore(val);
             }, 0);
             return total / questionKeys.length;
         }
@@ -2165,8 +2173,12 @@
             // TODO: wire to questionnaire state once answers persist outside analyzeRole
             const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
             let lam = 0.02;
-            lam += 0.01 * norm(get('Q14')) + 0.01 * norm(get('Q17')) + 0.005 * norm(get('Q15')) + 0.005 * norm(get('Q16'));
-            lam -= 0.01 * norm(get('Q12')) + 0.01 * norm(get('Q10'));
+            lam += 0.01 * (norm(get('Q14')) - 0.5);
+            lam += 0.01 * (norm(get('Q17')) - 0.5);
+            lam += 0.005 * (norm(get('Q15')) - 0.5);
+            lam += 0.005 * (norm(get('Q16')) - 0.5);
+            lam -= 0.01 * (norm(get('Q12')) - 0.5);
+            lam -= 0.01 * (norm(get('Q10')) - 0.5);
             return clamp(lam, 0.005, 0.05);
         }
 
@@ -2174,7 +2186,11 @@
             // TODO: wire to questionnaire state once answers persist outside analyzeRole
             const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
             let pace = 1.0;
-            pace += 0.20 * norm(get('Q2')) + 0.15 * norm(get('Q17')) + 0.15 * norm(get('Q14')) + 0.10 * norm(get('Q8')) + 0.10 * norm(get('Q6'));
+            pace += 0.20 * (norm(get('Q2')) - 0.5);
+            pace += 0.15 * (norm(get('Q17')) - 0.5);
+            pace += 0.15 * (norm(get('Q14')) - 0.5);
+            pace += 0.10 * (norm(get('Q8')) - 0.5);
+            pace += 0.10 * (norm(get('Q6')) - 0.5);
             return clamp(pace, 0.6, 1.8);
         }
 
