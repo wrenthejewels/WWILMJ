@@ -410,63 +410,63 @@
                 <div class='article-body'>
                     <section>
                         <h2>What the calculator actually simulates</h2>
-                        <p>The experience you see on the main page sits on top of a hazard model. Each year carries some probability that your role is displaced; integrate those annual hazards and you get the cumulative chance that automation has arrived. The blue curve on the chart is the survival complement for technical feasibility, and it comes straight from that integration.</p>
+                        <p>The experience you see on the main page sits on top of a stacked hazard model. Each year carries some probability that your role is displaced; integrate those annual hazards and you get the cumulative chance that automation has arrived. The blue curve on the chart is the survival complement for technical feasibility, and it comes straight from that integration.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Survival relationship</span>
-                            <div class='equation-display'>P_loss(t) = 1 - exp(- integral_0^t lambda_total(s) ds)</div>
+                            <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
                         </div>
                         <p>In this release the interactive focuses on the AI hazard term. We treat macro shocks, firm strategy, and personal agency as separate layers, but the simulator you are using keeps the spotlight on how quickly AI can credibly do the work and how much friction stands in its way.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
-                            <div class='equation-display'>lambda_AI(s) = min[0.95, h_base(s) * exp(sum w_amp x_i) * exp(sum w_fric x_i)]</div>
+                            <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \min\!\left[0.95,\; h_{\text{base}}(s)\, \exp\Bigg(\sum w_{\text{amp}} x_i\Bigg)\, \exp\Bigg(\sum w_{\text{fric}} x_i\Bigg)\right]$$</div>
                         </div>
-                        <p>The base hazard is a three-phase curve. When capability is less than 10% of the threshold we pin hazard at 0.1%. It ramps linearly as AI closes the gap, and once capability exceeds the threshold we track h_base(s) = h0 * (A(s) / theta0)^gamma, then damp it by organizational friction and seniority. A few levers matter inside that term:</p>
+                        <p>The base hazard is a three-phase curve. When capability is \(&lt;10\%\) of the threshold we pin hazard at 0.1%. It ramps linearly as AI closes the gap, and once capability exceeds the threshold we track $$h_{\text{base}}(s) = h_0 \left(\frac{A(s)}{\theta_0}\right)^{\gamma}$$ then damp it by organizational friction and seniority. A few levers matter inside that term:</p>
                         <ul class='detail-list'>
-                            <li><strong>Capability growth A(t):</strong> the AI doubling slider sets A(t) = exp((24 ln 2 / doubling_months) * t) so shorter doubling times bend the blue curve forward.</li>
-                            <li><strong>Compute scaling:</strong> we multiply capability by (multiplier)^t each year to reflect compute-led efficiency gains.</li>
+                            <li><strong>Capability growth $A(t)$:</strong> the AI doubling slider sets $$A(t)=\exp\!\left(\frac{24 \ln 2}{\text{doubling months}} \, t\right)$$ so shorter doubling times bend the blue curve forward.</li>
+                            <li><strong>Compute scaling:</strong> capability is multiplied by $(\text{multiplier})^{t}$ each year to reflect compute-led efficiency gains.</li>
                             <li><strong>Industry pace:</strong> a constant multiplier captures diffusion pressure from your sector.</li>
-                            <li><strong>Friction term H(t):</strong> answers initialize H(0) and it decays as H(t) = H(0) * exp(-0.02 t), so stubborn organizations eventually soften.</li>
-                            <li><strong>Threshold theta0:</strong> we start at 3.0 for entry roles and scale it by [1.00, 1.61, 2.00, 2.11, 2.43] as seniority climbs, forcing higher capability before leaders are threatened.</li>
-                            <li><strong>Seniority damper:</strong> once above threshold we multiply by (1 - r_s) where r_s sits in {0, 0.45, 0.65, 0.85, 0.95} from entry through executive to reflect retention bias.</li>
-                            <li><strong>Friction multiplier:</strong> the hazard is further reduced by 1 / (1 + kappa * H(t) / 5) with kappa = 0.3 so persistent friction buys time.</li>
+                            <li><strong>Friction term $H(t)$:</strong> answers initialize $H(0)$ and it decays as $$H(t) = H(0)\, e^{-0.02 t}$$ so stubborn organizations eventually soften.</li>
+                            <li><strong>Threshold $\theta_0$:</strong> we start at $3.0$ for entry roles and scale it by $[1.00, 1.61, 2.00, 2.11, 2.43]$ as seniority climbs, forcing higher capability before leaders are threatened.</li>
+                            <li><strong>Seniority damper:</strong> once above threshold we multiply by $(1 - r_s)$ where $r_s \in \{0, 0.45, 0.65, 0.85, 0.95\}$ from entry through executive to reflect retention bias.</li>
+                            <li><strong>Friction multiplier:</strong> the hazard is further reduced by $$\frac{1}{1 + \kappa \tfrac{H(t)}{5}}$$ with $\kappa = 0.3$, so persistent friction buys time.</li>
                         </ul>
                         <p>We run Simpson's rule over that hazard curve to deliver the technical-feasibility probability you see in the chart.</p>
                     </section>
 
                     <section>
                         <h2>How your answers move the curve</h2>
-                        <p>Every prompt in the wizard maps to a coded value x_i. Likert responses convert to the symmetric set (-2, -1, 0, +1, +2), while yes or no toggles land at +/-1. The model tracks two channels: an amplifier sum sum(w_amp * x_i) and a friction sum sum(w_fric * x_i). After clamping each sum to [-2, 2] we exponentiate them, so the combined multiplier ranges from about 0.14 to 7.4 times the baseline hazard.</p>
+                        <p>Every prompt in the wizard maps to a coded value $x_i$. Likert responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$, while yes or no toggles land at $\pm1$. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, so the combined multiplier ranges from about $0.14\times$ to $7.4\times$ the baseline hazard.</p>
                         <p>The prompts cluster into four themes:</p>
                         <ul class='detail-list'>
-                            <li><strong>AI readiness (Q1-Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
-                            <li><strong>Task structure (Q5-Q9):</strong> complex decomposition and tacit knowledge feed the protective friction channel, while rapid feedback loops and standardization accelerate adoption.</li>
-                            <li><strong>Human moat (Q10-Q13):</strong> relationship intensity, unions, physical presence, and trust demands all load the friction side and slow the curve.</li>
-                            <li><strong>Firm and personal context (Q14-Q21):</strong> company levers shape implementation delay, and adaptability questions (Q18, Q20) drive re-employment probability rather than the hazard directly.</li>
+                            <li><strong>AI readiness (Q1–Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
+                            <li><strong>Task structure (Q5–Q9):</strong> complex decomposition and tacit knowledge feed the protective friction channel, while rapid feedback loops and standardization accelerate adoption.</li>
+                            <li><strong>Human moat (Q10–Q13):</strong> relationship intensity, unions, physical presence, and trust demands all load the friction side and slow the curve.</li>
+                            <li><strong>Firm and personal context (Q14–Q21):</strong> company levers shape implementation delay, and adaptability questions (Q18, Q20) drive re-employment probability rather than the hazard directly.</li>
                         </ul>
-                        <p>We also tweak the gate steepness gamma via a lighter-weight pass inside <code>kEff</code>. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. That captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
+                        <p>We also tweak the gate steepness $\gamma$ via a lighter-weight pass inside <code>kEff</code>. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. That captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
-                            <p><strong>Calibration check:</strong> every page load reruns unit tests. Pushing Q1, Q4, and Q6 to five yields roughly a 2.5x hazard boost versus neutral answers, while stacking protective responses (Q5, Q7, Q8, Q16 high) suppresses the hazard by about 50 percent. If a future edit drifts, the console will flag it.</p>
+                            <p><strong>Calibration check:</strong> every page load reruns unit tests. Pushing Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q5, Q7, Q8, Q16 high) suppresses the hazard by about $50\%$. If a future edit drifts, the console will flag it.</p>
                         </div>
                     </section>
 
                     <section>
                         <h2>Implementation delay and the green curve</h2>
-                        <p>The green actual job loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q14 through Q17 look at adoption appetite, labor cost pressure, labor market tightness, and infrastructure. Q19 and Q21 reward complementary work and strong performance.</p>
+                        <p>The green actual job-loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q14 through Q17 look at adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q19 and Q21 reward complementary work and strong performance.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Delay function</span>
-                            <div class='equation-display'>delay = (1.75 - 1.25 * s_delay) * m_seniority, with s_delay in [-2, 2] and m_seniority in {0.8, 1.2, 1.4, 1.6, 1.8}</div>
+                            <div class='equation-display'>$$\text{delay} = \big(1.75 - 1.25\, s_{\text{delay}}\big)\, m_{\text{seniority}}, \quad s_{\text{delay}} \in [-2,2],\; m_{\text{seniority}} \in \{0.8,1.2,1.4,1.6,1.8\}$$</div>
                         </div>
-                        <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can collapse the gap toward 0.5 years, while defensive environments stretch it beyond three. Senior leaders get another bump because their multiplier reaches 1.8.</p>
-                        <p>Re-employment odds pull from the adaptability prompts. We start at 60 percent, add or subtract up to 20 points based on transferable skills and learning speed, subtract up to 30 points if the median technical hazard lands within three years, and then apply a small seniority boost (up to 12 percent). The result is clamped between 10 and 85 percent -- nobody is guaranteed, but nobody is written off.</p>
+                        <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can collapse the gap toward $0.5$ years, while defensive environments stretch it beyond three. Senior leaders get another bump because their multiplier reaches $1.8\times$.</p>
+                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, add or subtract up to $20$ points based on transferable skills and learning speed, subtract up to $30$ points if the median technical hazard lands within three years, and then apply a small seniority boost (up to $12\%$). The result is clamped between $10\%$ and $85\%$ &mdash; nobody is guaranteed, but nobody is written off.</p>
                     </section>
 
                     <section>
                         <h2>Reading the outputs</h2>
-                        <p>The chart shows two survival complements: blue for technical feasibility and green for realized displacement once friction and delay kick in. Because we integrate lambda(s) with Simpson's rule, the area under each curve is the cumulative probability that automation has already happened.</p>
+                        <p>The chart shows two survival complements: blue for technical feasibility and green for realized displacement once friction and delay kick in. Because we integrate $\lambda(s)$ with Simpson's rule, the area under each curve is the cumulative probability that automation has already happened.</p>
                         <ul class='detail-list'>
-                            <li><strong>Median timeline:</strong> we binary-search for the year where cumulative probability hits 50 percent. That becomes the headline median job loss metric.</li>
-                            <li><strong>Risk by 2030 or 2031:</strong> the model evaluates P_loss at 5.35 and 6.35 years from 2024.65, matching the scenario years shown on the card.</li>
-                            <li><strong>Personal timeline:</strong> we surface the 25, 50, 75, and 90 percent milestones when they fall within the next 10, 15, 18, and 25 years respectively so you can see the near-term thresholds.</li>
+                            <li><strong>Median timeline:</strong> we binary-search for the year where cumulative probability hits $50\%$. That becomes the headline median job-loss metric.</li>
+                            <li><strong>Risk by 2030 or 2031:</strong> the model evaluates $P_{\text{loss}}$ at $5.35$ and $6.35$ years from $2024.65$, matching the scenario years shown on the card.</li>
+                            <li><strong>Personal timeline:</strong> we surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
                             <li><strong>Re-employment label:</strong> the probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
                         </ul>
                         <p>Use the growth sliders to stress-test assumptions. Faster AI doubling or heavier compute scaling pivots both curves left. Increasing friction answers or dialing up implementation drag leaves the blue curve anchored but pushes the green curve out, telling you whether you are dealing with imminent technical substitution or a slower organizational grind.</p>
@@ -487,11 +487,19 @@
         </div>
     </main>
 
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js' async></script>
     <script src='navigation.js'></script>
 </body>
 
 </html>
-
-
-
-
