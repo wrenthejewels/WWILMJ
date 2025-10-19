@@ -2062,26 +2062,28 @@
                 </div>
                 <div class="equation-callout">
                     <span class="callout-label">Survival relationship</span>
-                    <div class="equation-display">$$P_{\text{loss}}(t) = 1 - S(t) = 1 - \exp\left(-\int_0^t I_{\text{total}}(s) \, ds\right)$$</div>
+                    <div class="equation-display">$$P_{\text{loss}}(t) = 1 - S(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s) \, ds\right)$$</div>
                 </div>
                 <div class="equation-callout">
                     <span class="callout-label">Total hazard (stacked framework)</span>
-                    <div class="equation-display">$$I_{\text{total}}(s) = I_{\text{AI}}(s) + I_{\text{macro}}(s) + I_{\text{firm}}(s) + I_{\text{role}}(s) + I_{\text{personal}}(s)$$</div>
+                    <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
                 </div>
                 <p>Right now the interactive experience concentrates on the AI hazard term. As you answer the prompts the curve shifts to reflect capability readiness, friction, and adaptability.</p>
                 <div class="equation-callout">
                     <span class="callout-label">AI hazard component</span>
-                    <div class="equation-display">$$I_{\text{AI}}(s) = \frac{h_{\text{AI}}}{1 + \exp(-k [A(s) \cdot C(s) - I_0 - b H(s) - c T_{\text{adapt}}(s)])}$$</div>
+                    <div class="equation-display">$$\lambda_{\text{AI}}(s) = \frac{h_{\text{AI}}}{1 + \exp\{-\gamma [A(s) - \theta_0 - \kappa H(s) - \beta T_{\text{adapt}}(s)]\}}$$</div>
                 </div>
                 <ul class="factor-grid factor-grid--compact">
-                    <li><strong>A(s)</strong> AI capability growth (exp. doubling every 5-7 months)</li>
-                    <li><strong>C(s)</strong> compute scaling effect (3.4-5x/year for leading labs)</li>
-                    <li><strong>H(s)</strong> organizational and regulatory friction</li>
-                    <li><strong>T<sub>adapt</sub>(s)</strong> how easily tasks can shift to AI</li>
-                    <li><strong>h<sub>AI</sub></strong> scaling constant for overall intensity</li>
-                    <li><strong>I<sub>0</sub></strong> baseline adoption threshold</li>
-                    <li><strong>k</strong> steepness of the adoption curve</li>
-                    <li><strong>b, c</strong> sensitivity to friction and adaptability</li>
+                    <li><strong>s:</strong> Time (years)</li>
+                    <li><strong>λ<sub>AI</sub>(s):</strong> AI hazard (annual chance of AI displacement)</li>
+                    <li><strong>A(s):</strong> AI readiness for your tasks (capability, reliability, cost)</li>
+                    <li><strong>H(s):</strong> Human/organizational friction</li>
+                    <li><strong>T<sub>adapt</sub>(s):</strong> Task adaptability</li>
+                    <li><strong>θ<sub>0</sub>:</strong> Baseline adoption threshold</li>
+                    <li><strong>γ:</strong> Steepness of the adoption curve</li>
+                    <li><strong>κ:</strong> Sensitivity to friction</li>
+                    <li><strong>β:</strong> Sensitivity to adaptability</li>
+                    <li><strong>h<sub>AI</sub>:</strong> Hazard scaling factor</li>
                 </ul>
             </section>
                 </div>
