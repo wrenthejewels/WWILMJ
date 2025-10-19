@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Cousine:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <link rel='preconnect' href='https://fonts.googleapis.com'>
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Cousine:wght@400;700&display=swap' rel='stylesheet'>
     <title>Guide - Don't Lose Your Job</title>
     <style>
         * {
@@ -16,11 +16,36 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #ffffff;
+            font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #faf7f1;
+            color: #1f1c18;
+            line-height: 1.7;
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
+        }
+
+        a {
+            color: #a35d2c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: #703b16;
+            text-decoration: underline;
+        }
+
+        .container {
+            width: 92.5%;
+            max-width: none;
+            margin: 0 auto;
+            padding: 0 0 120px;
+            background: transparent;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            margin: 0 auto;
         }
 
         .site-header {
@@ -32,7 +57,6 @@
 
         .header-inner {
             width: 92.5%;
-            max-width: none;
             margin: 0 auto;
             padding: 20px 0;
             display: flex;
@@ -47,9 +71,36 @@
             gap: 4px;
         }
 
+        .publication-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 0.02em;
+        }
+
+        .publication-tagline {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #5c564f;
+            font-weight: 600;
+        }
+
+        .author-link {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #6ba3d4;
+            transition: color 0.3s;
+            font-weight: 600;
+        }
+
+        .author-link:hover {
+            color: #4a8bc2;
+        }
+
         .header-actions {
             display: flex;
-            gap: 24px;
+            gap: 12px;
             align-items: center;
         }
 
@@ -80,251 +131,367 @@
             box-shadow: 0 12px 28px rgba(31, 28, 24, 0.2);
         }
 
-        .publication-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 0.02em;
+        .guide-article {
+            width: 100%;
         }
 
-        .publication-tagline {
+        .article-hero {
+            padding: 96px 0 48px;
+            border-bottom: 1px solid #e6e0d4;
+            margin-bottom: 48px;
+        }
+
+        .article-hero .eyebrow {
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
+            color: #1f1c18;
+            font-weight: 600;
+        }
+
+        .article-hero h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(2.8rem, 4vw, 3.6rem);
+            letter-spacing: -0.015em;
+            font-weight: 600;
+            margin-top: 18px;
+        }
+
+        .lede {
             color: #5c564f;
-            font-weight: 600;
+            max-width: 48ch;
+            margin-top: 16px;
+            font-size: 1.18rem;
         }
 
-        .author-link {
-            font-size: 0.75rem;
-            color: #8b8379;
-            text-decoration: none;
-            transition: color 0.2s ease;
+        .meta-line {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-top: 24px;
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #8c857d;
         }
 
-        .author-link:hover {
-            color: #1f1c18;
+        .article-body {
+            width: min(720px, 100%);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+            padding-bottom: 120px;
         }
 
-        .container {
-            max-width: 100%;
-            margin: 0;
+        .article-body section {
             background: #ffffff;
-            padding: 0;
+            border: 1px solid #e6e0d4;
+            border-radius: 24px;
+            padding: 40px 44px;
+            box-shadow: 0 32px 80px rgba(15, 23, 42, 0.05);
         }
 
-        .content-wrapper {
-            width: 92.5%;
-            max-width: none;
-            margin: 0 auto;
-            padding: 40px 0;
-        }
-
-        .section-category {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #2a5298;
-        }
-
-        .section-category h2 {
-            color: #2a5298;
-            margin-bottom: 15px;
-            font-size: 1.3em;
+        .article-body h2 {
             font-family: 'Sora', sans-serif;
-        }
-
-        .section-category h3 {
+            font-size: 1.8rem;
+            margin-bottom: 24px;
             color: #1f1c18;
-            margin-top: 25px;
-            margin-bottom: 12px;
-            font-size: 1.1em;
-            font-weight: 600;
         }
 
-        .section-category p {
-            color: #495057;
-            line-height: 1.8;
-            margin-bottom: 15px;
-            font-size: 1em;
+        .article-body h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.2rem;
+            margin: 32px 0 16px;
+            color: #1f1c18;
         }
 
-        .section-category ul {
-            margin-left: 25px;
-            margin-bottom: 20px;
+        .article-body p {
+            margin-bottom: 1.4em;
+            color: #3f392f;
         }
 
-        .section-category li {
-            color: #495057;
-            line-height: 1.8;
+        code {
+            font-family: 'Cousine', 'Menlo', monospace;
+            font-size: 0.95rem;
+            background: #f5efe4;
+            color: #3b3326;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        blockquote {
+            border-left: 4px solid #d2c7b8;
+            padding-left: 20px;
+            margin: 24px 0;
+            color: #5c564f;
+            font-style: italic;
+        }
+
+        .equation-callout {
+            margin: 24px 0;
+            padding: 20px 24px;
+            border-left: 4px solid #d2c7b8;
+            background: #fefbf5;
+            border-radius: 18px;
+        }
+
+        .callout-label {
+            display: block;
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            color: #3b3326;
+            text-transform: uppercase;
             margin-bottom: 10px;
-            font-size: 0.95em;
-        }
-
-        .section-category strong {
-            color: #2a5298;
             font-weight: 600;
         }
 
-        .intro-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            margin-bottom: 30px;
+        .equation-display {
+            font-size: 1.1rem;
+            color: #3b3326;
+            overflow-x: auto;
+            padding: 8px 0;
         }
 
-        .intro-section h1 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 2.5em;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
+        .detail-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .detail-list li {
+            background: #fefbf5;
+            border: 1px solid #eadfce;
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: #3f392f;
+        }
+
+        .detail-list li strong {
+            display: block;
+            font-family: 'Sora', sans-serif;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .insight-callout {
+            border-left: 4px solid #d2c7b8;
+            background: #fdf7ed;
+            border-radius: 18px;
+            padding: 18px 22px;
+            color: #3f392f;
+            font-size: 0.95rem;
+        }
+
+        .insight-callout strong {
             font-family: 'Sora', sans-serif;
         }
 
-        .intro-section p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.2em;
-            font-weight: 400;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
+        ol.action-list {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        ol.action-list li {
+            counter-increment: step;
+            position: relative;
+            padding: 18px 20px 18px 54px;
+            background: #fefbf5;
+            border: 1px solid #eadfce;
+            border-radius: 18px;
+            color: #3f392f;
+        }
+
+        ol.action-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: 18px;
+            top: 18px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1f1c18;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .header-inner {
+                width: 94%;
+            }
+
+            .article-hero {
+                padding: 72px 0 40px;
+            }
+
+            .article-body section {
+                padding: 32px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-btn {
+                flex: 1;
+            }
+
+            .article-hero h1 {
+                font-size: clamp(2.2rem, 7vw, 2.8rem);
+            }
+
+            .lede {
+                font-size: 1.05rem;
+            }
+
+            .article-body section {
+                padding: 28px;
+            }
+
+            ol.action-list li {
+                padding: 16px 18px 16px 48px;
+            }
+
+            ol.action-list li::before {
+                left: 14px;
+                top: 16px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <header class="site-header">
-        <div class="header-inner">
-            <div class="header-brand">
-                <span class="publication-title">Don't Lose Your Job</span>
-                <span class="publication-tagline">Forecasting work in the age of AI</span>
-                <a href="https://x.com/wrenclay" target="_blank" class="author-link">Clay Wren</a>
+    <header class='site-header'>
+        <div class='header-inner'>
+            <div class='header-brand'>
+                <span class='publication-title'>Don't Lose Your Job</span>
+                <span class='publication-tagline'>Forecasting work in the age of AI</span>
+                <a href='https://x.com/wrenclay' target='_blank' class='author-link'>Clay Wren</a>
             </div>
-            <div class="header-actions">
-                <button class="header-btn" data-page="/">Calculator</button>
-                <button class="header-btn active" data-page="/guide">Guide</button>
+            <div class='header-actions'>
+                <button class='header-btn' data-page='/'>Calculator</button>
+                <button class='header-btn active' data-page='/guide'>Guide</button>
             </div>
         </div>
     </header>
 
-    <div class="intro-section">
-        <h1>User Guide</h1>
-        <p>Learn how to use the Job Automation Risk Calculator and understand your results</p>
-    </div>
+    <main class='container'>
+        <div class='content-wrapper'>
+            <article class='guide-article'>
+                <header class='article-hero'>
+                    <span class='eyebrow'>Field guide</span>
+                    <h1>Understanding the Job Automation Risk Calculator</h1>
+                    <p class='lede'>This notebook walks through the hazard model that powers the calculator so you can interpret the curves, pressure-test scenarios, and translate the output into career choices.</p>
+                    <div class='meta-line'>
+                        <span>Updated October 2025</span>
+                    </div>
+                </header>
 
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="section-category">
-                <h2>Getting Started</h2>
-                <p>This job automation risk calculator helps you understand how vulnerable your role is to AI automation. Follow these steps to get the most accurate assessment:</p>
+                <div class='article-body'>
+                    <section>
+                        <h2>What the calculator actually simulates</h2>
+                        <p>The experience you see on the main page sits on top of a hazard model. Each year carries some probability that your role is displaced; integrate those annual hazards and you get the cumulative chance that automation has arrived. The blue curve on the chart is the survival complement for technical feasibility, and it comes straight from that integration.</p>
+                        <div class='equation-callout'>
+                            <span class='callout-label'>Survival relationship</span>
+                            <div class='equation-display'>P_loss(t) = 1 - exp(- integral_0^t lambda_total(s) ds)</div>
+                        </div>
+                        <p>In this release the interactive focuses on the AI hazard term. We treat macro shocks, firm strategy, and personal agency as separate layers, but the simulator you are using keeps the spotlight on how quickly AI can credibly do the work and how much friction stands in its way.</p>
+                        <div class='equation-callout'>
+                            <span class='callout-label'>AI hazard core</span>
+                            <div class='equation-display'>lambda_AI(s) = min[0.95, h_base(s) * exp(sum w_amp x_i) * exp(sum w_fric x_i)]</div>
+                        </div>
+                        <p>The base hazard is a three-phase curve. When capability is less than 10% of the threshold we pin hazard at 0.1%. It ramps linearly as AI closes the gap, and once capability exceeds the threshold we track h_base(s) = h0 * (A(s) / theta0)^gamma, then damp it by organizational friction and seniority. A few levers matter inside that term:</p>
+                        <ul class='detail-list'>
+                            <li><strong>Capability growth A(t):</strong> the AI doubling slider sets A(t) = exp((24 ln 2 / doubling_months) * t) so shorter doubling times bend the blue curve forward.</li>
+                            <li><strong>Compute scaling:</strong> we multiply capability by (multiplier)^t each year to reflect compute-led efficiency gains.</li>
+                            <li><strong>Industry pace:</strong> a constant multiplier captures diffusion pressure from your sector.</li>
+                            <li><strong>Friction term H(t):</strong> answers initialize H(0) and it decays as H(t) = H(0) * exp(-0.02 t), so stubborn organizations eventually soften.</li>
+                            <li><strong>Threshold theta0:</strong> we start at 3.0 for entry roles and scale it by [1.00, 1.61, 2.00, 2.11, 2.43] as seniority climbs, forcing higher capability before leaders are threatened.</li>
+                            <li><strong>Seniority damper:</strong> once above threshold we multiply by (1 - r_s) where r_s sits in {0, 0.45, 0.65, 0.85, 0.95} from entry through executive to reflect retention bias.</li>
+                            <li><strong>Friction multiplier:</strong> the hazard is further reduced by 1 / (1 + kappa * H(t) / 5) with kappa = 0.3 so persistent friction buys time.</li>
+                        </ul>
+                        <p>We run Simpson's rule over that hazard curve to deliver the technical-feasibility probability you see in the chart.</p>
+                    </section>
 
-                <h3>Step 1: Select Your Role Category</h3>
-                <p>Start by selecting your role category from the predefined options. This will pre-fill many of the assessment criteria with typical values for your profession, including:</p>
-                <ul>
-                    <li>Software/Tech roles</li>
-                    <li>Administrative positions</li>
-                    <li>Customer Service</li>
-                    <li>Data Analysis</li>
-                    <li>Finance/Accounting</li>
-                    <li>Sales/Marketing</li>
-                    <li>Creative/Design</li>
-                </ul>
+                    <section>
+                        <h2>How your answers move the curve</h2>
+                        <p>Every prompt in the wizard maps to a coded value x_i. Likert responses convert to the symmetric set (-2, -1, 0, +1, +2), while yes or no toggles land at +/-1. The model tracks two channels: an amplifier sum sum(w_amp * x_i) and a friction sum sum(w_fric * x_i). After clamping each sum to [-2, 2] we exponentiate them, so the combined multiplier ranges from about 0.14 to 7.4 times the baseline hazard.</p>
+                        <p>The prompts cluster into four themes:</p>
+                        <ul class='detail-list'>
+                            <li><strong>AI readiness (Q1-Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
+                            <li><strong>Task structure (Q5-Q9):</strong> complex decomposition and tacit knowledge feed the protective friction channel, while rapid feedback loops and standardization accelerate adoption.</li>
+                            <li><strong>Human moat (Q10-Q13):</strong> relationship intensity, unions, physical presence, and trust demands all load the friction side and slow the curve.</li>
+                            <li><strong>Firm and personal context (Q14-Q21):</strong> company levers shape implementation delay, and adaptability questions (Q18, Q20) drive re-employment probability rather than the hazard directly.</li>
+                        </ul>
+                        <p>We also tweak the gate steepness gamma via a lighter-weight pass inside <code>kEff</code>. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. That captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
+                        <div class='insight-callout'>
+                            <p><strong>Calibration check:</strong> every page load reruns unit tests. Pushing Q1, Q4, and Q6 to five yields roughly a 2.5x hazard boost versus neutral answers, while stacking protective responses (Q5, Q7, Q8, Q16 high) suppresses the hazard by about 50 percent. If a future edit drifts, the console will flag it.</p>
+                        </div>
+                    </section>
 
-                <h3>Step 2: Review and Customize</h3>
-                <p>After selecting a role, carefully review each assessment section. The calculator uses several key factors to determine automation risk.</p>
-            </div>
+                    <section>
+                        <h2>Implementation delay and the green curve</h2>
+                        <p>The green actual job loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q14 through Q17 look at adoption appetite, labor cost pressure, labor market tightness, and infrastructure. Q19 and Q21 reward complementary work and strong performance.</p>
+                        <div class='equation-callout'>
+                            <span class='callout-label'>Delay function</span>
+                            <div class='equation-display'>delay = (1.75 - 1.25 * s_delay) * m_seniority, with s_delay in [-2, 2] and m_seniority in {0.8, 1.2, 1.4, 1.6, 1.8}</div>
+                        </div>
+                        <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can collapse the gap toward 0.5 years, while defensive environments stretch it beyond three. Senior leaders get another bump because their multiplier reaches 1.8.</p>
+                        <p>Re-employment odds pull from the adaptability prompts. We start at 60 percent, add or subtract up to 20 points based on transferable skills and learning speed, subtract up to 30 points if the median technical hazard lands within three years, and then apply a small seniority boost (up to 12 percent). The result is clamped between 10 and 85 percent -- nobody is guaranteed, but nobody is written off.</p>
+                    </section>
 
-            <div class="section-category">
-                <h2>Understanding the Assessment Factors</h2>
+                    <section>
+                        <h2>Reading the outputs</h2>
+                        <p>The chart shows two survival complements: blue for technical feasibility and green for realized displacement once friction and delay kick in. Because we integrate lambda(s) with Simpson's rule, the area under each curve is the cumulative probability that automation has already happened.</p>
+                        <ul class='detail-list'>
+                            <li><strong>Median timeline:</strong> we binary-search for the year where cumulative probability hits 50 percent. That becomes the headline median job loss metric.</li>
+                            <li><strong>Risk by 2030 or 2031:</strong> the model evaluates P_loss at 5.35 and 6.35 years from 2024.65, matching the scenario years shown on the card.</li>
+                            <li><strong>Personal timeline:</strong> we surface the 25, 50, 75, and 90 percent milestones when they fall within the next 10, 15, 18, and 25 years respectively so you can see the near-term thresholds.</li>
+                            <li><strong>Re-employment label:</strong> the probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
+                        </ul>
+                        <p>Use the growth sliders to stress-test assumptions. Faster AI doubling or heavier compute scaling pivots both curves left. Increasing friction answers or dialing up implementation drag leaves the blue curve anchored but pushes the green curve out, telling you whether you are dealing with imminent technical substitution or a slower organizational grind.</p>
+                    </section>
 
-                <h3>Task Characteristics</h3>
-                <p>This section evaluates the nature of your daily work. Consider:</p>
-                <ul>
-                    <li><strong>Routine vs. Varied:</strong> How repetitive are your tasks?</li>
-                    <li><strong>Digital vs. Physical:</strong> Can your work be done entirely on a computer?</li>
-                    <li><strong>Rule-Based vs. Judgment:</strong> Do you follow clear procedures or make complex decisions?</li>
-                    <li><strong>Data Processing:</strong> How much of your work involves structured data?</li>
-                </ul>
-
-                <h3>Work Environment</h3>
-                <p>Your workplace context significantly affects automation potential:</p>
-                <ul>
-                    <li><strong>Industry Tech Adoption:</strong> How quickly does your industry adopt new technologies?</li>
-                    <li><strong>Company Size:</strong> Larger organizations often have more resources for automation</li>
-                    <li><strong>Regulatory Constraints:</strong> Some industries have strict regulations that slow automation</li>
-                    <li><strong>Remote Capability:</strong> Can your work be done remotely?</li>
-                </ul>
-
-                <h3>Economic Factors</h3>
-                <p>Economic pressures influence automation decisions:</p>
-                <ul>
-                    <li><strong>Labor Costs:</strong> Higher labor costs create more incentive to automate</li>
-                    <li><strong>ROI Timeline:</strong> How quickly would automation pay for itself?</li>
-                    <li><strong>Market Competition:</strong> Competitive industries may automate faster</li>
-                </ul>
-
-                <h3>Human Interaction Requirements</h3>
-                <p>Some aspects of work are difficult to automate:</p>
-                <ul>
-                    <li><strong>Empathy and Emotional Intelligence:</strong> Building trust and relationships</li>
-                    <li><strong>Creative Problem Solving:</strong> Novel situations requiring human judgment</li>
-                    <li><strong>Physical Presence:</strong> Tasks requiring in-person interaction</li>
-                    <li><strong>Collaboration:</strong> Complex teamwork and coordination</li>
-                </ul>
-            </div>
-
-            <div class="section-category">
-                <h2>Interpreting Your Results</h2>
-
-                <h3>Risk Score Breakdown</h3>
-                <p>The calculator provides a comprehensive risk score along with detailed breakdowns by category. Your overall score indicates:</p>
-                <ul>
-                    <li><strong>High Risk (70-100%):</strong> Roles highly susceptible to automation in the near term</li>
-                    <li><strong>Medium Risk (40-69%):</strong> Roles that may see significant AI augmentation</li>
-                    <li><strong>Low Risk (0-39%):</strong> Roles requiring substantial human skills and judgment</li>
-                </ul>
-
-                <h3>Using Your Results</h3>
-                <p>Use these insights to make informed decisions:</p>
-                <ul>
-                    <li>Identify areas where you might be most vulnerable</li>
-                    <li>Plan skill development in areas that are harder to automate</li>
-                    <li>Make informed career decisions and transitions</li>
-                    <li>Understand which aspects of your role to emphasize or develop</li>
-                </ul>
-            </div>
-
-            <div class="section-category">
-                <h2>Important Considerations</h2>
-
-                <h3>Model Limitations</h3>
-                <p>Remember that this is a model-based prediction. Your actual risk may vary based on factors like:</p>
-                <ul>
-                    <li>Your specific employer's adoption rate of AI technologies</li>
-                    <li>Your unique skills, experience, and professional network</li>
-                    <li>Regulatory changes in your industry or region</li>
-                    <li>The pace of AI development in your specific domain</li>
-                    <li>Economic conditions and labor market dynamics</li>
-                    <li>Unforeseen technological breakthroughs or limitations</li>
-                </ul>
-
-                <h3>Taking Action</h3>
-                <p>After reviewing your results, consider these proactive steps to future-proof your career:</p>
-                <ul>
-                    <li><strong>Develop complementary skills:</strong> Focus on skills that work alongside AI rather than compete with it</li>
-                    <li><strong>Build human-centric capabilities:</strong> Strengthen interpersonal, creative, and strategic thinking skills</li>
-                    <li><strong>Stay informed:</strong> Keep up with AI developments in your field</li>
-                    <li><strong>Network actively:</strong> Human relationships remain irreplaceable</li>
-                    <li><strong>Consider transitions:</strong> If your risk is high, explore adjacent roles with lower automation potential</li>
-                </ul>
-            </div>
+                    <section>
+                        <h2>How to work with the model</h2>
+                        <p>The calculator is most useful when you treat it like a scenario notebook rather than an oracle. A few patterns from user research help:</p>
+                        <ol class='action-list'>
+                            <li>Start with the preset that feels closest to your role, then tweak one cluster of questions at a time so you can see which dimensions move the hazard.</li>
+                            <li>Stress-test the extremes: set AI readiness to five while leaving friction high, then flip it. The distance between those runs is a map of where to invest your energy.</li>
+                            <li>Pair the re-employment score with the green curve. A fast hazard plus weak re-employment is the trigger for up-skilling or a job search; a slow hazard plus strong re-employment buys time for deliberate moves.</li>
+                        </ol>
+                        <p>Remember that this model isolates the AI capability channel. Macro cycles, regulation, leadership changes, and your own agency remain outside the frame. Use the weight structure as a checklist: strengthen the protective items you can influence, document the assumptions you cannot, and revisit the calculator as real-world signals shift.</p>
+                    </section>
+                </div>
+            </article>
         </div>
-    </div>
+    </main>
 
-    <script src="navigation.js"></script>
+    <script src='navigation.js'></script>
 </body>
 
 </html>
+
+
+
+
