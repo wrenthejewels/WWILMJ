@@ -314,6 +314,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            padding-right: 12px;
         }
 
         .profile-timeline {
@@ -321,11 +322,13 @@
             padding-left: 12px;
         }
 
-        .profile-timeline h4 {
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            color: #333;
+        .section-title {
+            font-size: 1em;
+            margin-bottom: 12px;
+            color: #1f1c18;
             font-weight: 600;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e6e0d4;
         }
 
         .parameter-item {
@@ -1956,10 +1959,9 @@
                 <div class="right-column" id="results-column">
 
             <div class="parameter-breakdown">
-                <h3>Your Risk Profile & Timeline</h3>
-
                 <div class="profile-grid">
                     <div class="profile-scores">
+                        <h4 class="section-title">Your Risk Profile</h4>
                         <div class="parameter-item">
                             <span class="parameter-label">Role:</span>
                             <span class="parameter-value" id="role-display">-</span>
@@ -1987,7 +1989,7 @@
                     </div>
 
                     <div class="profile-timeline">
-                        <h4>Your Timeline</h4>
+                        <h4 class="section-title">Your Automation Timeline</h4>
                         <div id="personal-timeline"></div>
                     </div>
                 </div>
