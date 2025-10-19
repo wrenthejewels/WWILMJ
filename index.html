@@ -1661,33 +1661,6 @@
                     </div>
 
                     <div class="question-group">
-                        <h5>11. Union/Labor Protections</h5>
-                        <p>How strong are labor protections in your field?</p>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="q11-1" name="q11" value="5">
-                                <label for="q11-1">Very Strong</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q11-2" name="q11" value="4">
-                                <label for="q11-2">Strong</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q11-3" name="q11" value="3" checked>
-                                <label for="q11-3">Moderate</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q11-4" name="q11" value="2">
-                                <label for="q11-4">Weak</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q11-5" name="q11" value="1">
-                                <label for="q11-5">Very Weak</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="question-group">
                         <h5>12. Physical Presence</h5>
                         <p>How much does your work require physical presence?</p>
                         <div class="radio-group">
@@ -2667,21 +2640,6 @@
             console.log(`  RESULT: ${q1SwingPass ? 'PASS ✓' : 'FAIL ✗'} (should be ≥12pp)`);
             if (!q1SwingPass) allPassed = false;
 
-            // Test 7: Q11 low→high swing should produce ≤−10pp change in 2030 risk
-            console.log('\nTEST 7: Q11 swing impact on 2030 risk');
-            const highRiskBase = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
-            const q11Low = { ...highRiskBase, Q11: 1 };
-            const q11High = { ...highRiskBase, Q11: 5 };
-            const riskQ11Low = computeRisk2030(q11Low);
-            const riskQ11High = computeRisk2030(q11High);
-            const q11Delta = (riskQ11High - riskQ11Low) * 100;
-            const q11SwingPass = q11Delta <= -10;
-            console.log(`  Q11=1 (weak protections): 2030 risk = ${(riskQ11Low * 100).toFixed(1)}%`);
-            console.log(`  Q11=5 (strong protections): 2030 risk = ${(riskQ11High * 100).toFixed(1)}%`);
-            console.log(`  Delta: ${q11Delta.toFixed(1)}pp`);
-            console.log(`  RESULT: ${q11SwingPass ? 'PASS ✓' : 'FAIL ✗'} (should be ≤−10pp)`);
-            if (!q11SwingPass) allPassed = false;
-
             console.log(`\n=== PATCH TESTS: ${allPassed ? 'ALL PASSED ✓' : 'SOME FAILED ✗'} ===\n`);
             return allPassed;
         }
@@ -2731,12 +2689,11 @@
             Q8:  { amp: +0.45 },  // Feedback Loop Speed
             Q9:  { fric: -0.40 }, // Tacit Knowledge
             Q10: { fric: -0.45 }, // Human Judgment & Relationships
-            Q11: { fric: -0.85 }, // Union/Labor Protections
             Q12: { fric: -0.60 }, // Physical Presence (FIXED: now fric− channel)
             Q13: { fric: -0.35 }, // Trust Requirements
             // Q14-Q17: Company/Industry context - affects implementation delay only
-            // Q18, Q20: Re-employment factors - affects job search success only
-            // Q19, Q21: Job retention factors - affects implementation delay only
+            // Q18, Q20, Q21: Re-employment factors - affects job search success only
+            // Q19: Job retention factor - affects implementation delay only
         };
 
         // Implementation delay weights - delays actual job loss from technical feasibility (Green Curve)
@@ -2748,15 +2705,15 @@
             Q15: +0.30,  // Labor cost pressure: 1=Not Sensitive (more delay), 5=Extremely Sensitive (less delay)
             Q16: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay)
             Q17: +0.35,  // IT infrastructure: 1=Very Outdated (more delay), 5=Cutting Edge (less delay)
-            // Job Retention Factors (Q19, Q21)
+            // Job Retention Factor (Q19)
             Q19: -0.25,  // AI complementarity: 5=Amplify Only (more delay), 1=Replace Only (less delay) - employer keeps you longer
-            Q21: -0.25,  // Job performance: 5=Top 10% (more delay), 1=Below Average (less delay) - top performers retained longer
         };
 
-        // Re-employment probability weights (Q18, Q20) - affects ability to find new job
+        // Re-employment probability weights (Q18, Q20, Q21) - affects ability to find new job
         const REEMPLOYMENT_WEIGHTS = {
             Q18: +0.50,  // Skill transferability: 5=Highly Transferable (higher re-employment), 1=Highly Specific (lower)
             Q20: +0.50,  // Adaptability: 5=Very Fast (higher re-employment), 1=Very Slow (lower)
+            Q21: +0.30,  // Job performance: 5=Top 10% (higher re-employment), 1=Below Average (lower re-employment)
         };
 
         // Code raw answers to numeric x_i, aiming for symmetric effects
@@ -2840,8 +2797,8 @@
                 // Decelerators (higher = slower/later automation)
                 Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q12: -0.15, Q13: -0.15
                 // Q14-Q17: Company/Industry - affects GREEN curve only
-                // Q18, Q20: Re-employment - affects re-employment metric only
-                // Q19, Q21: Job retention - affects GREEN curve only
+                // Q18, Q20, Q21: Re-employment - affects re-employment metric only
+                // Q19: Job retention - affects GREEN curve only
             };
             for (const [qid, raw] of Object.entries(answers)) {
                 const x = codeAnswer(qid, raw);
@@ -3182,21 +3139,7 @@
                 expected: '≥12pp'
             });
 
-            // Test 2: Q11 low->high should reduce Risk by 2030 by ≥ -10 points (protective)
-            const highRiskBase = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
-            const q11LowAnswers = { ...highRiskBase, Q11: 1 };
-            const q11HighAnswers = { ...highRiskBase, Q11: 5 };
-            const riskQ11Low = computeRisk2030(q11LowAnswers);
-            const riskQ11High = computeRisk2030(q11HighAnswers);
-            const q11Delta = (riskQ11High - riskQ11Low) * 100;
-            tests.push({
-                name: 'Q11 low->high reduces Risk by 2030 by ≥-10pp',
-                pass: q11Delta <= -10,
-                actual: q11Delta.toFixed(1) + 'pp',
-                expected: '≤-10pp'
-            });
-
-            // Test 3: Q1+Q4+Q6 max yields ≥2.5× hazard vs neutral
+            // Test 2: Q1+Q4+Q6 max yields ≥2.5× hazard vs neutral
             const maxRiskAnswers = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
             const { ampMult: neutralAmpMult, fricMult: neutralFricMult } = computeHazardMultipliers(neutralAnswers);
             const { ampMult: maxAmpMult, fricMult: maxFricMult } = computeHazardMultipliers(maxRiskAnswers);
@@ -3210,7 +3153,7 @@
                 expected: '≥2.5×'
             });
 
-            // Test 4: Protective stack (Q5+Q7+Q8+Q16 high) suppresses hazard by ≥50%
+            // Test 3: Protective stack (Q5+Q7+Q8+Q16 high) suppresses hazard by ≥50%
             const protectiveAnswers = { ...neutralAnswers, Q5: 5, Q7: 5, Q8: 5, Q16: 5 };
             const { ampMult: protAmpMult, fricMult: protFricMult } = computeHazardMultipliers(protectiveAnswers);
             const protMult = protAmpMult * protFricMult;
