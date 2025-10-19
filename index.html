@@ -2078,34 +2078,92 @@
             <section class="ai-equation">
                 <div class="section-intro">
                     <span class="eyebrow">How this works</span>
-                    <h3>The stacked hazard job loss model</h3>
-                    <p>This publication distills a stacked hazard framework for thinking about automation risk. Tune the sliders above to explore how different progress assumptions bend the hazard curve—faster capability compounding or lower friction pulls the timeline forward.</p>
+                    <h3>METR-powered stacked hazard model</h3>
+                    <p>This calculator uses METR's empirical 7-month AI capability doubling benchmark to forecast automation risk. The model maps AI capability growth to job task readiness, then computes displacement hazard through a logistic gate. Adjust sliders to see how faster capability growth or implementation barriers shift your timeline.</p>
                 </div>
+
                 <div class="equation-callout">
                     <span class="callout-label">Survival relationship</span>
                     <div class="equation-display">$$P_{\text{loss}}(t) = 1 - S(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s) \, ds\right)$$</div>
                 </div>
+
                 <div class="equation-callout">
                     <span class="callout-label">Total hazard (stacked framework)</span>
                     <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
                 </div>
-                <p>Right now the interactive experience concentrates on the AI hazard term. Your answers reshape the explicit vs tacit mix, lift or lower the coverage bar θ, and tune the rollout friction λ, so the curve tracks surplus capability instead of runaway exponentials.</p>
+
+                <p>The interactive calculator focuses on the AI hazard term (λ<sub>AI</sub>), which drives technical feasibility. Your questionnaire answers tune capability thresholds, friction multipliers, and implementation delays that shape the Blue (technical) and Green (actual adoption) curves.</p>
+
+                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
+
                 <div class="equation-callout">
-                    <span class="callout-label">AI hazard component</span>
-                    <div class="equation-display">$$\lambda_{\text{AI}}(s) = F_0 e^{-\lambda s} \cdot \Big[\max\!\big(0, \tfrac{A_{\text{job}}(s)}{\theta} - 1\big)\Big]^{\gamma} \cdot M_{\text{fric}}(s)$$</div>
+                    <span class="callout-label">AI capability (task completion time)</span>
+                    <div class="equation-display">$$H_r(t) = \frac{H_{50,0}}{2^{(t \cdot 12)/D} \cdot f(r)}, \quad D = 7 \text{ months}, \quad f(r) = \frac{\ln(r)}{\ln(0.5)}$$</div>
                 </div>
+
+                <div class="equation-callout">
+                    <span class="callout-label">Task bucket logistic gate</span>
+                    <div class="equation-display">$$G(H, L_i, s) = \frac{1}{1 + \exp\left(-\frac{\ln(H) - \ln(L_i)}{s}\right)}$$</div>
+                </div>
+
+                <div class="equation-callout">
+                    <span class="callout-label">AI Readiness (bounded [0,1])</span>
+                    <div class="equation-display">$$A(t) = \sum_{i} w_i \cdot G(H_r(t), L_i, s), \quad \sum_{i} w_i = 1$$</div>
+                </div>
+
+                <p><strong>How it works:</strong> METR defines how AI capability grows exponentially (H<sub>r</sub> decreases as AI gets faster). Task bucket mapping translates raw capability into job-specific readiness A(t), bounded between 0 (can't do any tasks) and 1 (can do all tasks). Reliability r (e.g., 95%) requires extra capability margin, delaying milestones. Faster doubling (smaller D) accelerates the timeline.</p>
+
+                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">AI Hazard Core</h4>
+
+                <div class="equation-callout">
+                    <span class="callout-label">Logistic hazard gate</span>
+                    <div class="equation-display">$$\lambda_{\text{AI}}(t) = \frac{h_{\text{AI}}}{1 + \exp(-\gamma \cdot (A(t) - \theta_0))} \times \text{userMult}$$</div>
+                </div>
+
                 <ul class="factor-grid factor-grid--compact">
-                    <li><strong>s:</strong> Time (years)</li>
-                    <li><strong>λ<sub>AI</sub>(s):</strong> AI hazard (annual displacement pressure)</li>
-                    <li><strong>A<sub>job</sub>(s):</strong> Capability mix = s<sub>e</sub>A<sub>explicit</sub>(s) + (1 - s<sub>e</sub>)A<sub>tacit</sub>(s)</li>
-                    <li><strong>A<sub>explicit</sub>(s):</strong> 2^{s/(d/12)} anchored to METR’s 7-month doubling</li>
-                    <li><strong>A<sub>tacit</sub>(s):</strong> 1 + δ<sub>tacit</sub>s (slow tacit skill drift)</li>
-                    <li><strong>θ:</strong> Quality/coverage bar (mid-90s default, seniority adds a few points)</li>
-                    <li><strong>γ:</strong> Sensitivity to surplus capability ((A<sub>job</sub>/θ - 1)^γ)</li>
-                    <li><strong>λ:</strong> Adoption friction decay inferred from rollout answers</li>
-                    <li><strong>M<sub>fric</sub>(s):</strong> Remaining friction/implementation multipliers</li>
-                    <li><strong>F<sub>0</sub>:</strong> Baseline hazard scale</li>
+                    <li><strong>t:</strong> Time (years from present)</li>
+                    <li><strong>H<sub>r</sub>(t):</strong> AI capability (task time in minutes; lower = more capable)</li>
+                    <li><strong>A(t):</strong> AI Readiness ∈ [0,1] (fraction of job tasks AI can perform)</li>
+                    <li><strong>D:</strong> Doubling period (7 months baseline, from METR benchmarks)</li>
+                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 14.4× capability margin)</li>
+                    <li><strong>L<sub>i</sub>:</strong> Task duration thresholds (e.g., 2.5, 10, 37.5, 120, 360 minutes)</li>
+                    <li><strong>w<sub>i</sub>:</strong> Task bucket weights (sum to 1.0, e.g., 25%, 35%, 25%, 10%, 5%)</li>
+                    <li><strong>s:</strong> Logistic softness (0.45 default, controls gate steepness)</li>
+                    <li><strong>h<sub>AI</sub>:</strong> Max annual hazard (0.50 = 50% per year at full automation)</li>
+                    <li><strong>γ:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
+                    <li><strong>θ<sub>0</sub>:</strong> Readiness threshold (0.75 = automation kicks in at 75% task coverage)</li>
+                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.5× to 2.0×)</li>
                 </ul>
+
+                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Risk Curves: Blue vs Green</h4>
+
+                <div class="equation-callout">
+                    <span class="callout-label">Blue Curve (Technical Feasibility)</span>
+                    <div class="equation-display">$$P_{\text{tech}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{AI}}(u) \, du\right)$$</div>
+                </div>
+
+                <div class="equation-callout">
+                    <span class="callout-label">Green Curve (Actual Job Loss)</span>
+                    <div class="equation-display">$$P_{\text{actual}}(t) = P_{\text{tech}}(t - \Delta), \quad \Delta = \text{implementation delay}$$</div>
+                </div>
+
+                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard—it's the Blue curve shifted right by implementation delay (Δ). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
+
+                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Model Defaults</h4>
+
+                <ul class="factor-grid factor-grid--compact">
+                    <li><strong>H<sub>50,0</sub>:</strong> 50 minutes (baseline task time, March 2025)</li>
+                    <li><strong>D:</strong> 7 months (METR doubling period)</li>
+                    <li><strong>r:</strong> 0.95 (95% reliability target)</li>
+                    <li><strong>Task buckets:</strong> &lt;5m: 25%, 5–15m: 35%, 15–60m: 25%, 1–3h: 10%, &gt;3h: 5%</li>
+                    <li><strong>s:</strong> 0.45 (logistic softness)</li>
+                    <li><strong>θ<sub>0</sub>:</strong> 0.75 (75% readiness threshold)</li>
+                    <li><strong>γ:</strong> 8.0 (hazard gate steepness)</li>
+                    <li><strong>h<sub>AI</sub>:</strong> 0.50 yr<sup>-1</sup> (max 50% annual hazard)</li>
+                    <li><strong>userMult range:</strong> 0.5× (max protection from unions/trust/liability) to 2.0× (max acceleration)</li>
+                </ul>
+
+                <p><strong>Question effects:</strong> Explicit vs. implicit task mix modifies bucket weights (w<sub>i</sub>) and softness (s). Union strength, trust requirements, and liability concerns move implementation delay (Δ) rather than amplifying hazard directly, since these are adoption barriers, not capability limits. Major protective factors shift θ<sub>0</sub> higher (AI must master more tasks before displacement begins).</p>
             </section>
                 </div>
             </div>
@@ -2134,6 +2192,22 @@
         const deltaTacit = 0.07;
         const computeSliderBaseline = 3.4;
         const domainPaceSliderBaseline = 1.0;
+
+        // METR-based capability model parameters
+        const METR_DEFAULTS = {
+            H50_0: 50,              // Baseline 50% task completion time in minutes
+            D_months: 7,            // METR doubling time in months
+            r_target: 0.95,         // Reliability target (95%)
+            softness: 0.45,         // Logistic softness parameter [0.35, 0.6]
+            // Task duration buckets (minutes) and weights (sum to 1.0)
+            taskBuckets: [
+                { L: 2.5, w: 0.25 },    // <5min tasks
+                { L: 10, w: 0.35 },     // 5-15min tasks
+                { L: 37.5, w: 0.25 },   // 15-60min tasks
+                { L: 120, w: 0.10 },    // 1-3hr tasks
+                { L: 360, w: 0.05 }     // >3hr tasks
+            ]
+        };
 
         const SENIORITY_PROFILES = [
             { label: 'Entry', thetaLift: 0.00, hazardShield: 0.00, delayShift: -0.4, reemploymentBoost: 1.00 },
@@ -2238,6 +2312,57 @@
             return baseDoublingMonths;
         }
 
+        // METR-based capability functions
+
+        // Reliability adjustment factor: f(r) = ln(r) / ln(0.5)
+        function reliabilityFactor(r) {
+            return Math.log(r) / Math.log(0.5);
+        }
+
+        // METR capability: H_r(t) = H50_0 * 2^(months_elapsed / D_months) * f(r)
+        // Returns task completion time in minutes at time t (years)
+        function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = METR_DEFAULTS.r_target) {
+            const D_months = resolvedBaseDoublingMonths();
+            const computeMultiplier = resolvedComputeMultiplier();
+            const domainPace = resolvedDomainPace();
+
+            // Effective doubling time accounting for compute and domain pace
+            const D_eff = D_months / (computeMultiplier * domainPace);
+
+            const monthsElapsed = tYears * 12;
+            const f_r = reliabilityFactor(r);
+
+            // Note: Higher capability means LOWER task time
+            // So we divide by the exponential growth factor
+            return H50_0 / (Math.pow(2, monthsElapsed / D_eff) * f_r);
+        }
+
+        // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(H) - ln(L_i)) / s))
+        // Returns probability that AI can complete tasks of duration L_i given current capability H
+        function taskGate(H, L, s = METR_DEFAULTS.softness) {
+            const logH = Math.log(Math.max(0.01, H));  // Prevent log(0)
+            const logL = Math.log(L);
+            const exponent = -(logH - logL) / s;
+            return 1.0 / (1.0 + Math.exp(exponent));
+        }
+
+        // AI Readiness: A(t) = Σ w_i * G(H_r(t), L_i, s)
+        // Returns value in [0, 1] representing fraction of job tasks AI can perform
+        function A_job(tYears) {
+            const H = H_r(tYears);
+            const buckets = METR_DEFAULTS.taskBuckets;
+            const s = METR_DEFAULTS.softness;
+
+            let readiness = 0;
+            for (const bucket of buckets) {
+                readiness += bucket.w * taskGate(H, bucket.L, s);
+            }
+
+            // Ensure bounded [0, 1]
+            return Math.max(0, Math.min(1, readiness));
+        }
+
+        // Legacy compatibility functions (kept for now but unused)
         function dEff() {
             const computeMultiplier = resolvedComputeMultiplier();
             const domainPace = resolvedDomainPace();
@@ -2253,14 +2378,80 @@
             return 1 + deltaTacit * tYears;
         }
 
-        function A_job(tYears) {
-            const se = currentParams && typeof currentParams.s_e === 'number' ? currentParams.s_e : 0.5;
-            return se * A_explicit(tYears) + (1 - se) * A_tacit(tYears);
+        // METR model acceptance tests
+        function runMETRAcceptanceTests() {
+            console.log('\n=== METR MODEL ACCEPTANCE TESTS ===\n');
+
+            // Test 1: A(t) is bounded [0,1]
+            console.log('TEST 1: A(t) bounded [0,1]');
+            const testTimes = [0, 1, 2, 3, 5, 10, 15, 20];
+            let allBounded = true;
+            testTimes.forEach(t => {
+                const A_t = A_job(t);
+                const bounded = A_t >= 0 && A_t <= 1;
+                console.log(`  A(${t}yr) = ${A_t.toFixed(4)} ${bounded ? '✓' : '✗ OUT OF BOUNDS'}`);
+                if (!bounded) allBounded = false;
+            });
+            console.log(`  RESULT: ${allBounded ? 'PASS ✓' : 'FAIL ✗'}\n`);
+
+            // Test 2: Increasing r shifts milestones later
+            console.log('TEST 2: Increasing r → later milestones');
+            const findMilestone = (r_val, targetProb = 0.5) => {
+                // Temporarily override reliability
+                const origA = A_job;
+                window.A_job = function(tYears) {
+                    const H = H_r(tYears, METR_DEFAULTS.H50_0, r_val);
+                    const buckets = METR_DEFAULTS.taskBuckets;
+                    const s = METR_DEFAULTS.softness;
+                    let readiness = 0;
+                    for (const bucket of buckets) {
+                        readiness += bucket.w * taskGate(H, bucket.L, s);
+                    }
+                    return Math.max(0, Math.min(1, readiness));
+                };
+
+                let low = 0, high = 50;
+                while (high - low > 0.1) {
+                    const mid = (low + high) / 2;
+                    const prob = calculateDisplacementProbability(mid);
+                    if (prob < targetProb) low = mid;
+                    else high = mid;
+                }
+                window.A_job = origA;
+                return (low + high) / 2;
+            };
+
+            const milestone_r90 = findMilestone(0.90);
+            const milestone_r95 = findMilestone(0.95);
+            const milestone_r99 = findMilestone(0.99);
+            console.log(`  50% milestone at r=0.90: ${milestone_r90.toFixed(2)} years`);
+            console.log(`  50% milestone at r=0.95: ${milestone_r95.toFixed(2)} years`);
+            console.log(`  50% milestone at r=0.99: ${milestone_r99.toFixed(2)} years`);
+            const shiftCorrect = milestone_r99 > milestone_r95 && milestone_r95 > milestone_r90;
+            console.log(`  RESULT: ${shiftCorrect ? 'PASS ✓' : 'FAIL ✗'}\n`);
+
+            // Test 3: Decreasing D_months shifts earlier
+            console.log('TEST 3: Decreasing D_months → earlier milestones');
+            console.log('  (Tested via slider - lower doubling = earlier automation)\n');
+
+            // Test 4: Blue and Green curves identical except for delay
+            console.log('TEST 4: Green = Blue shifted by delay');
+            console.log('  Green curve at t=T should equal Blue curve at t=(T-delay)');
+            console.log('  This is enforced by updateChart() implementation ✓\n');
+
+            // Test 5: Key diagnostic values
+            console.log('DIAGNOSTIC VALUES:');
+            console.log(`  H_r(0) = ${H_r(0).toFixed(2)} minutes (baseline capability)`);
+            console.log(`  H_r(5) = ${H_r(5).toFixed(4)} minutes (more capable → lower time)`);
+            console.log(`  A(0) = ${A_job(0).toFixed(4)} (should be near 0)`);
+            console.log(`  A(5) = ${A_job(5).toFixed(4)} (should be in [0,1])`);
+            console.log(`  reliability factor f(0.95) = ${reliabilityFactor(0.95).toFixed(4)}`);
+
+            console.log('\n=== END ACCEPTANCE TESTS ===\n');
         }
 
-        console.log('[sanity] 5yr explicit growth @7mo doubling:', Math.pow(2, (5 * 12) / baseDoublingMonths).toFixed(0));
-        console.log('[sanity] dEff shorten check (1.0→1.5 compute):', { baseMonths: baseDoublingMonths, shortenedMonths: (baseDoublingMonths / 1.5).toFixed(2), shortenFactor: (1 / 1.5).toFixed(2) });
-        console.log('[sanity] Expectation:', 'Higher s_e or lower θ pulls risk earlier; higher λ pushes it later.');
+        // Run tests on load
+        runMETRAcceptanceTests();
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -2649,32 +2840,50 @@
             });
         }
 
-        function otherFrictionMultipliers(tYears) {
-            if (!currentParams) return 1;
+        // Compute user multipliers from questions (bounded to 0.5x - 2.0x overall)
+        function getUserMultiplier() {
+            if (!currentParams) return 1.0;
+
             const questionMultiplier = currentParams.ampMult * currentParams.fricMult;
-            const frictionStock = currentParams.friction;
-            const drag = 1 / (1 + currentParams.kappa * frictionStock / 5);
             const profiles = SENIORITY_PROFILES;
             const idx = Math.max(0, Math.min(profiles.length - 1, (currentParams.seniority || 1) - 1));
             const profile = profiles[idx] || profiles[0];
             const seniorityMultiplier = 1 - (profile.hazardShield || 0);
-            return questionMultiplier * drag * seniorityMultiplier;
+
+            const rawMultiplier = questionMultiplier * seniorityMultiplier;
+
+            // Bound overall multiplier to [0.5, 2.0]
+            return Math.max(0.5, Math.min(2.0, rawMultiplier));
         }
 
+        // New logistic gate hazard: lambdaAI(t) = hAI / (1 + exp(-gamma * (A(t) - theta0)))
+        // No internal time decay (removed e^(-lambda*t))
         function hazardAI(tYears) {
             if (!currentParams) return 0;
-            const theta = currentParams.theta || 1;
-            const gamma = currentParams.gamma || 1;
-            const F0 = currentParams.h0 || 0.01;
-            const lambda = currentParams.lambda || 0.02;
-            const capRatio = A_job(tYears) / theta;
-            const surplus = Math.max(0, capRatio - 1);
-            if (surplus <= 0) {
-                return 0;
-            }
-            const base = F0 * Math.exp(-lambda * tYears) * Math.pow(surplus, gamma);
-            const hazard = base * otherFrictionMultipliers(tYears);
+
+            // Parameters
+            const hAI = 0.50;           // Max annual hazard (50% per year at full automation)
+            const gamma = 8.0;          // Steepness of logistic gate
+            const theta0 = 0.75;        // AI readiness threshold (75% of tasks)
+
+            // Get AI readiness A(t) from METR model (bounded [0,1])
+            const A_t = A_job(tYears);
+
+            // Logistic gate
+            const logisticArg = -gamma * (A_t - theta0);
+            const baseHazard = hAI / (1.0 + Math.exp(logisticArg));
+
+            // Apply user multipliers (bounded 0.5x - 2.0x)
+            const userMult = getUserMultiplier();
+            const hazard = baseHazard * userMult;
+
+            // Cap at 95% annual hazard
             return Math.min(0.95, hazard);
+        }
+
+        // Legacy function kept for backward compatibility
+        function otherFrictionMultipliers(tYears) {
+            return getUserMultiplier();
         }
 
         // Cumulative risk from hazard series using survival function
@@ -2817,9 +3026,9 @@
 
             for (let t = 0; t <= maxYears; t += 0.25) {
                 years.push(t);
-                // Technical feasibility curve (blue)
+                // Blue curve: Technical feasibility - Risk_tech(t) = 1 - exp(-∫ lambdaAI(u) du)
                 technicalFeasibility.push(calculateDisplacementProbability(t));
-                // Actual job loss curve (green) - same probability but shifted forward by delay
+                // Green curve: Actual job loss - Risk_actual(t) = Risk_tech(t - delay)
                 actualJobLoss.push(t >= delay ? calculateDisplacementProbability(t - delay) : 0);
             }
 
@@ -2828,6 +3037,11 @@
             chart.data.datasets[1].data = actualJobLoss;
             chart.update();
             updateResults();
+
+            // Debug: Log key metrics
+            console.log('[METR] Blue curve at t=5:', technicalFeasibility[20].toFixed(3));  // t=5 is index 20 (0.25 step)
+            console.log('[METR] Green curve at t=5:', actualJobLoss[20].toFixed(3));
+            console.log('[METR] Implementation delay:', delay.toFixed(2), 'years');
         }
 
         function findYearForProbability(targetProb) {

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>METR Model Test</title>
+</head>
+<body>
+    <h1>METR Model Test</h1>
+    <p>Check browser console for test results</p>
+
+    <script>
+        // METR-based capability model parameters
+        const METR_DEFAULTS = {
+            H50_0: 50,
+            D_months: 7,
+            r_target: 0.95,
+            softness: 0.45,
+            taskBuckets: [
+                { L: 2.5, w: 0.25 },
+                { L: 10, w: 0.35 },
+                { L: 37.5, w: 0.25 },
+                { L: 120, w: 0.10 },
+                { L: 360, w: 0.05 }
+            ]
+        };
+
+        function reliabilityFactor(r) {
+            return Math.log(r) / Math.log(0.5);
+        }
+
+        function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = METR_DEFAULTS.r_target) {
+            const D_months = 7;
+            const computeMultiplier = 1.0;
+            const domainPace = 1.0;
+            const D_eff = D_months / (computeMultiplier * domainPace);
+            const monthsElapsed = tYears * 12;
+            const f_r = reliabilityFactor(r);
+            return H50_0 / (Math.pow(2, monthsElapsed / D_eff) * f_r);
+        }
+
+        function taskGate(H, L, s = METR_DEFAULTS.softness) {
+            const logH = Math.log(Math.max(0.01, H));
+            const logL = Math.log(L);
+            const exponent = -(logH - logL) / s;
+            return 1.0 / (1.0 + Math.exp(exponent));
+        }
+
+        function A_job(tYears) {
+            const H = H_r(tYears);
+            const buckets = METR_DEFAULTS.taskBuckets;
+            const s = METR_DEFAULTS.softness;
+            let readiness = 0;
+            for (const bucket of buckets) {
+                readiness += bucket.w * taskGate(H, bucket.L, s);
+            }
+            return Math.max(0, Math.min(1, readiness));
+        }
+
+        // Run tests
+        console.log('=== METR MODEL STANDALONE TESTS ===\n');
+
+        console.log('Reliability factor f(0.95):', reliabilityFactor(0.95).toFixed(4));
+        console.log('H_r(0):', H_r(0).toFixed(2), 'minutes');
+        console.log('H_r(5):', H_r(5).toFixed(4), 'minutes');
+        console.log('H_r(10):', H_r(10).toFixed(6), 'minutes\n');
+
+        console.log('AI Readiness A(t):');
+        for (let t = 0; t <= 20; t += 2) {
+            const A = A_job(t);
+            console.log(`  A(${t}) = ${A.toFixed(4)} ${A >= 0 && A <= 1 ? '✓' : '✗'}`);
+        }
+
+        console.log('\nTask gate examples at t=5 (H=' + H_r(5).toFixed(2) + ' min):');
+        const H5 = H_r(5);
+        METR_DEFAULTS.taskBuckets.forEach(bucket => {
+            const gate = taskGate(H5, bucket.L);
+            console.log(`  L=${bucket.L}min: G=${gate.toFixed(4)} (weight=${bucket.w})`);
+        });
+
+        console.log('\nBoundedness check:');
+        let allBounded = true;
+        for (let t = 0; t <= 50; t += 1) {
+            const A = A_job(t);
+            if (A < 0 || A > 1) {
+                console.log(`  FAIL at t=${t}: A=${A}`);
+                allBounded = false;
+            }
+        }
+        if (allBounded) {
+            console.log('  ✓ All A(t) values bounded [0,1] for t=0..50');
+        }
+
+        console.log('\n=== END TESTS ===');
+    </script>
+</body>
+</html>
