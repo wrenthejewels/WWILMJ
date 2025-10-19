@@ -2215,11 +2215,17 @@
         }
 
         function resolvedBaseDoublingMonths() {
+            const slider = document.getElementById('ai-doubling');
+            if (slider) {
+                const raw = parseFloat(slider.value);
+                if (!Number.isNaN(raw)) {
+                    return raw;
+                }
+            }
             if (currentParams && typeof currentParams.doublingMonths === 'number') {
                 return currentParams.doublingMonths;
             }
-            const slider = document.getElementById('ai-doubling');
-            return slider ? parseFloat(slider.value) : baseDoublingMonths;
+            return baseDoublingMonths;
         }
 
         function dEff() {
