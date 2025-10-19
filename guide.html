@@ -414,7 +414,7 @@
                         </div>
                         <p>The base hazard now activates only when surplus capability shows up. We let explicit capability double every $d$ months, blend in a slow tacit ramp, compare that job mix to the quality bar $\theta$, and raise any surplus to the power $\gamma$. A decay term $e^{-\lambda s}$ and the familiar friction multipliers keep adoption grounded.</p>
                         <ul class='detail-list'>
-                            <li><strong>Explicit capability $A_{\text{explicit}}(t)$:</strong> $$2^{t/(d/12)}$$ with default $d = 7$ months (METR). The compute and industry sliders shorten $d$ to reflect faster progress.</li>
+                            <li><strong>Explicit capability $A_{\text{explicit}}(t)$:</strong> $$2^{t/(d/12)}$$ with default $d = 7$ months (METR). The compute slider (defaulted to 3.4x annual growth per <a href="https://ai-2027.com/research/compute-forecast" target="_blank">AI 2027</a>) and industry sliders shorten $d$ to reflect faster progress.</li>
                             <li><strong>Tacit capability $A_{\text{tacit}}(t)$:</strong> $$1 + \delta_{\text{tacit}} t$$ with \delta_{\text{tacit}} = 0.07 so apprenticeship-heavy work advances more slowly.</li>
                             <li><strong>Job mix $A_{\text{job}}(t)$:</strong> $$s_e A_{\text{explicit}}(t) + (1 - s_e)A_{\text{tacit}}(t)$$ where $s_e$ comes from the digitization and standardization answers.</li>
                             <li><strong>Coverage bar $\theta$:</strong> starts around $0.94$ for entry roles; each seniority step lifts the bar by roughly +1.5 to +7 points before automation clears it.</li>

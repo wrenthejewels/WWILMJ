@@ -2288,14 +2288,15 @@
 
         function resolvedComputeMultiplier() {
             const slider = document.getElementById('compute-scaling');
-            // Slider now represents barriers/friction (1.5 to 5, default 3.4)
-            // Higher value = more barriers = slower AI progress
+            // Slider represents annual compute growth (1.5 to 5, default 3.4)
+            // Higher value = faster compute growth = faster AI progress
             const sliderValue = slider ? parseFloat(slider.value) : computeSliderBaseline;
-            const normalized = sliderValue / computeSliderBaseline;
+            // Invert: higher compute growth should DIVIDE doubling time (faster progress)
+            const inverted = (computeSliderBaseline * 2) / sliderValue;
             const base = currentParams && typeof currentParams.computeMultiplier === 'number'
                 ? currentParams.computeMultiplier
                 : 1.0;
-            return base * normalized;
+            return base * inverted;
         }
 
         function resolvedDomainPace() {
@@ -3377,7 +3378,7 @@
             const computeValue = parseFloat(this.value);
             document.getElementById('compute-scaling-value').textContent = computeValue.toFixed(1) + 'x';
             console.log('[Slider] Compute Scaling:', computeValue.toFixed(1) + 'x',
-                       '→ expect', computeValue > 3.4 ? 'SLOWER' : 'FASTER', 'automation');
+                       '→ expect', computeValue > 3.4 ? 'FASTER' : 'SLOWER', 'automation');
             updateChart();
         });
 
