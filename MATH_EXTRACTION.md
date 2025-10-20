@@ -58,12 +58,13 @@ Where:
 
 **Reliability Factor:**
 ```
-f(r) = ln(r) / ln(0.5)
+f(r) = \exp(-\sigma \cdot \operatorname{logit}(r)),\quad \sigma \approx 1.19
 
 Examples:
 f(0.50) = 1.0    (no adjustment)
-f(0.95) = 14.4   (requires 14.4× more capability)
-f(0.99) = 71.8   (requires 71.8× more capability)
+f(0.80) ≈ 5.21  (requires ~5× more capability)
+f(0.95) ≈ 33.3  (requires ~33× more capability)
+f(0.99) ≈ 237   (requires ~235× more capability)
 ```
 
 **Key Property:** Lower H_r(t) = higher AI capability (faster task completion)

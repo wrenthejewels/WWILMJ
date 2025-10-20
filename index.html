@@ -2170,6 +2170,7 @@
         // METR-based capability model parameters
         const METR_DEFAULTS = {
             H50_0: 137,             // Baseline 50% task completion time in minutes (GPT-5, Aug 2025)
+            H80_0: 26.372464,       // Baseline 80% reliability horizon in minutes (GPT-5, Aug 2025)
             D_months: 7,            // METR doubling time in months
             r_target: 0.95,         // Reliability target (95%)
             softness: 0.45,         // Logistic softness parameter [0.35, 0.6]
@@ -2183,12 +2184,16 @@
             ]
         };
 
+        const LOGIT_80 = Math.log(0.8 / 0.2);
+        const METR_SIGMA = Math.log(METR_DEFAULTS.H80_0 / METR_DEFAULTS.H50_0) / LOGIT_80;
+        const RELIABILITY_GUARD = 1e-6;
+
         const SENIORITY_PROFILES = [
-            { label: 'Entry', thetaLift: 0.00, hazardShield: 0.00, delayShift: 0.0, reemploymentBoost: 1.00 },
-            { label: 'Mid-Level', thetaLift: 0.00, hazardShield: 0.00, delayShift: 0.4, reemploymentBoost: 1.03 },
-            { label: 'Senior', thetaLift: 0.00, hazardShield: 0.00, delayShift: 0.8, reemploymentBoost: 1.06 },
-            { label: 'Lead/Principal', thetaLift: 0.00, hazardShield: 0.00, delayShift: 1.2, reemploymentBoost: 1.08 },
-            { label: 'Executive', thetaLift: 0.00, hazardShield: 0.00, delayShift: 1.6, reemploymentBoost: 1.10 }
+            { label: 'Entry',          thetaLift: -0.02, hazardShield: 0.00, delayShift: -0.4, reemploymentBoost: 1.00 },
+            { label: 'Mid-Level',      thetaLift: 0.00,  hazardShield: 0.02, delayShift: -0.1, reemploymentBoost: 1.03 },
+            { label: 'Senior',         thetaLift: 0.03,  hazardShield: 0.05, delayShift: 0.2,  reemploymentBoost: 1.06 },
+            { label: 'Lead/Principal', thetaLift: 0.05,  hazardShield: 0.08, delayShift: 0.4,  reemploymentBoost: 1.08 },
+            { label: 'Executive',      thetaLift: 0.08,  hazardShield: 0.10, delayShift: 0.6,  reemploymentBoost: 1.10 }
         ];
 
         // Seniority-based task weight shifts (shift toward longer tasks for higher levels)
@@ -2358,8 +2363,12 @@
         // Higher reliability requires shorter/easier tasks: f(0.50)=1.0×, f(0.80)=5.54×, f(0.95)=10.36×
         // We DIVIDE H by f(r), so higher reliability → lower H → AI can only handle shorter tasks
         function reliabilityFactor(r) {
-            const k = -3.643; // Fitted to METR p50/p80 ratio
-            return Math.pow(0.50 / r, k);
+            const lower = 0.5 + RELIABILITY_GUARD;
+            const upper = 0.99 - RELIABILITY_GUARD;
+            const target = clamp(r, lower, upper);
+            const odds = target / (1 - target);
+            const logit = Math.log(odds);
+            return Math.exp(-METR_SIGMA * logit);
         }
 
         // METR capability: H_r(t) = (H50_0 * 2^(months_elapsed / D_eff)) / f(r)
@@ -2543,9 +2552,9 @@
             console.log('\nTEST 2: Reliability factor');
             const f95 = reliabilityFactor(0.95);
             const f99 = reliabilityFactor(0.99);
-            const reliabilityPass = (f95 > 10 && f95 < 16) && (f99 > 65 && f99 < 75);
-            console.log(`  f(0.95) = ${f95.toFixed(2)} (expected ~13.5)`);
-            console.log(`  f(0.99) = ${f99.toFixed(2)} (expected ~69-72)`);
+            const reliabilityPass = (f95 > 25 && f95 < 45) && (f99 > 180 && f99 < 320);
+            console.log(`  f(0.95) = ${f95.toFixed(2)} (expected ~33)`);
+            console.log(`  f(0.99) = ${f99.toFixed(2)} (expected ~235)`);
             console.log(`  RESULT: ${reliabilityPass ? 'PASS ✓' : 'FAIL ✗'}`);
             if (!reliabilityPass) allPassed = false;
 
@@ -2827,14 +2836,13 @@
                 const x = codeAnswer(qid, raw);
                 delayScore += weight * x;
             }
-            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
             delayScore = clamp(delayScore, -2.0, +2.0);
-            let delay = 1.0 - (delayScore * 0.9);
-            delay = Math.max(0.5, Math.min(3.0, delay));
+            let delay = 1.75 - 1.25 * delayScore;
+            delay = clamp(delay, 0.5, 3.0);
             if (seniorityProfile) {
                 delay += seniorityProfile.delayShift;
             }
-            return Math.max(0.4, Math.min(4.0, delay));
+            return clamp(delay, 0.3, 4.0);
         }
 
         // Calculate re-employment probability (0-1 scale)
@@ -2926,14 +2934,10 @@
 
             // Baseline parameters (will be modified by question multipliers)
             const h0_base = 0.015;
-            const thetaBase = THETA_BASE_ENTRY;  // entry-level coverage bar ~94%
-            const gamma = 1.2;  // Capability sensitivity to surplus
-            const kappa = 0.3;  // Baseline friction damping retained for other multipliers
+            const thetaBase = THETA_BASE_ENTRY;  // Baseline coverage bar before role/domain adjustments
+            const gammaBase = 8.0;               // Capability sensitivity to surplus (logistic gate steepness)
+            const kappa = 0.3;                   // Baseline friction damping retained for other multipliers
             const frictionValue = 3.0;
-
-            const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
-            const theta = thetaBase + seniorityProfile.thetaLift;
-            const thetaEffective = Math.max(0.4, Math.min(1.2, theta));
 
             const s_e = inferredExplicitness(answers);
             const lambda = inferredFrictionDecay(answers);
@@ -2941,8 +2945,16 @@
             const { penalty: domainPenalty, alignment: domainAlignment } = computeDomainMismatch(answers);
             const doublingMonths = parseFloat(document.getElementById('ai-doubling').value) || baseDoublingMonths;
 
+            const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
+            const thetaProfileBase = thetaBase + (seniorityProfile.thetaLift || 0);
+            const alignmentShift = 0.12 * (0.5 - domainAlignment);
+            const explicitnessShift = 0.10 * (0.5 - s_e);
+            const thetaCandidate = thetaProfileBase + alignmentShift + explicitnessShift;
+            const thetaEffective = clamp(thetaCandidate, 0.35, 0.72);
+
             // Apply optional timing shift (capability gate steepness adjustment)
-            const gammaEffective = kEff(gamma, answers);
+            const gammaEffective = kEff(gammaBase, answers);
+            const gammaClamped = clamp(gammaEffective, 3.0, 16.0);
 
             // Calculate implementation delay (scaled by seniority)
             const implementationDelay = calculateImplementationDelay(answers, seniority, seniorityProfile);
@@ -2951,7 +2963,7 @@
                 name: roleName,
                 h0: h0_base,
                 theta: thetaEffective,
-                gamma: Math.max(0.8, Math.min(2.5, gammaEffective)),
+                gamma: gammaClamped,
                 kappa: kappa,
                 friction: frictionValue,
                 seniority: seniority,
@@ -3136,15 +3148,19 @@
             if (!currentParams) return 0;
 
             const hAI = 0.50;           // Max annual hazard (50% per year at full automation)
-            const gamma = 8.0;          // Steepness of logistic gate
+            const gammaDefault = 8.0;   // Steepness of logistic gate baseline
 
             const seniorityLevel = currentParams.seniority || 1;
             const idx = Math.max(0, Math.min(SENIORITY_PROFILES.length - 1, seniorityLevel - 1));
             const profile = SENIORITY_PROFILES[idx];
             const thetaCandidate = typeof currentParams.theta === 'number'
                 ? currentParams.theta
-                : 0.50 + profile.thetaLift;
-            const theta = Math.max(0.4, Math.min(1.2, thetaCandidate));
+                : THETA_BASE_ENTRY + (profile.thetaLift || 0);
+            const theta = clamp(thetaCandidate, 0.35, 0.72);
+
+            const gamma = (currentParams && typeof currentParams.gamma === 'number')
+                ? currentParams.gamma
+                : gammaDefault;
 
             const A_t = A_job(tYears);
             const logisticArg = -gamma * (A_t - theta);
@@ -3344,19 +3360,19 @@
         function describeTheta(theta, seniority) {
             if (typeof theta !== 'number') return '-';
             const profiles = SENIORITY_PROFILES;
-            const baselineProfile = profiles[0] || { thetaLift: 0, label: 'Entry' };
-            const baselinePct = (THETA_BASE_ENTRY + (baselineProfile.thetaLift || 0)) * 100;
             const idx = Math.max(0, Math.min(profiles.length - 1, (seniority || 1) - 1));
-            const profile = profiles[idx] || baselineProfile;
+            const profile = profiles[idx] || { label: 'Entry', thetaLift: 0 };
+            const baseTheta = THETA_BASE_ENTRY + (profile.thetaLift || 0);
             const pct = theta * 100;
-            const lift = pct - baselinePct;
+            const basePct = baseTheta * 100;
+            const delta = pct - basePct;
             let note;
-            if (lift > 2) {
-                note = `${profile.label} raises the coverage bar by ~${lift.toFixed(1)} pts.`;
-            } else if (lift < -2) {
-                note = `${profile.label} sits below the entry coverage bar by ~${Math.abs(lift).toFixed(1)} pts.`;
+            if (delta > 3) {
+                note = `${profile.label} coverage lifts by ~${delta.toFixed(1)} pts due to tacit or compliance load.`;
+            } else if (delta < -3) {
+                note = `${profile.label} coverage drops by ~${Math.abs(delta).toFixed(1)} pts thanks to explicit digital tasks.`;
             } else {
-                note = `${profile.label} holds roughly the entry-level coverage bar.`;
+                note = `${profile.label} coverage bar is close to the baseline expectations.`;
             }
             return `${pct.toFixed(1)}% - ${note}`;
         }
