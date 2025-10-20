@@ -2094,7 +2094,7 @@
 
                 <ul class="factor-grid factor-grid--compact">
                     <li><strong>t:</strong> Time (years from present)</li>
-                    <li><strong>H<sub>r</sub>(t):</strong> AI capability (task time in minutes; lower = more capable)</li>
+                    <li><strong>H<sub>r</sub>(t):</strong> AI capability (max task length in minutes; higher = more capable)</li>
                     <li><strong>A(t):</strong> AI Readiness ∈ [0,1] (fraction of job tasks AI can perform)</li>
                     <li><strong>D:</strong> Doubling period (7 months baseline, from METR benchmarks)</li>
                     <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 14.4× capability margin)</li>
@@ -2362,10 +2362,12 @@
             return Math.pow(0.50 / r, k);
         }
 
-        // METR capability: H_r(t) = H50_0 / (f(r) * 2^(months_elapsed / D_eff))
-        // Returns task completion time in minutes at time t (years)
-        // Lower H = better AI (can complete tasks faster)
-        // Higher reliability requirement → lower H → AI can only automate shorter tasks
+        // METR capability: H_r(t) = (H50_0 * 2^(months_elapsed / D_eff)) / f(r)
+        // Returns maximum human-equivalent task length (in minutes) AI can handle at time t with reliability r
+        // Higher H = better AI (can handle longer/harder tasks that take humans more time)
+        // As time progresses, H increases (AI improves and tackles longer tasks)
+        // Higher reliability requirement → larger f(r) → lower H → can only automate shorter tasks
+        // Lower reliability requirement → smaller f(r) → higher H → can automate longer tasks
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = null) {
             const D_months = resolvedBaseDoublingMonths();
             const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
@@ -2386,24 +2388,28 @@
             const progress = Math.pow(2, monthsElapsed / D_eff);
             const f_r = reliabilityFactor(reliability);
 
-            // Note: Lower H means better AI capability (can handle longer tasks in less time)
-            // Domain penalty increases H (makes AI worse for domain-mismatched roles)
+            // Note: Higher H means better AI (can handle longer human-equivalent tasks)
+            // Domain penalty > 1 decreases H (makes AI relatively worse for domain-mismatched roles)
             const domainPenalty = currentParams && typeof currentParams.domainPenalty === 'number'
                 ? currentParams.domainPenalty
                 : 1.0;
-            const baselineMinutes = H50_0 * domainPenalty;  // Domain mismatch stretches METR baseline
+            const baselineMinutes = H50_0 / domainPenalty;  // Domain mismatch reduces effective capability
 
-            // FIXED: Divide by f_r (higher reliability → smaller H → can only automate shorter tasks)
-            return baselineMinutes / (f_r * progress);
+            // FIXED: Multiply by progress, divide by f_r
+            // - progress increases H over time (AI tackles harder tasks)
+            // - f(r) decreases H for higher reliability (more restrictive threshold)
+            return (baselineMinutes * progress) / f_r;
         }
 
-        // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(L_i) - ln(H)) / s))
+        // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(H) - ln(L_i)) / s))
         // Returns probability that AI can complete tasks of duration L_i given current capability H
-        // FIXED: Now uses ln(L) - ln(H) so faster AI (lower H) → higher readiness
+        // H = max task length AI can handle; higher H → better AI → higher readiness
+        // When H > L: AI can handle this task → gate opens (high probability)
+        // When H < L: AI cannot handle this task → gate closes (low probability)
         function taskGate(H, L, s = METR_DEFAULTS.softness) {
             const logH = Math.log(Math.max(0.01, H));  // Prevent log(0)
             const logL = Math.log(L);
-            const exponent = -(logL - logH) / s;  // FIXED: Reversed to ln(L) - ln(H)
+            const exponent = -(logH - logL) / s;  // FIXED: ln(H) - ln(L) so higher H → higher readiness
             return 1.0 / (1.0 + Math.exp(exponent));
         }
 
