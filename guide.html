@@ -499,15 +499,17 @@
 
                             <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task-length horizon has compounded by roughly seven months per doubling since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
 
-                            <p>We use METR's 50% task completion baseline (50 minutes) as our capability anchor, then apply a 95% reliability threshold to determine when AI systems are production-ready. This reliability adjustment stretches task horizons to account for the extra capability margin needed for dependable real-world deployment. That anchor flows directly into the blue curve on the calculator: it sets the horizon of the METR task buckets, the logistic coverage bar, and the compute/friction adjustments you change with the sliders.</p>
+                            <p>The calculator borrows METR's observed 7-month doubling trend to project AI capability growth over time. We use an initial baseline of 50 minutes and shrink it exponentially at METR's doubling rate. We then require 95% reliability before automating work—meaning AI must be able to complete tasks with 95% success, not just 50%. This reliability requirement stretches timelines by roughly 8% beyond raw capability growth.</p>
 
                             <ul class="detail-list">
 
-                                <li><strong>Task horizon feed:</strong> METR's 50% baseline (\(H_{50,0} = 50\) minutes) gets stretched by our 95% reliability factor and domain penalties when your role leans tacit, physical, or trust heavy.</li>
+                                <li><strong>Doubling trend:</strong> METR's empirical 7-month doubling time drives how fast AI capability improves. Every 7 months, AI can handle 2× longer tasks at the same success rate.</li>
 
-                                <li><strong>Logistic gate:</strong> Once the reconstructed readiness \(A_{\text{job}}(t)\) clears the seniority-specific coverage bar \(\theta\), we open the hazard channel described in the next section.</li>
+                                <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. This stretches the capability horizon to ensure AI is production-ready, not just technically capable.</li>
 
-                                <li><strong>Scenario levers:</strong> Compute growth, industry drag, and your questionnaire weights rescale the METR trend but never overwrite it, so the shape always honors their observed doubling cadence.</li>
+                                <li><strong>Task mapping:</strong> Your job gets decomposed into task duration buckets (2.5, 10, 37.5, 120, 360 minutes). Once AI can reliably complete enough of these buckets, the hazard channel opens.</li>
+
+                                <li><strong>Scenario levers:</strong> Compute growth, industry drag, and your questionnaire responses rescale the METR trend but never overwrite it, so the shape always honors their observed doubling cadence.</li>
 
                             </ul>
 
@@ -517,7 +519,7 @@
 
                             <img src="images/metr-length-of-tasks-linear.png" alt="METR linear task horizon trend">
 
-                            <figcaption>Linear horizon chart reproduced from <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR</a>. The calculator uses their 50% baseline with a 95% reliability adjustment for production-ready thresholds.</figcaption>
+                            <figcaption>Linear horizon chart reproduced from <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR</a>. The calculator uses their 7-month doubling trend with a 95% reliability requirement for production-ready automation.</figcaption>
 
                         </figure>
 
