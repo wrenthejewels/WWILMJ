@@ -1859,82 +1859,55 @@
                     </div>
 
                     <div class="question-group">
-                        <h5>18. AI Complementarity</h5>
-                        <p>How much could AI amplify (vs. replace) your productivity?</p>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="q18-1" name="q18" value="1">
-                                <label for="q18-1">Replace Only</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q18-2" name="q18" value="2">
-                                <label for="q18-2">Mostly Replace</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q18-3" name="q18" value="3" checked>
-                                <label for="q18-3">Mixed</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q18-4" name="q18" value="4">
-                                <label for="q18-4">Mostly Amplify</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="q18-5" name="q18" value="5">
-                                <label for="q18-5">Amplify Only</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="question-group">
-                        <h5>19. Adaptability/Learning</h5>
+                        <h5>18. Adaptability/Learning</h5>
                         <p>How quickly can you learn and adopt new tools/technologies?</p>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="q19-1" name="q19" value="1">
-                                <label for="q19-1">Very Slow</label>
+                                <input type="radio" id="q18-1" name="q18" value="1">
+                                <label for="q18-1">Very Slow</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q19-2" name="q19" value="2">
-                                <label for="q19-2">Slow</label>
+                                <input type="radio" id="q18-2" name="q18" value="2">
+                                <label for="q18-2">Slow</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q19-3" name="q19" value="3" checked>
-                                <label for="q19-3">Moderate</label>
+                                <input type="radio" id="q18-3" name="q18" value="3" checked>
+                                <label for="q18-3">Moderate</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q19-4" name="q19" value="4">
-                                <label for="q19-4">Fast</label>
+                                <input type="radio" id="q18-4" name="q18" value="4">
+                                <label for="q18-4">Fast</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q19-5" name="q19" value="5">
-                                <label for="q19-5">Very Fast</label>
+                                <input type="radio" id="q18-5" name="q18" value="5">
+                                <label for="q18-5">Very Fast</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="question-group">
-                        <h5>20. Job Performance</h5>
+                        <h5>19. Job Performance</h5>
                         <p>How good are you at your job, relative to your peers?</p>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="q20-1" name="q20" value="1">
-                                <label for="q20-1">Below Average</label>
+                                <input type="radio" id="q19-1" name="q19" value="1">
+                                <label for="q19-1">Below Average</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q20-2" name="q20" value="2">
-                                <label for="q20-2">Average</label>
+                                <input type="radio" id="q19-2" name="q19" value="2">
+                                <label for="q19-2">Average</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q20-3" name="q20" value="3" checked>
-                                <label for="q20-3">Above Average</label>
+                                <input type="radio" id="q19-3" name="q19" value="3" checked>
+                                <label for="q19-3">Above Average</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q20-4" name="q20" value="4">
-                                <label for="q20-4">Excellent</label>
+                                <input type="radio" id="q19-4" name="q19" value="4">
+                                <label for="q19-4">Excellent</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="q20-5" name="q20" value="5">
-                                <label for="q20-5">Top Performer</label>
+                                <input type="radio" id="q19-5" name="q19" value="5">
+                                <label for="q19-5">Top Performer</label>
                             </div>
                         </div>
                     </div>
@@ -2762,9 +2735,8 @@
             Q11: { fric: -0.60 }, // Physical Presence (FIXED: now fric− channel)
             Q12: { fric: -0.35 }, // Trust Requirements
             // Q13-Q16: Company/Industry context - affects implementation delay only
-            // Q17, Q19: Re-employment factors - affects job search success only
-            // Q18, Q20: Job retention factors - affects implementation delay only
-            // Q20: Also affects re-employment (dual purpose)
+            // Q17, Q18: Re-employment factors - affects job search success only
+            // Q19: Job retention factor - affects implementation delay and re-employment (dual purpose)
         };
 
         const DOMAIN_ALIGNMENT_WEIGHTS = {
@@ -2801,16 +2773,15 @@
             Q14: +0.30,  // Labor cost pressure: 1=Not Sensitive (more delay), 5=Extremely Sensitive (less delay)
             Q15: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay)
             Q16: +0.35,  // IT infrastructure: 1=Very Outdated (more delay), 5=Cutting Edge (less delay)
-            // Job Retention Factors (Q18, Q20)
-            Q18: -0.25,  // AI complementarity: 5=Amplify Only (more delay), 1=Replace Only (less delay) - employer keeps you longer
-            Q20: -0.35,  // Job performance: 5=Top 10% (more delay), 1=Below Average (less delay) - top performers retained longer
+            // Job Retention Factor (Q19)
+            Q19: -0.35,  // Job performance: 5=Top 10% (more delay), 1=Below Average (less delay) - top performers retained longer
         };
 
-        // Re-employment probability weights (Q17, Q19, Q20) - affects ability to find new job
+        // Re-employment probability weights (Q17, Q18, Q19) - affects ability to find new job
         const REEMPLOYMENT_WEIGHTS = {
             Q17: +0.50,  // Skill transferability: 5=Highly Transferable (higher re-employment), 1=Highly Specific (lower)
-            Q19: +0.50,  // Adaptability: 5=Very Fast (higher re-employment), 1=Very Slow (lower)
-            Q20: +0.30,  // Job performance: 5=Top 10% (higher re-employment), 1=Below Average (lower re-employment)
+            Q18: +0.50,  // Adaptability: 5=Very Fast (higher re-employment), 1=Very Slow (lower)
+            Q19: +0.30,  // Job performance: 5=Top 10% (higher re-employment), 1=Below Average (lower re-employment)
         };
 
         // Code raw answers to numeric x_i, aiming for symmetric effects
@@ -2893,8 +2864,8 @@
                 // Decelerators (higher = slower/later automation)
                 Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q11: -0.15, Q12: -0.15
                 // Q13-Q16: Company/Industry - affects GREEN curve only
-                // Q17, Q19: Re-employment - affects re-employment metric only
-                // Q18, Q20: Job retention - affects GREEN curve only (Q20 also affects re-employment)
+                // Q17, Q18: Re-employment - affects re-employment metric only
+                // Q19: Job retention - affects GREEN curve and re-employment (dual purpose)
             };
             for (const [qid, raw] of Object.entries(answers)) {
                 const x = codeAnswer(qid, raw);

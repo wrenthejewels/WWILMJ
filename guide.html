@@ -557,7 +557,7 @@
                             <li><strong>AI readiness (Q1-Q4):</strong> High scores strengthen the amplifier channel when you indicate strong capability for AI learning and completing your tasks.</li>
                             <li><strong>Task structure (Q5-Q9):</strong> Structured, decomposable tasks (Q5, Q6 high) accelerate adoption via the amplifier channel, while tacit knowledge (Q9) and context dependency (Q7) feed the protective friction channel and the domain-alignment penalty. Rapid feedback loops (Q8) amplify risk by helping AI learn faster.</li>
                             <li><strong>Human moat (Q10-Q12):</strong> Relationship intensity, physical presence, and trust demands all load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
-                            <li><strong>Firm and personal context (Q13-Q20):</strong> Company levers shape implementation delay. Job performance (Q20) delays displacement for top performers while also helping re-employment. Adaptability questions (Q17, Q19) drive re-employment probability.</li>
+                            <li><strong>Firm and personal context (Q13-Q19):</strong> Company levers shape implementation delay. Job performance (Q19) delays displacement for top performers while also helping re-employment. Adaptability (Q18) and transferability (Q17) drive re-employment probability.</li>
                         </ul>
                         <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
@@ -567,7 +567,7 @@
 
                     <section>
                         <h2>Implementation delay and the green curve</h2>
-                        <p>The green actual job-loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q13 through Q16 look at adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q18 (complementarity) and Q20 (job performance) help retain top performers, delaying job loss.</p>
+                        <p>The green actual job-loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q13 through Q16 look at adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q19 (job performance) helps retain top performers, delaying job loss.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Delay function</span>
                             <div class='equation-display'>$$\text{delay} = \operatorname{clip}(1.75 - 1.25 s_{\text{delay}}, 0.5, 3.0) + \Delta_{\text{seniority}},\quad s_{\text{delay}} \in [-2,2],\; \Delta_{\text{seniority}} \in \{-0.4,-0.1,+0.2,+0.4,+0.6\}$$</div>
