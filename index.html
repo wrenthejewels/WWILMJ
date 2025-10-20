@@ -2201,12 +2201,13 @@
         ];
 
         // Seniority-based task weight shifts (shift toward longer tasks for higher levels)
+        // DISABLED: All zeroed to ensure seniority only affects green curve (implementation delay)
         const SENIORITY_TASK_SHIFTS = [
             [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Entry
-            [-0.02, -0.02,  0.00, +0.03, +0.01],  // Mid
-            [-0.04, -0.04,  0.00, +0.06, +0.02],  // Senior
-            [-0.06, -0.06,  0.00, +0.08, +0.04],  // Lead
-            [-0.08, -0.08,  0.00, +0.10, +0.06]   // Exec
+            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Mid
+            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Senior
+            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Lead
+            [ 0.00,  0.00,  0.00, +0.00, +0.00]   // Exec
         ];
 
         // Get task weights for a given seniority level (1-5)
@@ -2219,9 +2220,10 @@
             return adjusted.map(w => w / sum);  // Normalize
         }
 
-        // Get softness parameter for a given seniority level (slightly harder gate for senior)
+        // Get softness parameter for a given seniority level
+        // FIXED: Now constant across all levels to ensure seniority only affects green curve
         function getSoftnessForSeniority(level) {
-            return 0.45 - 0.0125 * (level - 1);  // 0.45 → 0.40
+            return 0.45;  // Constant for all seniority levels
         }
 
         const THETA_BASE_ENTRY = 0.50;
