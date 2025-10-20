@@ -531,8 +531,8 @@
                         <p>The active AI hazard channel ($\lambda_{\text{AI}}(s)$) generates the blue technical-feasibility curve. Your firm and personal questionnaire responses then shift this curve forward in time to create the green implementation curve. The same data also determines your re-employment probability.</p>
                         <ul class='detail-list'>
                             <li><strong>AI hazard:</strong> METR task-length data map capability progress into the blue curve.</li>
-                            <li><strong>Adaptability delay:</strong> firm and personal answers shift the AI hazard forward in time to produce the green curve.</li>
-                            <li><strong>Re-employment likelihood:</strong> adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
+                            <li><strong>Adaptability delay:</strong> Firm and personal answers shift the AI hazard forward in time to produce the green curve.</li>
+                            <li><strong>Re-employment likelihood:</strong> Adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
                         </ul>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
@@ -541,10 +541,10 @@
                         <p>The hazard turns on once METR readiness clears the coverage bar. We let the METR 50% horizon shrink at the chosen doubling pace, stretch that horizon by a domain-alignment penalty for non-software work, pass it through METR's task buckets, and feed the resulting readiness into the logistic gate. Questionnaire multipliers only scale the hazard after that gate.</p>
                         <ul class='detail-list'>
                             <li><strong>Task horizon $H_r(t)$:</strong> $$H_r(t) = \frac{H_{50,0} \cdot 2^{(t \cdot 12)/D_{\text{eff}}}}{p_{\text{domain}} \cdot f(r)}$$ where $D_{\text{eff}}$ is the METR doubling time adjusted by compute growth and industry friction, $f(r)$ is the reliability factor (higher reliability divides H, limiting AI to shorter tasks), and $p_{\text{domain}} \in [0.5, 3.0]$ damps capability for tacit or physical work while letting highly aligned software roles keep more of the METR trendline.</li>
-                            <li><strong>Task buckets:</strong> five duration buckets reuse METR's software/reasoning anthology. Each bucket uses $$G_i(H) = \frac{1}{1 + \exp\!\left(-\frac{\ln H - \ln L_i}{s}\right)}$$ so better models (higher $H$) lift readiness.</li>
+                            <li><strong>Task buckets:</strong> Five duration buckets reuse METR's software/reasoning anthology. Each bucket uses $$G_i(H) = \frac{1}{1 + \exp\!\left(-\frac{\ln H - \ln L_i}{s}\right)}$$ so better models (higher $H$) lift readiness.</li>
                             <li><strong>Readiness $A_{\text{job}}(t)$:</strong> $$A_{\text{job}}(t) = \sum_i w_i G_i(H_r(t))$$ where $w_i$ are the task bucket weights that sum to 1.0, representing your job's composition across different task durations.</li>
-                            <li><strong>Coverage bar $\theta$:</strong> baseline $0.50$ shifts with seniority, explicitness ($s_e$), and domain alignment. Digital, well-documented work can pull $\theta$ down toward $0.38$, while tacit or compliance-heavy roles push it up toward ~$0.68$ before the hazard opens. This gate controls how much of the job must be automatable; the reliability slider governs how well each task must be performed.</li>
-                            <li><strong>User multipliers $M_{\text{user}}(s)$:</strong> questionnaire responses exponentiate into amplifier and friction sums, then are capped between $0.33\times$ and $3\times$ for responsiveness.</li>
+                            <li><strong>Coverage bar $\theta$:</strong> Baseline $0.50$ shifts with seniority, explicitness ($s_e$), and domain alignment. Digital, well-documented work can pull $\theta$ down toward $0.38$, while tacit or compliance-heavy roles push it up toward ~$0.68$ before the hazard opens. This gate controls how much of the job must be automatable; the reliability slider governs how well each task must be performed.</li>
+                            <li><strong>User multipliers $M_{\text{user}}(s)$:</strong> Questionnaire responses exponentiate into amplifier and friction sums, then are capped between $0.33\times$ and $3\times$ for responsiveness.</li>
                         </ul>
                         <p>We still integrate the hazard with Simpson's rule to get the blue technical-feasibility curve.</p>
                     </section>
@@ -554,14 +554,14 @@
                         <p>Each questionnaire response maps to a coded value $x_i$. All responses use the same coding rule: Likert 1..5 responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$ (i.e., $1\to -2, 3\to 0, 5\to +2$). Effects run in the correct direction via the weight's sign. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, multiply the results, then bound the overall multiplier to $[0.33, 3.0]$ for responsiveness.</p>
                         <p>The prompts cluster into four themes:</p>
                         <ul class='detail-list'>
-                            <li><strong>AI readiness (Q1-Q4):</strong> high scores strengthen the amplifier channel when you report top-tier models, abundant data, crisp benchmarks, and digitized workflows.</li>
-                            <li><strong>Task structure (Q5-Q9):</strong> structured, decomposable tasks (Q5, Q6 high) accelerate adoption via the amplifier channel, while tacit knowledge (Q9) and context dependency (Q7) feed the protective friction channel and the domain-alignment penalty. Rapid feedback loops (Q8) amplify risk by helping AI learn faster.</li>
-                            <li><strong>Human moat (Q10-Q12):</strong> relationship intensity, physical presence, and trust demands all load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
-                            <li><strong>Firm and personal context (Q13-Q20):</strong> company levers shape implementation delay. Job performance (Q20) delays displacement for top performers while also helping re-employment. Adaptability questions (Q17, Q19) drive re-employment probability.</li>
+                            <li><strong>AI readiness (Q1-Q4):</strong> High scores strengthen the amplifier channel when you indicate strong capability for AI learning and completing your tasks.</li>
+                            <li><strong>Task structure (Q5-Q9):</strong> Structured, decomposable tasks (Q5, Q6 high) accelerate adoption via the amplifier channel, while tacit knowledge (Q9) and context dependency (Q7) feed the protective friction channel and the domain-alignment penalty. Rapid feedback loops (Q8) amplify risk by helping AI learn faster.</li>
+                            <li><strong>Human moat (Q10-Q12):</strong> Relationship intensity, physical presence, and trust demands all load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
+                            <li><strong>Firm and personal context (Q13-Q20):</strong> Company levers shape implementation delay. Job performance (Q20) delays displacement for top performers while also helping re-employment. Adaptability questions (Q17, Q19) drive re-employment probability.</li>
                         </ul>
                         <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
-                            <p><strong>Calibration:</strong> the model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q7, Q9, Q11 high) suppresses the hazard by about $50\%$, delays implementation by $\geq 0.7$ years, and pushes the domain penalty above $~2\times$ so readiness clears METR later.</p>
+                            <p><strong>Calibration:</strong> The model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q7, Q9, Q11 high) suppresses the hazard by about $50\%$, delays implementation by $\geq 0.7$ years, and pushes the domain penalty above $~2\times$ so readiness clears METR later.</p>
                         </div>
                     </section>
 
@@ -580,10 +580,10 @@
                         <h2>Reading the outputs</h2>
                         <p>The chart shows two survival complements: blue for technical feasibility and green for realized displacement once friction and delay kick in. Because we integrate $\lambda(s)$ with Simpson's rule, the area under each curve is the cumulative probability that automation has already happened.</p>
                         <ul class='detail-list'>
-                            <li><strong>Median timeline:</strong> we binary-search for the year where cumulative probability hits $50\%$. That becomes the headline median job-loss metric.</li>
-                            <li><strong>Risk by 2030 or 2031:</strong> the model evaluates $P_{\text{loss}}$ at $5.35$ and $6.35$ years from $2024.65$, matching the scenario years shown on the card.</li>
-                            <li><strong>Personal timeline:</strong> we surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
-                            <li><strong>Re-employment label:</strong> the probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
+                            <li><strong>Median timeline:</strong> We binary-search for the year where cumulative probability hits $50\%$. That becomes the headline median job-loss metric.</li>
+                            <li><strong>Risk by 2030 or 2031:</strong> The model evaluates $P_{\text{loss}}$ at $5.35$ and $6.35$ years from $2024.65$, matching the scenario years shown on the card.</li>
+                            <li><strong>Personal timeline:</strong> We surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
+                            <li><strong>Re-employment label:</strong> The probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
                         </ul>
                         <p>Use the growth sliders to stress-test assumptions. Shorter doubling settings or faster inferred pace shrink $d$ and pivot both curves left. Answers that raise $s_e$ or ease the coverage bar $\theta$ have the same effect, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out, signaling a slower adoption grind. High scores on Q7-Q12 also stretch $p_{\text{domain}}$, so even fast doubling must cover more ground before matching METR's software baselines.</p>
                     </section>
