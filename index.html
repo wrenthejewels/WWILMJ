@@ -2072,12 +2072,6 @@
                     </div>
                 </div>
 
-                <p>You're looking at three live pieces today:</p>
-                <ul class="detail-list">
-                    <li><strong>AI hazard:</strong> the blue curve shows the METR-based logistic gate for technical feasibility.</li>
-                    <li><strong>Adaptability delay:</strong> the green curve shifts the AI hazard by your implementation delay, so firm and personal friction slow the rollout instead of changing the capability threshold.</li>
-                    <li><strong>Re-employment likelihood:</strong> the dashboard summarizes how easily you can land somewhere new once displacement arrives.</li>
-                </ul>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
 
@@ -2280,19 +2274,36 @@
         }
 
         function inferredPace(answers) {
-            // TODO: wire to questionnaire state once answers persist outside analyzeRole
+            // Map questionnaire responses into a METR pace multiplier.
             const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
+            const normDiff = (key) => norm(get(key)) - 0.5;
+
             let pace = 1.0;
-            pace += 0.20 * (norm(get('Q2')) - 0.5);
-            pace += 0.15 * (norm(get('Q16')) - 0.5);
-            pace += 0.15 * (norm(get('Q13')) - 0.5);
-            pace += 0.10 * (norm(get('Q8')) - 0.5);
-            pace += 0.10 * (norm(get('Q6')) - 0.5);
-            pace -= 0.18 * (norm(get('Q7')) - 0.5);
-            pace -= 0.20 * (norm(get('Q9')) - 0.5);
-            pace -= 0.24 * (norm(get('Q10')) - 0.5);
-            pace -= 0.28 * (norm(get('Q11')) - 0.5);
-            pace -= 0.16 * (norm(get('Q12')) - 0.5);
+
+            const acceleratorWeights = {
+                Q2: 0.20,   // Data availability accelerates when high
+                Q6: 0.10,   // Standardized workflows accelerate automation
+                Q8: 0.10,   // Fast feedback loops accelerate iteration
+                Q13: 0.15,  // Company adoption culture accelerates
+                Q16: 0.15   // Strong IT infrastructure accelerates
+            };
+
+            const frictionWeights = {
+                Q7: 0.18,   // Context dependence slows automation when high
+                Q9: 0.20,   // Tacit knowledge slows transfer
+                Q10: 0.24,  // Relationship-heavy work slows automation
+                Q11: 0.28,  // Physical presence needs slow automation
+                Q12: 0.16   // Trust/compliance requirements slow adoption
+            };
+
+            for (const [key, weight] of Object.entries(acceleratorWeights)) {
+                pace -= weight * normDiff(key);
+            }
+
+            for (const [key, weight] of Object.entries(frictionWeights)) {
+                pace += weight * normDiff(key);
+            }
+
             return clamp(pace, 0.5, 2.0);
         }
 
