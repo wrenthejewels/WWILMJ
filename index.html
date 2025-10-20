@@ -168,15 +168,6 @@
             border-color: #2a5298;
         }
         
-        .custom-input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            margin-bottom: 10px;
-        }
-        
         .question-group {
             background: #f8f9fa;
             padding: 15px;
@@ -685,11 +676,6 @@
             .analyze-btn {
                 padding: 12px;
                 font-size: 1em;
-            }
-
-            .custom-input {
-                font-size: 0.9em;
-                padding: 8px;
             }
 
             .parameter-breakdown {
@@ -1339,12 +1325,8 @@
                     <button class="preset-btn" data-role="education">
                         Education
                     </button>
-                    <button class="preset-btn" data-role="management">
-                        Management
-                    </button>
                     <button class="preset-btn" data-role="custom">Other/Custom</button>
                 </div>
-                <input type="text" class="custom-input" id="custom-role" placeholder="Or type your specific role (e.g., Machine Learning Engineer, Product Manager)">
             </div>
 
             <div class="setup-section">
@@ -2716,13 +2698,6 @@
                 this.classList.add('active');
                 selectedRole = this.dataset.role;
 
-                const customInput = document.getElementById('custom-role');
-                if (selectedRole === 'custom') {
-                    customInput.style.display = 'block';
-                } else {
-                    customInput.style.display = 'none';
-                }
-
                 analyzeRole();
             });
         });
@@ -2906,7 +2881,7 @@
             }
 
             const roleName = selectedRole === 'custom' ?
-                (document.getElementById('custom-role').value || 'Custom Role') :
+                'Other/Custom' :
                 document.querySelector(`.preset-btn[data-role="${selectedRole}"]`).textContent.trim();
 
             // Collect all answers
