@@ -177,89 +177,99 @@
             padding-bottom: 120px;
         }
 
-        .metr-intro {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 32px;
-            align-items: start;
-        }
-
-        .metr-brand-card,
-        .metr-chart-card {
-            background: #fdf8f0;
-            border: 1px solid #e6e0d4;
-            border-radius: 18px;
-            padding: 28px;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
-        }
-
-        .metr-chart-card canvas {
-            width: 100%;
-            height: 260px;
-        }
-
-        .metr-brand-link {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .metr-brand-link img {
-            width: 56px;
-            height: auto;
-        }
-
-        .metr-brand-text {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .metr-brand-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.15rem;
-            letter-spacing: 0.1em;
-            color: #1f1c18;
-            text-transform: uppercase;
-        }
-
-        .metr-brand-subtitle {
-            font-size: 0.95rem;
-            color: #5c564f;
-        }
-
-        .metr-figure {
-            background: #ffffff;
-            border: 1px solid #e6e0d4;
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.05);
-        }
-
-        .metr-figure img {
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-        }
-
-        .metr-figure figcaption {
-            margin-top: 12px;
-            font-size: 0.9rem;
-            color: #6b635a;
-        }
-
-        .chart-note {
-            margin-top: 18px;
-            font-size: 0.92rem;
-            color: #5c564f;
-        }
-
-        @media (max-width: 960px) {
-            .metr-intro {
-                gap: 24px;
-            }
-        }
-
+        .metr-intro {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            align-items: start;
+        }
+
+        .metr-brand-card,
+        .metr-chart-card {
+            background: #fdf8f0;
+            border: 1px solid #e6e0d4;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
+        }
+
+        .metr-chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            margin-bottom: 0;
+        }
+
+        .metr-chart-card canvas {
+            display: block;
+            box-sizing: border-box;
+            height: 260px !important;
+            width: 100% !important;
+            max-height: 260px !important;
+        }
+
+        .metr-brand-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .metr-brand-link img {
+            width: 56px;
+            height: auto;
+        }
+
+        .metr-brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metr-brand-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 0.1em;
+            color: #1f1c18;
+            text-transform: uppercase;
+        }
+
+        .metr-brand-subtitle {
+            font-size: 0.95rem;
+            color: #5c564f;
+        }
+
+        .metr-figure {
+            background: #ffffff;
+            border: 1px solid #e6e0d4;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.05);
+        }
+
+        .metr-figure img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+
+        .metr-figure figcaption {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: #6b635a;
+        }
+
+        .chart-note {
+            margin-top: 18px;
+            font-size: 0.92rem;
+            color: #5c564f;
+        }
+
+        @media (max-width: 960px) {
+            .metr-intro {
+                gap: 24px;
+            }
+        }
+
         .article-body section {
             background: #ffffff;
             border: 1px solid #e6e0d4;
@@ -528,7 +538,9 @@
 
                         <div class="metr-chart-card">
 
-                            <canvas id="metr-80-chart" aria-label="Reconstructed METR 80% success trend" role="img"></canvas>
+                            <div class="metr-chart-wrapper">
+                                <canvas id="metr-80-chart" aria-label="Reconstructed METR 80% success trend" role="img"></canvas>
+                            </div>
 
                             <p class="chart-note">We recompute METR's published dataset locally to plot the 80% success horizon in hours. Estimated doubling time: <span id="metr-80-doubling">~7.0 months</span>.</p>
 
@@ -698,11 +710,16 @@
                 doublingNode.textContent = Number.isFinite(doubling) ? `~${doubling.toFixed(1)} months` : 'n/a';
             }
 
-            // Set canvas size before creating chart to prevent expansion loop
-            canvas.style.width = '100%';
-            canvas.style.height = '260px';
-            canvas.width = canvas.offsetWidth;
-            canvas.height = 260;
+            // Get the wrapper to constrain dimensions
+            const wrapper = canvas.parentElement;
+            if (wrapper) {
+                const wrapperWidth = wrapper.offsetWidth;
+                const wrapperHeight = wrapper.offsetHeight;
+
+                // Set explicit pixel dimensions on the canvas element
+                canvas.width = wrapperWidth;
+                canvas.height = wrapperHeight;
+            }
 
             new Chart(canvas, {
                 type: 'line',
