@@ -894,22 +894,23 @@
             letter-spacing: 0.02em;
         }
 
-        .publication-tagline {
+        .publication-tagline,
+        .author-link {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            color: #5c564f;
             font-weight: 600;
         }
 
+        .publication-tagline {
+            color: #5c564f;
+        }
+
         .author-link {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
             color: #6ba3d4;
             text-decoration: none;
             transition: color 0.3s;
-            font-weight: 600;
         }
 
         .author-link:hover {
@@ -1265,12 +1266,10 @@
 
             .header-actions {
                 width: 100%;
-                justify-content: flex-start;
             }
 
             .header-btn {
-                padding: 12px 24px;
-                font-size: 0.95rem;
+                flex: 1;
             }
 
             .container {
