@@ -768,6 +768,38 @@
             font-weight: 600;
         }
 
+        .article-hero {
+            padding: 96px 0 48px;
+            border-bottom: 1px solid #e6e0d4;
+            margin-bottom: 48px;
+        }
+
+        .article-hero h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(2.8rem, 4vw, 3.6rem);
+            letter-spacing: -0.015em;
+            font-weight: 600;
+            margin-top: 18px;
+        }
+
+        .lede {
+            color: #5c564f;
+            max-width: 48ch;
+            margin-top: 16px;
+            font-size: 1.18rem;
+        }
+
+        .meta-line {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-top: 24px;
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #8c857d;
+        }
+
         .subtitle {
             color: #5c564f;
             font-size: 1.15rem;
@@ -1249,6 +1281,10 @@
                 padding: 64px 0 40px;
             }
 
+            .article-hero {
+                padding: 72px 0 40px;
+            }
+
             .model-explanation,
             .ai-equation,
             .setup-wizard {
@@ -1276,19 +1312,20 @@
             </div>
         </div>
     </header>
-    <div class="container">
+
+    <main class="container">
         <div class="content-wrapper">
+            <header class="article-hero">
+                <h1>AI Job Displacement Model</h1>
+                <p class="lede">Complete the sections below for a personalized analysis of how AI capability growth affects your role.</p>
+                <div class="meta-line">
+                    <span>Updated October 2025</span>
+                </div>
+            </header>
 
             <div class="two-column-layout">
                 <div class="left-column">
                     <div class="setup-wizard" id="setup-wizard">
-            <div class="progress-indicator">
-                <div>Complete all sections below for personalized analysis</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
-            </div>
-
             <div class="setup-section">
                 <h3>Step 1: Select Your Role Category</h3>
                 <div class="role-presets">
@@ -2142,7 +2179,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         MathJax = {
