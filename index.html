@@ -2022,7 +2022,7 @@
 
                 <div class="control-group">
                     <h3>AI Reliability</h3>
-                    <p>Success rate required before automation (50% = possible, 95% = production-ready)</p>
+                    <p>Success rate required before automation</p>
                     <div class="slider-container">
                         <input type="range" id="ai-reliability" min="50" max="99" step="1" value="95">
                         <span class="value-display" id="ai-reliability-value">95%</span>
@@ -2370,10 +2370,13 @@
 
         // METR-based capability functions
 
-        // Reliability adjustment factor: f(r) = ln(0.5) / ln(r)
-        // FIXED: Now multiplies requirement (r=0.95 → ~13.5×, r=0.99 → ~69-72×)
+        // Reliability adjustment factor fitted to METR empirical data
+        // METR shows p50/p80 ≈ 5.54× across models, which gives exponent k ≈ -3.643
+        // Formula: f(r) = (0.50/r)^k where k = log(5.54) / log(0.50/0.80)
+        // Results: f(0.50)=1.0×, f(0.80)=5.54× (METR), f(0.95)=10.36×, f(0.99)=12.04×
         function reliabilityFactor(r) {
-            return Math.log(0.5) / Math.log(r);
+            const k = -3.643; // Fitted to METR p50/p80 ratio
+            return Math.pow(0.50 / r, k);
         }
 
         // METR capability: H_r(t) = (H50_0 * f(r)) / 2^(months_elapsed / D_eff)
