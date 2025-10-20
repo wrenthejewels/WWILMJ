@@ -169,13 +169,179 @@
         }
 
         .article-body {
-            width: min(720px, 100%);
+            width: min(1200px, 95%);
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             gap: 48px;
             padding-bottom: 120px;
         }
+
+        .metr-intro {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+
+            gap: 32px;
+
+            align-items: start;
+
+        }
+
+
+
+        .metr-brand-card,
+
+        .metr-chart-card {
+
+            background: #fdf8f0;
+
+            border: 1px solid #e6e0d4;
+
+            border-radius: 18px;
+
+            padding: 28px;
+
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
+
+        }
+
+
+
+        .metr-chart-card canvas {
+
+            width: 100%;
+
+            height: 260px;
+
+        }
+
+
+
+        .metr-brand-link {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 16px;
+
+        }
+
+
+
+        .metr-brand-link img {
+
+            width: 56px;
+
+            height: auto;
+
+        }
+
+
+
+        .metr-brand-text {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 4px;
+
+        }
+
+
+
+        .metr-brand-title {
+
+            font-family: 'Sora', sans-serif;
+
+            font-size: 1.15rem;
+
+            letter-spacing: 0.1em;
+
+            color: #1f1c18;
+
+            text-transform: uppercase;
+
+        }
+
+
+
+        .metr-brand-subtitle {
+
+            font-size: 0.95rem;
+
+            color: #5c564f;
+
+        }
+
+
+
+        .metr-figure {
+
+            background: #ffffff;
+
+            border: 1px solid #e6e0d4;
+
+            border-radius: 18px;
+
+            padding: 20px;
+
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.05);
+
+        }
+
+
+
+        .metr-figure img {
+
+            width: 100%;
+
+            height: auto;
+
+            border-radius: 12px;
+
+        }
+
+
+
+        .metr-figure figcaption {
+
+            margin-top: 12px;
+
+            font-size: 0.9rem;
+
+            color: #6b635a;
+
+        }
+
+
+
+        .chart-note {
+
+            margin-top: 18px;
+
+            font-size: 0.92rem;
+
+            color: #5c564f;
+
+        }
+
+
+
+        @media (max-width: 960px) {
+
+            .metr-intro {
+
+                gap: 24px;
+
+            }
+
+        }
+
+
 
         .article-body section {
             background: #ffffff;
@@ -400,6 +566,58 @@
                 </header>
 
                 <div class='article-body'>
+
+                    <section class="metr-intro">
+
+                        <div class="metr-brand-card">
+
+                            <a class="metr-brand-link" href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">
+
+                                <img src="images/metr-logo.svg" alt="METR logo">
+
+                                <div class="metr-brand-text">
+
+                                    <span class="metr-brand-title">METR</span>
+
+                                    <span class="metr-brand-subtitle">Measuring AI ability to complete long tasks</span>
+
+                                </div>
+
+                            </a>
+
+                            <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task-length horizon has compounded by roughly seven months per doubling since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
+
+                            <p>We treat their 80% success horizon as the point where work is not just technically solvable but production ready. That anchor flows directly into the blue curve on the calculator: it sets the horizon of the METR task buckets, the logistic coverage bar, and the compute/friction adjustments you change with the sliders.</p>
+
+                            <ul class="detail-list">
+
+                                <li><strong>Task horizon feed:</strong> METR's hours at 80% success become our base \(H_{50,0}\), stretched by domain penalties when your role leans tacit, physical, or trust heavy.</li>
+
+                                <li><strong>Logistic gate:</strong> Once the reconstructed readiness \(A_{\text{job}}(t)\) clears the seniority-specific coverage bar \(\theta\), we open the hazard channel described in the next section.</li>
+
+                                <li><strong>Scenario levers:</strong> Compute growth, industry drag, and your questionnaire weights rescale the METR trend but never overwrite it, so the shape always honors their observed doubling cadence.</li>
+
+                            </ul>
+
+                        </div>
+
+                        <figure class="metr-figure">
+
+                            <img src="images/metr-length-of-tasks-linear.png" alt="METR linear task horizon trend">
+
+                            <figcaption>Linear horizon chart reproduced from <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR</a>. Toggle their interactive view to 80% success to match the reconstruction below.</figcaption>
+
+                        </figure>
+
+                        <div class="metr-chart-card">
+
+                            <canvas id="metr-80-chart" height="220" aria-label="Reconstructed METR 80% success trend" role="img"></canvas>
+
+                            <p class="chart-note">We recompute METR's published dataset locally to plot the 80% success horizon in hours. Estimated doubling time: <span id="metr-80-doubling">~7.0 months</span>.</p>
+
+                        </div>
+
+                    </section>
                     <section>
                         <h2>What the calculator actually simulates</h2>
                         <p>The experience you see on the main page builds on a stacked hazard template: separate channels track AI capability, macro cycles, firm execution, role design, and personal leverage. The framework stays in place even when some channels are empty.</p>
@@ -492,6 +710,140 @@
                 fontCache: 'global'
             }
         };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script>
+        (function() {
+            const canvas = document.getElementById('metr-80-chart');
+            if (!canvas) return;
+
+            const points = [
+                { label: '2019-02-14', model: 'GPT-2', hours: 0.005646 },
+                { label: '2020-05-28', model: 'Davinci-002', hours: 0.034119 },
+                { label: '2022-03-15', model: 'GPT-3.5 Turbo Instruct', hours: 0.173085 },
+                { label: '2023-03-14', model: 'GPT-4', hours: 0.965175 },
+                { label: '2023-11-06', model: 'GPT-4 (Nov 2023)', hours: 1.453006 },
+                { label: '2024-01-25', model: 'GPT-4 (Jan 2024)', hours: 1.197496 },
+                { label: '2024-03-04', model: 'Claude 3 Opus', hours: 1.125572 },
+                { label: '2024-04-09', model: 'GPT-4 Turbo', hours: 1.523202 },
+                { label: '2024-05-13', model: 'GPT-4o', hours: 1.689572 },
+                { label: '2024-06-07', model: 'Qwen 2 72B', hours: 0.424603 },
+                { label: '2024-06-20', model: 'Claude 3.5 Sonnet', hours: 3.199280 },
+                { label: '2024-09-12', model: 'o1 Preview', hours: 4.619420 },
+                { label: '2024-09-19', model: 'Qwen 2.5 72B', hours: 0.933300 },
+                { label: '2024-10-22', model: 'Claude 3.5 Sonnet (Oct)', hours: 4.640773 },
+                { label: '2024-12-05', model: 'o1 Elicited', hours: 5.973358 },
+                { label: '2024-12-26', model: 'DeepSeek V3', hours: 3.860789 },
+                { label: '2025-01-20', model: 'DeepSeek R1', hours: 4.332735 },
+                { label: '2025-02-24', model: 'Claude 3.7 Sonnet', hours: 15.156049 },
+                { label: '2025-03-24', model: 'DeepSeek V3 (Mar)', hours: 5.305094 },
+                { label: '2025-04-16', model: 'o3', hours: 20.389159 },
+                { label: '2025-04-16', model: 'o4 Mini', hours: 15.047173 },
+                { label: '2025-05-22', model: 'Claude 4 Opus', hours: 20.300219 },
+                { label: '2025-05-22', model: 'Claude 4 Sonnet', hours: 16.659787 },
+                { label: '2025-05-28', model: 'DeepSeek R1 (May)', hours: 3.750648 },
+                { label: '2025-06-05', model: 'Gemini 2.5 Pro Preview', hours: 9.199105 },
+                { label: '2025-07-09', model: 'Grok 4', hours: 14.911130 },
+                { label: '2025-08-05', model: 'Claude 4.1 Opus', hours: 21.087887 },
+                { label: '2025-08-05', model: 'GPT-OSS 120B', hours: 6.632316 },
+                { label: '2025-08-07', model: 'GPT-5', hours: 26.372464 },
+                { label: '2025-09-29', model: 'Claude Sonnet 4.5', hours: 20.151826 }
+            ];
+
+            const labels = points.map(point => point.label);
+            const values = points.map(point => point.hours);
+            const msPerMonth = 1000 * 60 * 60 * 24 * 30.4375;
+            const base = new Date(labels[0]).getTime();
+            const months = labels.map(label => (new Date(label).getTime() - base) / msPerMonth);
+            const logValues = values.map(value => Math.log(value));
+
+            let sumX = 0;
+            let sumY = 0;
+            let sumXY = 0;
+            let sumXX = 0;
+            const n = months.length;
+            for (let i = 0; i < n; i += 1) {
+                const x = months[i];
+                const y = logValues[i];
+                sumX += x;
+                sumY += y;
+                sumXY += x * y;
+                sumXX += x * x;
+            }
+
+            const denominator = n * sumXX - sumX * sumX;
+            const slope = denominator === 0 ? 0 : (n * sumXY - sumX * sumY) / denominator;
+            const intercept = (sumY - slope * sumX) / n;
+            const fit = months.map(x => Math.exp(intercept + slope * x));
+            const doubling = slope === 0 ? Number.POSITIVE_INFINITY : Math.log(2) / slope;
+            const doublingNode = document.getElementById('metr-80-doubling');
+            if (doublingNode) {
+                doublingNode.textContent = Number.isFinite(doubling) ? `~${doubling.toFixed(1)} months` : 'n/a';
+            }
+
+            new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: '80% success horizon (hours)',
+                            data: values,
+                            borderColor: '#1f6feb',
+                            backgroundColor: 'rgba(31, 111, 235, 0.18)',
+                            tension: 0.25,
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Exponential fit',
+                            data: fit,
+                            borderColor: '#ff7f0e',
+                            borderDash: [6, 4],
+                            borderWidth: 2,
+                            tension: 0.25,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Hours at 80% success' },
+                            ticks: {
+                                callback(value) {
+                                    return value >= 1 ? value.toFixed(0) : value.toFixed(2);
+                                }
+                            }
+                        },
+                        x: {
+                            title: { display: true, text: 'Model release' },
+                            ticks: { maxRotation: 60, minRotation: 45 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: {
+                            callbacks: {
+                                label(context) {
+                                    const point = points[context.dataIndex];
+                                    if (!point || context.datasetIndex !== 0) {
+                                        const label = context.dataset.label || '';
+                                        return `${label}: ${context.formattedValue} h`;
+                                    }
+                                    return `${point.model}: ${context.formattedValue} h`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }());
     </script>
     <script src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js' async></script>
     <script src='navigation.js'></script>
