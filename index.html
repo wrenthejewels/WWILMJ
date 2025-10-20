@@ -2355,15 +2355,17 @@
         // Reliability adjustment factor fitted to METR empirical data
         // METR shows p50/p80 ≈ 5.54× across models, which gives exponent k ≈ -3.643
         // Formula: f(r) = (0.50/r)^k where k = log(5.54) / log(0.50/0.80)
-        // Results: f(0.50)=1.0×, f(0.80)=5.54× (METR), f(0.95)=10.36×, f(0.99)=12.04×
+        // Higher reliability requires shorter/easier tasks: f(0.50)=1.0×, f(0.80)=5.54×, f(0.95)=10.36×
+        // We DIVIDE H by f(r), so higher reliability → lower H → AI can only handle shorter tasks
         function reliabilityFactor(r) {
             const k = -3.643; // Fitted to METR p50/p80 ratio
             return Math.pow(0.50 / r, k);
         }
 
-        // METR capability: H_r(t) = (H50_0 * f(r)) / 2^(months_elapsed / D_eff)
+        // METR capability: H_r(t) = H50_0 / (f(r) * 2^(months_elapsed / D_eff))
         // Returns task completion time in minutes at time t (years)
-        // FIXED: Now multiplies H50_0 by f(r) to stretch requirement (higher reliability → higher requirement)
+        // Lower H = better AI (can complete tasks faster)
+        // Higher reliability requirement → lower H → AI can only automate shorter tasks
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = null) {
             const D_months = resolvedBaseDoublingMonths();
             const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
@@ -2384,12 +2386,15 @@
             const progress = Math.pow(2, monthsElapsed / D_eff);
             const f_r = reliabilityFactor(reliability);
 
-            // Note: Higher capability means LOWER task time
+            // Note: Lower H means better AI capability (can handle longer tasks in less time)
+            // Domain penalty increases H (makes AI worse for domain-mismatched roles)
             const domainPenalty = currentParams && typeof currentParams.domainPenalty === 'number'
                 ? currentParams.domainPenalty
                 : 1.0;
             const baselineMinutes = H50_0 * domainPenalty;  // Domain mismatch stretches METR baseline
-            return (baselineMinutes * f_r) / progress;
+
+            // FIXED: Divide by f_r (higher reliability → smaller H → can only automate shorter tasks)
+            return baselineMinutes / (f_r * progress);
         }
 
         // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(L_i) - ln(H)) / s))
