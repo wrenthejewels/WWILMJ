@@ -179,9 +179,15 @@
 
         .metr-intro {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 32px;
             align-items: start;
+        }
+
+        @media (max-width: 960px) {
+            .metr-intro {
+                grid-template-columns: 1fr;
+            }
         }
 
         .metr-brand-card,
@@ -191,18 +197,6 @@
             border-radius: 18px;
             padding: 28px;
             box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
-        }
-
-        .metr-svg-chart {
-            width: 100%;
-            height: 300px;
-            overflow: visible;
-        }
-
-        .metr-svg-chart svg {
-            width: 100%;
-            height: 100%;
-            display: block;
         }
 
         .metr-brand-link {
@@ -259,12 +253,6 @@
             margin-top: 18px;
             font-size: 0.92rem;
             color: #5c564f;
-        }
-
-        @media (max-width: 960px) {
-            .metr-intro {
-                gap: 24px;
-            }
         }
 
         .article-body section {
@@ -511,11 +499,11 @@
 
                             <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task-length horizon has compounded by roughly seven months per doubling since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
 
-                            <p>We treat their 80% success horizon as the point where work is not just technically solvable but production ready. That anchor flows directly into the blue curve on the calculator: it sets the horizon of the METR task buckets, the logistic coverage bar, and the compute/friction adjustments you change with the sliders.</p>
+                            <p>We use METR's 50% task completion baseline (50 minutes) as our capability anchor, then apply a 95% reliability threshold to determine when AI systems are production-ready. This reliability adjustment stretches task horizons to account for the extra capability margin needed for dependable real-world deployment. That anchor flows directly into the blue curve on the calculator: it sets the horizon of the METR task buckets, the logistic coverage bar, and the compute/friction adjustments you change with the sliders.</p>
 
                             <ul class="detail-list">
 
-                                <li><strong>Task horizon feed:</strong> METR's hours at 80% success become our base \(H_{50,0}\), stretched by domain penalties when your role leans tacit, physical, or trust heavy.</li>
+                                <li><strong>Task horizon feed:</strong> METR's 50% baseline (\(H_{50,0} = 50\) minutes) gets stretched by our 95% reliability factor and domain penalties when your role leans tacit, physical, or trust heavy.</li>
 
                                 <li><strong>Logistic gate:</strong> Once the reconstructed readiness \(A_{\text{job}}(t)\) clears the seniority-specific coverage bar \(\theta\), we open the hazard channel described in the next section.</li>
 
@@ -529,17 +517,10 @@
 
                             <img src="images/metr-length-of-tasks-linear.png" alt="METR linear task horizon trend">
 
-                            <figcaption>Linear horizon chart reproduced from <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR</a>. Toggle their interactive view to 80% success to match the reconstruction below.</figcaption>
+                            <figcaption>Linear horizon chart reproduced from <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR</a>. The calculator uses their 50% baseline with a 95% reliability adjustment for production-ready thresholds.</figcaption>
 
                         </figure>
 
-                        <div class="metr-chart-card">
-
-                            <div id="metr-80-chart" class="metr-svg-chart"></div>
-
-                            <p class="chart-note">We recompute METR's published dataset locally to plot the 80% success horizon in hours. Estimated doubling time: <span id="metr-80-doubling">~7.0 months</span>.</p>
-
-                        </div>
 
                     </section>
                     <section>
@@ -634,163 +615,6 @@
                 fontCache: 'global'
             }
         };
-    </script>
-    <script>
-        (function() {
-            // METR benchmark data from benchmark_results.yaml (p80_horizon_length)
-            const data = [
-                { date: '2019-02-14', model: 'GPT-2', hours: 0.005646 },
-                { date: '2020-05-28', model: 'Davinci-002', hours: 0.034119 },
-                { date: '2022-03-15', model: 'GPT-3.5 Turbo Instruct', hours: 0.173085 },
-                { date: '2023-03-14', model: 'GPT-4', hours: 0.965175 },
-                { date: '2023-11-06', model: 'GPT-4 (Nov 2023)', hours: 1.453006 },
-                { date: '2024-01-25', model: 'GPT-4 (Jan 2024)', hours: 1.197496 },
-                { date: '2024-03-04', model: 'Claude 3 Opus', hours: 1.125572 },
-                { date: '2024-04-09', model: 'GPT-4 Turbo', hours: 1.523202 },
-                { date: '2024-05-13', model: 'GPT-4o', hours: 1.689572 },
-                { date: '2024-06-07', model: 'Qwen 2 72B', hours: 0.424603 },
-                { date: '2024-06-20', model: 'Claude 3.5 Sonnet', hours: 3.199280 },
-                { date: '2024-09-12', model: 'o1 Preview', hours: 4.619420 },
-                { date: '2024-09-19', model: 'Qwen 2.5 72B', hours: 0.933300 },
-                { date: '2024-10-22', model: 'Claude 3.5 Sonnet (Oct)', hours: 4.640773 },
-                { date: '2024-12-05', model: 'o1 Elicited', hours: 5.973358 },
-                { date: '2024-12-26', model: 'DeepSeek V3', hours: 3.860789 },
-                { date: '2025-01-20', model: 'DeepSeek R1', hours: 4.332735 },
-                { date: '2025-02-24', model: 'Claude 3.7 Sonnet', hours: 15.156049 },
-                { date: '2025-03-24', model: 'DeepSeek V3 (Mar)', hours: 5.305094 },
-                { date: '2025-04-16', model: 'o3', hours: 20.389159 },
-                { date: '2025-04-16', model: 'o4 Mini', hours: 15.047173 },
-                { date: '2025-05-22', model: 'Claude 4 Opus', hours: 20.300219 },
-                { date: '2025-05-22', model: 'Claude 4 Sonnet', hours: 16.659787 },
-                { date: '2025-05-28', model: 'DeepSeek R1 (May)', hours: 3.750648 },
-                { date: '2025-06-05', model: 'Gemini 2.5 Pro Preview', hours: 9.199105 },
-                { date: '2025-07-09', model: 'Grok 4', hours: 14.911130 },
-                { date: '2025-08-05', model: 'Claude 4.1 Opus', hours: 21.087887 },
-                { date: '2025-08-05', model: 'GPT-OSS 120B', hours: 6.632316 },
-                { date: '2025-08-07', model: 'GPT-5', hours: 26.372464 },
-                { date: '2025-09-29', model: 'Claude Sonnet 4.5', hours: 20.151826 }
-            ];
-
-            // Calculate doubling time
-            const msPerMonth = 1000 * 60 * 60 * 24 * 30.4375;
-            const baseTime = new Date(data[0].date).getTime();
-            const months = data.map(d => (new Date(d.date).getTime() - baseTime) / msPerMonth);
-            const logHours = data.map(d => Math.log(d.hours));
-
-            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-            for (let i = 0; i < data.length; i++) {
-                sumX += months[i];
-                sumY += logHours[i];
-                sumXY += months[i] * logHours[i];
-                sumXX += months[i] * months[i];
-            }
-            const n = data.length;
-            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-            const doubling = Math.log(2) / slope;
-
-            const doublingNode = document.getElementById('metr-80-doubling');
-            if (doublingNode) {
-                doublingNode.textContent = `~${doubling.toFixed(1)} months`;
-            }
-
-            // Create simple SVG chart
-            const container = document.getElementById('metr-80-chart');
-            if (!container) return;
-
-            const width = 800;
-            const height = 300;
-            const padding = { top: 20, right: 20, bottom: 60, left: 60 };
-            const chartWidth = width - padding.left - padding.right;
-            const chartHeight = height - padding.top - padding.bottom;
-
-            // Find min/max values
-            const minDate = new Date(data[0].date).getTime();
-            const maxDate = new Date(data[data.length - 1].date).getTime();
-            const maxHours = Math.max(...data.map(d => d.hours));
-
-            // Create SVG
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-            svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-
-            // Create background
-            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bg.setAttribute('width', width);
-            bg.setAttribute('height', height);
-            bg.setAttribute('fill', '#fdf8f0');
-            svg.appendChild(bg);
-
-            // Y-axis grid lines and labels
-            const ySteps = 5;
-            for (let i = 0; i <= ySteps; i++) {
-                const y = padding.top + (chartHeight * i / ySteps);
-                const value = maxHours * (1 - i / ySteps);
-
-                // Grid line
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', padding.left);
-                line.setAttribute('y1', y);
-                line.setAttribute('x2', width - padding.right);
-                line.setAttribute('y2', y);
-                line.setAttribute('stroke', '#e6e0d4');
-                line.setAttribute('stroke-width', '1');
-                svg.appendChild(line);
-
-                // Label
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', padding.left - 10);
-                text.setAttribute('y', y);
-                text.setAttribute('text-anchor', 'end');
-                text.setAttribute('dominant-baseline', 'middle');
-                text.setAttribute('font-size', '12');
-                text.setAttribute('fill', '#5c564f');
-                text.textContent = value.toFixed(1);
-                svg.appendChild(text);
-            }
-
-            // Plot points
-            data.forEach(point => {
-                const date = new Date(point.date).getTime();
-                const x = padding.left + (date - minDate) / (maxDate - minDate) * chartWidth;
-                const y = padding.top + (1 - point.hours / maxHours) * chartHeight;
-
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', x);
-                circle.setAttribute('cy', y);
-                circle.setAttribute('r', '4');
-                circle.setAttribute('fill', '#1f6feb');
-                circle.setAttribute('stroke', '#fff');
-                circle.setAttribute('stroke-width', '1');
-
-                const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-                title.textContent = `${point.model}: ${point.hours.toFixed(2)}h`;
-                circle.appendChild(title);
-
-                svg.appendChild(circle);
-            });
-
-            // Axis labels
-            const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            yLabel.setAttribute('x', 15);
-            yLabel.setAttribute('y', height / 2);
-            yLabel.setAttribute('text-anchor', 'middle');
-            yLabel.setAttribute('transform', `rotate(-90, 15, ${height / 2})`);
-            yLabel.setAttribute('font-size', '14');
-            yLabel.setAttribute('fill', '#1f1c18');
-            yLabel.textContent = 'Hours at 80% success';
-            svg.appendChild(yLabel);
-
-            const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            xLabel.setAttribute('x', width / 2);
-            xLabel.setAttribute('y', height - 10);
-            xLabel.setAttribute('text-anchor', 'middle');
-            xLabel.setAttribute('font-size', '14');
-            xLabel.setAttribute('fill', '#1f1c18');
-            xLabel.textContent = 'Model release date';
-            svg.appendChild(xLabel);
-
-            container.appendChild(svg);
-        }());
     </script>
     <script src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js' async></script>
     <script src='navigation.js'></script>
