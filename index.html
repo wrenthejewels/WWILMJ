@@ -2058,7 +2058,7 @@
                 <div class="section-intro">
                     <span class="eyebrow">How this works</span>
                     <h3>METR-powered stacked hazard model</h3>
-                    <p>This calculator uses METR's empirical 7-month AI capability doubling benchmark to forecast automation risk. The stacked framework keeps separate hazard channels for AI progress, macro shocks, firm strategy, role-level dynamics, and personal factors.</p>
+                    <p>This calculator uses METR's empirical 7-month AI capability doubling benchmark inside a stacked hazard framework. Each channel (AI progress, macro shocks, firm execution, role design, personal leverage) stays in the template so new evidence can switch it on without rewriting the model.</p>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
@@ -2072,13 +2072,12 @@
                     </div>
                 </div>
 
-                <p>In the current release, the charts and cards you see draw on three pieces:</p>
+                <p>You're looking at three live pieces today:</p>
                 <ul class="detail-list">
                     <li><strong>AI hazard:</strong> the blue curve shows the METR-based logistic gate for technical feasibility.</li>
                     <li><strong>Adaptability delay:</strong> the green curve shifts the AI hazard by your implementation delay, so firm and personal friction slow the rollout instead of changing the capability threshold.</li>
                     <li><strong>Re-employment likelihood:</strong> the dashboard summarizes how easily you can land somewhere new once displacement arrives.</li>
                 </ul>
-                <p>Macro, firm, role, and personal hazard layers remain placeholders for now; they stay at zero until we have validated datasets, but the stacked template is ready for those future additions.</p>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
 
@@ -2119,7 +2118,7 @@
                     <li><strong>s:</strong> Logistic softness (0.45 default, controls gate steepness)</li>
                     <li><strong>h<sub>AI</sub>:</strong> Max annual hazard (0.50 = 50% per year at full automation)</li>
                     <li><strong>γ:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
-                    <li><strong>θ<sub>0</sub>:</strong> Readiness threshold (0.75 = automation kicks in at 75% task coverage)</li>
+                    <li><strong>θ<sub>0</sub>:</strong> Readiness threshold (0.50 = automation kicks in at 50% task coverage)</li>
                     <li><strong>userMult:</strong> Question-based multiplier (bounded 0.5× to 2.0×)</li>
                 </ul>
 
@@ -2147,7 +2146,7 @@
                     <li><strong>r:</strong> 0.95 (95% reliability target)</li>
                     <li><strong>Task buckets:</strong> &lt;5m: 25%, 5-15m: 35%, 15-60m: 25%, 1-3h: 10%, &gt;3h: 5%</li>
                     <li><strong>s:</strong> 0.45 (logistic softness)</li>
-                    <li><strong>θ<sub>0</sub>:</strong> 0.75 (75% readiness threshold)</li>
+                    <li><strong>θ<sub>0</sub>:</strong> 0.50 (50% readiness threshold)</li>
                     <li><strong>γ:</strong> 8.0 (hazard gate steepness)</li>
                     <li><strong>h<sub>AI</sub>:</strong> 0.50 yr<sup>-1</sup> (max 50% annual hazard)</li>
                     <li><strong>userMult range:</strong> 0.5× (max protection from unions/trust/liability) to 2.0× (max acceleration)</li>
@@ -2231,7 +2230,7 @@
             return 0.45 - 0.0125 * (level - 1);  // 0.45 → 0.40
         }
 
-        const THETA_BASE_ENTRY = 0.94;
+        const THETA_BASE_ENTRY = 0.50;
 
         function clamp(value, min = 0, max = 1) {
             return Math.min(max, Math.max(min, value));
@@ -2646,7 +2645,7 @@
                 const mismatch = computeDomainMismatch(answers);
                 const savedParams = currentParams;
                 currentParams = {
-                    h0: 0.015, theta: 0.75, gamma: 1.2, kappa: 0.3, friction: 3.0,
+                    h0: 0.015, theta: 0.50, gamma: 1.2, kappa: 0.3, friction: 3.0,
                     seniority: 1, seniorityProfile: SENIORITY_PROFILES[0],
                     s_e: inferredExplicitness(answers), lambda: inferredFrictionDecay(answers),
                     domainPace: inferredPace(answers), computeMultiplier: 1.0,
@@ -2808,7 +2807,7 @@
             }
             const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
             delayScore = clamp(delayScore, -2.0, +2.0);
-            let delay = 1.75 - (delayScore * 1.25);
+            let delay = 1.0 - (delayScore * 0.9);
             delay = Math.max(0.5, Math.min(3.0, delay));
             if (seniorityProfile) {
                 delay += seniorityProfile.delayShift;
@@ -2912,7 +2911,7 @@
 
             const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
             const theta = thetaBase + seniorityProfile.thetaLift;
-            const thetaEffective = Math.max(0.6, Math.min(1.4, theta));
+            const thetaEffective = Math.max(0.4, Math.min(1.2, theta));
 
             const s_e = inferredExplicitness(answers);
             const lambda = inferredFrictionDecay(answers);
@@ -3114,29 +3113,24 @@
         function hazardAI(tYears) {
             if (!currentParams) return 0;
 
-            // Parameters
             const hAI = 0.50;           // Max annual hazard (50% per year at full automation)
             const gamma = 8.0;          // Steepness of logistic gate
-            const theta0_base = 0.75;   // Base AI readiness threshold (75% of tasks)
 
-            // Apply seniority theta lift
             const seniorityLevel = currentParams.seniority || 1;
             const idx = Math.max(0, Math.min(SENIORITY_PROFILES.length - 1, seniorityLevel - 1));
             const profile = SENIORITY_PROFILES[idx];
-            const theta = theta0_base + profile.thetaLift;
+            const thetaCandidate = typeof currentParams.theta === 'number'
+                ? currentParams.theta
+                : 0.50 + profile.thetaLift;
+            const theta = Math.max(0.4, Math.min(1.2, thetaCandidate));
 
-            // Get AI readiness A(t) from METR model (bounded [0,1])
             const A_t = A_job(tYears);
-
-            // Logistic gate
             const logisticArg = -gamma * (A_t - theta);
             const baseHazard = hAI / (1.0 + Math.exp(logisticArg));
 
-            // Apply user multipliers (bounded 0.5x - 2.0x)
             const userMult = getUserMultiplier();
             const hazard = baseHazard * userMult;
 
-            // Cap at 95% annual hazard
             return Math.min(0.95, hazard);
         }
 
@@ -3165,7 +3159,7 @@
                 const savedParams = currentParams;
                 currentParams = {
                     h0: 0.015,
-                    theta: 0.95,
+                    theta: 0.50,
                     gamma: 1.2,
                     kappa: 0.3,
                     friction: 3.0,
