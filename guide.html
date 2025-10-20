@@ -499,7 +499,7 @@
 
                                 <li><strong>Doubling trend:</strong> METR's empirical 7-month doubling time drives how fast AI capability improves. Every 7 months, AI can handle 2× longer tasks at the same success rate.</li>
 
-                                <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. This stretches the capability horizon to ensure AI is production-ready, not just technically capable.</li>
+                                <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. Technical capability requires a high bar to outperform human error, though the calculator allows a custom reliability gate if tasks can feasibly be automated at a lower success rate.</li>
 
                                 <li><strong>Task mapping:</strong> Your job gets decomposed into task duration buckets (2.5, 10, 37.5, 120, 360 minutes). Once AI can reliably complete enough of these buckets, the hazard channel opens.</li>
 
@@ -521,10 +521,12 @@
                     </section>
                     <section>
                         <h2>What the calculator actually simulates</h2>
-                        <p>The calculator uses a stacked hazard framework with separate channels for AI capability, macro cycles, firm execution, role design, and personal leverage. Currently, only the AI capability channel is active—the other channels are reserved for future calibration when we have sufficient empirical data.</p>
+                        <p>The calculator models job displacement as a survival problem where multiple hazard channels compound over time. Currently, only the AI capability channel is active—the other channels (macro cycles, firm execution, role design, personal leverage) are reserved for future calibration when we have sufficient empirical data.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Survival relationship</span>
                             <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
+                            <span class='callout-label'>Stacked hazard model</span>
+                            <div class='equation-display'>$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
                         </div>
                         <p>The active AI hazard channel ($\lambda_{\text{AI}}(s)$) generates the blue technical-feasibility curve. Your firm and personal questionnaire responses then shift this curve forward in time to create the green implementation curve. The same data also determines your re-employment probability.</p>
                         <ul class='detail-list'>

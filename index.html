@@ -2019,6 +2019,15 @@
                         <span class="value-display" id="industry-pace-value">1.0x</span>
                     </div>
                 </div>
+
+                <div class="control-group">
+                    <h3>AI Reliability</h3>
+                    <p>Success rate required before automation (50% = possible, 95% = production-ready)</p>
+                    <div class="slider-container">
+                        <input type="range" id="ai-reliability" min="50" max="99" step="1" value="95">
+                        <span class="value-display" id="ai-reliability-value">95%</span>
+                    </div>
+                </div>
             </div>
             
             <div class="chart-container">
@@ -2336,6 +2345,15 @@
             return clamp(combined, 0.4, 3.0);
         }
 
+        function resolvedReliabilityTarget() {
+            const slider = document.getElementById('ai-reliability');
+            if (slider) {
+                const percentValue = parseInt(slider.value); // 50-99
+                return percentValue / 100.0; // Convert to 0.50-0.99
+            }
+            return METR_DEFAULTS.r_target; // Default 0.95
+        }
+
         function resolvedBaseDoublingMonths() {
             const slider = document.getElementById('ai-doubling');
             if (slider) {
@@ -2361,10 +2379,11 @@
         // METR capability: H_r(t) = (H50_0 * f(r)) / 2^(months_elapsed / D_eff)
         // Returns task completion time in minutes at time t (years)
         // FIXED: Now multiplies H50_0 by f(r) to stretch requirement (higher reliability → higher requirement)
-        function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = METR_DEFAULTS.r_target) {
+        function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = null) {
             const D_months = resolvedBaseDoublingMonths();
             const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
             const industryFriction = resolvedDomainPace();  // Now represents friction
+            const reliability = r !== null ? r : resolvedReliabilityTarget(); // Use slider if r not provided
 
             // Effective doubling time: MULTIPLY by frictions (higher friction → longer doubling → slower automation)
             const D_eff = D_months * computeFriction * industryFriction;
@@ -2372,12 +2391,13 @@
             // Debug logging (only log occasionally to avoid spam)
             if (tYears === 0 && Math.random() < 0.1) {
                 console.log('[H_r] D_months:', D_months, 'computeFriction:', computeFriction.toFixed(2),
-                           'industryFriction:', industryFriction.toFixed(2), '→ D_eff:', D_eff.toFixed(2), 'months');
+                           'industryFriction:', industryFriction.toFixed(2), '→ D_eff:', D_eff.toFixed(2), 'months',
+                           'reliability:', (reliability * 100).toFixed(0) + '%');
             }
 
             const monthsElapsed = tYears * 12;
             const progress = Math.pow(2, monthsElapsed / D_eff);
-            const f_r = reliabilityFactor(r);
+            const f_r = reliabilityFactor(reliability);
 
             // Note: Higher capability means LOWER task time
             const domainPenalty = currentParams && typeof currentParams.domainPenalty === 'number'
@@ -3463,6 +3483,14 @@
             document.getElementById('industry-pace-value').textContent = frictionValue.toFixed(1) + 'x';
             console.log('[Slider] Industry Friction:', frictionValue.toFixed(1) + 'x',
                        '→ expect', frictionValue > 1.0 ? 'SLOWER' : 'FASTER', 'automation');
+            updateChart();
+        });
+
+        document.getElementById('ai-reliability')?.addEventListener('input', function() {
+            const reliabilityValue = parseInt(this.value);
+            document.getElementById('ai-reliability-value').textContent = reliabilityValue + '%';
+            console.log('[Slider] AI Reliability:', reliabilityValue + '%',
+                       '→ expect', reliabilityValue > 95 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
         });
 
