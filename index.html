@@ -2132,11 +2132,11 @@
             softness: 0.45,         // Logistic softness parameter [0.35, 0.6]
             // Task duration buckets (minutes) and weights (sum to 1.0)
             taskBuckets: [
-                { L: 2.5, w: 0.25 },    // <5min tasks
-                { L: 10, w: 0.35 },     // 5-15min tasks
-                { L: 37.5, w: 0.25 },   // 15-60min tasks
-                { L: 120, w: 0.10 },    // 1-3hr tasks
-                { L: 360, w: 0.05 }     // >3hr tasks
+                { L: 2.5,  w: 0.25 },   // <5min tasks (center ~2.5m)
+                { L: 15,   w: 0.35 },   // 5-15min tasks (use upper-midpoint for 95% reliability)
+                { L: 60,   w: 0.25 },   // 15-60min tasks (more conservative center)
+                { L: 180,  w: 0.10 },   // 1-3hr tasks (higher threshold)
+                { L: 540,  w: 0.05 }    // >3hr tasks (higher threshold)
             ]
         };
 
@@ -2916,12 +2916,12 @@
             // at lower AI capability levels (lower theta = easier to automate)
             const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
             const feasibilityBonus =
-                0.05 * (norm(get('Q2')) - 0.5) +   // Data availability - more data = clearer automation path
-                0.04 * (norm(get('Q6')) - 0.5) +   // Standardization - clearer success criteria
-                0.03 * (norm(get('Q8')) - 0.5);    // Fast feedback - easier to validate AI performance
+                0.04 * (norm(get('Q2')) - 0.5) +   // Data availability - lighter feasibility effect
+                0.03 * (norm(get('Q6')) - 0.5) +   // Standardization - lighter feasibility effect
+                0.02 * (norm(get('Q8')) - 0.5);    // Fast feedback - lighter feasibility effect
 
             const thetaCandidate = thetaProfileBase + alignmentShift + explicitnessShift - feasibilityBonus;
-            const thetaEffective = clamp(thetaCandidate, 0.35, 0.72);
+            const thetaEffective = clamp(thetaCandidate, 0.50, 0.72);
 
             // Apply optional timing shift (capability gate steepness adjustment)
             const gammaEffective = kEff(gammaBase, answers);
