@@ -1980,7 +1980,7 @@
                 <div class="model-insights">
                     <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
                     <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
-                    <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
+                    <p><strong>Effective doubling time:</strong> <span id="insight-pace">-</span></p>
                     <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
                     <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
                 </div>
@@ -3400,13 +3400,15 @@
         function describePace(pace) {
             if (typeof pace !== 'number' || !Number.isFinite(pace)) return '-';
             const multiplier = pace.toFixed(2);
+            const effectiveMonths = (7 * pace).toFixed(1);
+
             if (pace > 1.05) {
-                return `~${multiplier}x METR doubling time - slower capability transfer.`;
+                return `${effectiveMonths} months (${multiplier}× METR baseline) - slower progress due to industry/domain friction.`;
             }
             if (pace < 0.95) {
-                return `~${multiplier}x METR doubling time - faster than the trend.`;
+                return `${effectiveMonths} months (${multiplier}× METR baseline) - faster progress than baseline.`;
             }
-            return `~${multiplier}x METR doubling time - close to baseline.`;
+            return `${effectiveMonths} months (${multiplier}× METR baseline) - close to baseline.`;
         }
 
         function describeFriction(lambda) {
