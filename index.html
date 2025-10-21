@@ -1908,7 +1908,7 @@
                 <!-- Removed compute scaling slider: METR doubling baked in -->
                 <div class="control-group">
                     <h3>Domain Friction</h3>
-                    <p>Industry-specific barriers that slow AI capability transfer (â‰¥1.0Ã— METR baseline)</p>
+                    <p>Industry-specific barriers that slow AI capability transfer (≥1.0× METR baseline)</p>
                     <div class="slider-container">
                         <input type="range" id="industry-pace" min="1" max="2" step="0.1" value="1">
                         <span class="value-display" id="industry-pace-value">1.0x</span>
@@ -1962,7 +1962,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 <div class="model-insights">
                     <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
-                    <p><strong>Required quality Î¸:</strong> <span id="insight-theta">-</span></p>
+                    <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
                     <p><strong>Effective doubling time:</strong> <span id="insight-pace">-</span></p>
                     <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
                     <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
@@ -1987,7 +1987,7 @@
                         transition: background-color 0.2s ease;
                     " onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor='#f8f9fa'">
                         <span>View Task Duration Profile</span>
-                        <span id="toggle-icon" style="font-size: 12px; transition: transform 0.2s ease;">â–¼</span>
+                    <span id="toggle-icon" style="font-size: 12px; transition: transform 0.2s ease;">▼</span>
                     </button>
                     <div id="task-breakdown-content" style="
                         display: none;
@@ -2021,7 +2021,7 @@
                 </div>
 
 
-                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability â†’ Readiness</h4>
+                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
                     <div class="equation-callout">
@@ -2052,16 +2052,16 @@
                 <ul class="factor-grid factor-grid--compact">
                     <li><strong>t:</strong> Time (years from present)</li>
                     <li><strong>H<sub>r</sub>(t):</strong> AI capability (max task length in minutes; higher = more capable)</li>
-                    <li><strong>A(t):</strong> AI Readiness âˆˆ [0,1] (fraction of job tasks AI can perform)</li>
+                    <li><strong>A(t):</strong> AI Readiness ∈ [0,1] (fraction of job tasks AI can perform)</li>
                     <li><strong>D:</strong> Doubling period (7 months baseline, from METR benchmarks)</li>
-                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 33Ã— capability margin)</li>
+                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 33× capability margin)</li>
                     <li><strong>L<sub>i</sub>:</strong> Task duration thresholds (e.g., 2.5, 10, 37.5, 120, 360 minutes)</li>
                     <li><strong>w<sub>i</sub>:</strong> Task bucket weights (sum to 1.0, e.g., 25%, 35%, 25%, 10%, 5%)</li>
                     <li><strong>s:</strong> Logistic softness (0.45 default, controls gate steepness)</li>
                     <li><strong>h<sub>AI</sub>:</strong> Max base annual hazard (0.40 = 40% per year at full automation)</li>
-                    <li><strong>Î³:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
-                    <li><strong>Î¸<sub>0</sub>:</strong> Readiness threshold (0.50 = automation kicks in at 50% task coverage)</li>
-                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.33Ã— to 3.0Ã—)</li>
+                    <li><strong>γ:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
+                    <li><strong>θ<sub>0</sub>:</strong> Readiness threshold (0.50 = automation kicks in at 50% task coverage)</li>
+                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.33× to 3.0×)</li>
                 </ul>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Risk Curves: Blue vs Green</h4>
@@ -2078,7 +2078,7 @@
                     </div>
                 </div>
 
-                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard-it's the Blue curve shifted right by implementation delay (Î”). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
+                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard — it's the Blue curve shifted right by implementation delay (Δ). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Model Defaults</h4>
 
@@ -2088,10 +2088,10 @@
                     <li><strong>r:</strong> 0.95 (95% reliability target)</li>
                     <li><strong>Task buckets:</strong> &lt;5m: 25%, 5-15m: 35%, 15-60m: 25%, 1-3h: 10%, &gt;3h: 5%</li>
                     <li><strong>s:</strong> 0.45 (logistic softness)</li>
-                    <li><strong>Î¸<sub>0</sub>:</strong> 0.50 (50% readiness threshold)</li>
-                    <li><strong>Î³:</strong> 8.0 (hazard gate steepness)</li>
+                    <li><strong>θ<sub>0</sub>:</strong> 0.50 (50% readiness threshold)</li>
+                    <li><strong>γ:</strong> 8.0 (hazard gate steepness)</li>
                     <li><strong>h<sub>AI</sub>:</strong> 0.40 yr<sup>-1</sup> (max base annual hazard)</li>
-                    <li><strong>userMult range:</strong> 0.33Ã— (max protection from unions/trust/liability) to 3.0Ã— (max acceleration, clamped to 0.95 yr<sup>-1</sup> effective max hazard)</li>
+                    <li><strong>userMult range:</strong> 0.33× (max protection from unions/trust/liability) to 3.0× (max acceleration, clamped to 0.95 yr<sup>-1</sup> effective max hazard)</li>
                 </ul>
 
                 <p><strong>Question effects:</strong> Explicit vs. implicit task mix modifies bucket weights (w<sub>i</sub>) and softness (s). Union strength, trust requirements, and liability concerns move implementation delay (Î”) rather than amplifying hazard directly, since these are adoption barriers, not capability limits. Major protective factors shift Î¸<sub>0</sub> higher (AI must master more tasks before displacement begins).</p>
@@ -2168,7 +2168,7 @@
             // Baseline weights: [<5min, 5-15min, 15-60min, 1-3hr, >3hr]
             let weights = [0.25, 0.35, 0.25, 0.10, 0.05];
 
-            // 1. SENIORITY SHIFT: Entry â†’ more short tasks; Executive â†’ more long tasks
+            // 1. SENIORITY SHIFT: Entry → more short tasks; Executive → more long tasks
             // Reasoning: Junior roles do more tactical execution (quick tasks)
             //            Senior roles do more strategy & integration (long tasks)
             const seniorityShift = (level - 1) / 4;  // 0.0 (entry) to 1.0 (exec)
@@ -2185,38 +2185,38 @@
                 return weights.map(w => w / sum);
             }
 
-            // 2. TASK DECOMPOSABILITY (Q5): Structured â†’ more short; Complex â†’ more long
-            // Q5: 1=Very Complex (integrated work) â†’ 5=Highly Structured (discrete tasks)
+            // 2. TASK DECOMPOSABILITY (Q5): Structured → more short; Complex → more long
+            // Q5: 1=Very Complex (integrated work) → 5=Highly Structured (discrete tasks)
             // Reasoning: Structured work breaks into many short tasks
             //            Complex work requires longer integrated effort
             const q5 = answers.Q5 || 3;
             const structureShift = (q5 - 3) / 2;  // -1.0 to +1.0
-            weights[0] += 0.10 * structureShift;   // Structured â†’ more <5min
-            weights[1] += 0.08 * structureShift;   // Structured â†’ more 5-15min
-            weights[3] -= 0.10 * structureShift;   // Complex â†’ more 1-3hr
-            weights[4] -= 0.08 * structureShift;   // Complex â†’ more >3hr
+            weights[0] += 0.10 * structureShift;   // Structured → more <5min
+            weights[1] += 0.08 * structureShift;   // Structured → more 5-15min
+            weights[3] -= 0.10 * structureShift;   // Complex → more 1-3hr
+            weights[4] -= 0.08 * structureShift;   // Complex → more >3hr
 
             // 3. TASK STANDARDIZATION (Q6): Affects distribution shape
-            // Q6: 1=Highly Variable â†’ 5=Highly Standardized
-            // Reasoning: Standardized â†’ tasks have similar durations (concentrate in middle)
-            //            Variable â†’ wide range of durations (spread out)
+            // Q6: 1=Highly Variable → 5=Highly Standardized
+            // Reasoning: Standardized → tasks have similar durations (concentrate in middle)
+            //            Variable → wide range of durations (spread out)
             const q6 = answers.Q6 || 3;
             const stdShift = (q6 - 3) / 2;  // -1.0 to +1.0
-            weights[1] += 0.08 * stdShift;   // Standardized â†’ more short tasks
-            weights[2] += 0.06 * stdShift;   // Standardized â†’ more medium tasks
-            weights[0] -= 0.08 * stdShift;   // Variable â†’ more variety in quick
-            weights[4] -= 0.06 * stdShift;   // Variable â†’ less very long
+            weights[1] += 0.08 * stdShift;   // Standardized → more short tasks
+            weights[2] += 0.06 * stdShift;   // Standardized → more medium tasks
+            weights[0] -= 0.08 * stdShift;   // Variable → more variety in quick
+            weights[4] -= 0.06 * stdShift;   // Variable → less very long
 
-            // 4. CONTEXT DEPENDENCY (Q7): High context â†’ longer integrated tasks
-            // Q7: 1=Minimal â†’ 5=Critical
+            // 4. CONTEXT DEPENDENCY (Q7): High context → longer integrated tasks
+            // Q7: 1=Minimal → 5=Critical
             // Reasoning: High-context work requires understanding complex situations
             //            Takes longer per task (fewer quick wins)
             const q7 = answers.Q7 || 3;
             const contextShift = (q7 - 3) / 2;  // -1.0 to +1.0
-            weights[0] -= 0.08 * contextShift;  // High context â†’ fewer <5min
-            weights[1] -= 0.06 * contextShift;  // High context â†’ fewer 5-15min
-            weights[3] += 0.08 * contextShift;  // High context â†’ more 1-3hr
-            weights[4] += 0.06 * contextShift;  // High context â†’ more >3hr
+            weights[0] -= 0.08 * contextShift;  // High context → fewer <5min
+            weights[1] -= 0.06 * contextShift;  // High context → fewer 5-15min
+            weights[3] += 0.08 * contextShift;  // High context → more 1-3hr
+            weights[4] += 0.06 * contextShift;  // High context → more >3hr
 
             // Ensure all weights are positive and normalize to sum to 1.0
             weights = weights.map(w => Math.max(0.01, w));
@@ -2281,7 +2281,7 @@
 
         function inferredDomainFriction(answers) {
             // Calculate domain-specific friction that slows AI capability transfer
-            // Only adds friction (â‰¥1.0) - cannot make automation faster than METR baseline
+            // Only adds friction (≥1.0) - cannot make automation faster than METR baseline
             const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
             const normDiff = (key) => norm(get(key)) - 0.5;
 
@@ -2300,7 +2300,7 @@
                 friction += weight * normDiff(key);
             }
 
-            // Floor at 1.0 (METR baseline), ceiling at 2.0 (2Ã— slower)
+            // Floor at 1.0 (METR baseline), ceiling at 2.0 (2× slower)
             return clamp(friction, 1.0, 2.0);
         }
 
@@ -2338,9 +2338,9 @@
 
         // Reliability adjustment factor fitted to METR empirical data (logistic calibration)
         // Uses f(r) = exp(-Ïƒ Â· logit(r)) where logit(r) = ln(r/(1-r))
-        // Ïƒ is calibrated from METR's H50_0/H80_0 ratio (137/26.37 â‰ˆ 5.19Ã—)
-        // Examples: f(0.50)=1.0Ã—, f(0.80)â‰ˆ5.2Ã—, f(0.95)â‰ˆ33.1Ã—, f(0.99)â‰ˆ235Ã—
-        // We DIVIDE H by f(r), so higher reliability â†’ lower H â†’ AI can only handle shorter tasks
+        // σ is calibrated from METR's H50_0/H80_0 ratio (137/26.37 ≈ 5.19×)
+        // Examples: f(0.50)=1.0×, f(0.80)≈5.2×, f(0.95)≈33.1×, f(0.99)≈235×
+        // We DIVIDE H by f(r), so higher reliability → lower H → AI can only handle shorter tasks
         function reliabilityFactor(r) {
             const lower = 0.5 + RELIABILITY_GUARD;
             const upper = 0.99 - RELIABILITY_GUARD;
@@ -2354,11 +2354,11 @@
         // Returns maximum human-equivalent task length (in minutes) AI can handle at time t with reliability r
         // Higher H = better AI (can handle longer/harder tasks that take humans more time)
         // As time progresses, H increases (AI improves and tackles longer tasks)
-        // Higher reliability requirement â†’ larger f(r) â†’ lower H â†’ can only automate shorter tasks
-        // Lower reliability requirement â†’ smaller f(r) â†’ higher H â†’ can automate longer tasks
+        // Higher reliability requirement → larger f(r) → lower H → can only automate shorter tasks
+        // Lower reliability requirement → smaller f(r) → higher H → can automate longer tasks
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = null) {
             const D_months = resolvedBaseDoublingMonths();
-            const frictionMult = resolvedDomainPace();  // Domain friction multiplier (â‰¥1.0)
+            const frictionMult = resolvedDomainPace();  // Domain friction multiplier (≥1.0)
             const reliability = r !== null ? r : resolvedReliabilityTarget(); // Use slider if r not provided
 
             // Option B: Effective doubling time fixed to METR baseline (no domain/question stretching)
@@ -3246,7 +3246,7 @@
             weights.forEach((w, i) => {
                 const pct = Math.round(w * 100);
                 const barLength = Math.round(pct / 2);  // Scale to ~50 char max
-                const bar = 'â–ˆ'.repeat(barLength);
+                const bar = '█'.repeat(barLength);
                 html += `<div style="margin-bottom: 4px;">${bucketLabels[i]} <span style="color: #0066cc;">${pct}%</span> ${bar}</div>`;
             });
 
@@ -3459,7 +3459,7 @@
         document.getElementById('ai-doubling')?.addEventListener('input', function() {
             const value = parseFloat(this.value);
             document.getElementById('ai-doubling-value').textContent = value + ' mo';
-            console.log('[Slider] AI Doubling:', value, 'months â†’ expect', value < 7 ? 'FASTER' : 'SLOWER', 'automation');
+            console.log('[Slider] AI Doubling:', value, 'months → expect', value < 7 ? 'FASTER' : 'SLOWER', 'automation');
             updateChart();
         });
 
@@ -3467,7 +3467,7 @@
             const frictionValue = parseFloat(this.value);
             document.getElementById('industry-pace-value').textContent = frictionValue.toFixed(1) + 'x';
             console.log('[Slider] Industry Friction:', frictionValue.toFixed(1) + 'x',
-                       'â†’ expect', frictionValue > 1.0 ? 'SLOWER' : 'FASTER', 'automation');
+                       '→ expect', frictionValue > 1.0 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
         });
 
@@ -3475,7 +3475,7 @@
             const reliabilityValue = parseInt(this.value);
             document.getElementById('ai-reliability-value').textContent = reliabilityValue + '%';
             console.log('[Slider] AI Reliability:', reliabilityValue + '%',
-                       'â†’ expect', reliabilityValue > 95 ? 'SLOWER' : 'FASTER', 'automation');
+                       '→ expect', reliabilityValue > 95 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
         });
 
@@ -3487,12 +3487,12 @@
 
             if (content.style.display === 'none') {
                 content.style.display = 'block';
-                icon.textContent = 'â–²';
+                icon.textContent = '▲';
                 icon.style.transform = 'rotate(180deg)';
                 button.querySelector('span:first-child').textContent = 'Hide Task Duration Profile';
             } else {
                 content.style.display = 'none';
-                icon.textContent = 'â–¼';
+                icon.textContent = '▼';
                 icon.style.transform = 'rotate(0deg)';
                 button.querySelector('span:first-child').textContent = 'View Task Duration Profile';
             }
