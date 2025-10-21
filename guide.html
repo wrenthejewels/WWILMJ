@@ -493,7 +493,7 @@
 
                             <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task horizon has doubled roughly every seven months since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
 
-                            <p>The calculator uses METR's observed 7-month doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's 50th percentile performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx 1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than the 50th percentile), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
+                            <p>The calculator uses METR's observed 7-month doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's 50th percentile performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx -1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than the 50th percentile), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
 
                             <ul class="detail-list">
 
@@ -566,13 +566,13 @@
 
                     <section>
                         <h2>Implementation delay and the green curve</h2>
-                        <p>The green actual job-loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q13 through Q16 look at adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q19 (job performance) helps retain top performers, delaying job loss.</p>
+                        <p>The green actual job-loss curve is the same hazard shifted forward by the implementation delay we derive from company context and individual leverage. Q12 through Q15 look at adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q18 (job performance) helps retain top performers, delaying job loss.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Delay function</span>
                             <div class='equation-display'>$$\text{delay} = \operatorname{clip}(1.75 - 1.25 s_{\text{delay}}, 0.5, 3.0) + \Delta_{\text{seniority}},\quad s_{\text{delay}} \in [-2,2],\; \Delta_{\text{seniority}} \in \{-0.4,-0.1,+0.2,+0.4,+0.6\}$$</div>
                         </div>
                         <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can reduce the delay to as low as $0.5$ years, while defensive environments stretch it beyond three. Senior leaders pick up additive shifts (up to +0.6 years) because coordinated change takes longer at the top.</p>
-                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, add or subtract up to $20$ points based on transferable skills and learning speed, subtract up to $30$ points if the median technical hazard lands within three years, and then apply the seniority boost from the profile (roughly +0% to +10%). The result is clamped between $10\%$ and $85\%$ &mdash; No one is guaranteed, but no one is written off.</p>
+                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, adjust based on transferable skills (Q16), learning speed (Q17), and job performance (Q18) with a scaling factor of $0.2$ per weighted point, subtract up to $30$ points if the median technical hazard lands within three years, and then apply the seniority boost from the profile (roughly +0% to +10%). The result is clamped between $10\%$ and $85\%$ &mdash; No one is guaranteed, but no one is written off.</p>
                     </section>
 
                     <section>
