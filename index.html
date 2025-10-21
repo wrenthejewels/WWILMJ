@@ -241,11 +241,13 @@
         }
         
         .parameter-breakdown {
-            background: #f0f8ff;
-            padding: 12px 14px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            border-left: 3px solid #2a5298;
+            background: #ffffff;
+            border: 1px solid #e6e0d4;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.05);
+            margin-top: 24px;
+            margin-bottom: 48px;
         }
 
         .parameter-breakdown h3 {
@@ -266,8 +268,6 @@
         }
 
         .profile-timeline {
-            border-left: 1px solid #ddd;
-            padding-left: 24px;
             display: flex;
             flex-direction: column;
         }
@@ -645,13 +645,6 @@
             .profile-grid {
                 grid-template-columns: 1fr;
                 gap: 16px;
-            }
-
-            .profile-timeline {
-                border-left: none;
-                border-top: 1px solid #ddd;
-                padding-left: 0;
-                padding-top: 12px;
             }
 
             .parameter-item {
@@ -2909,18 +2902,7 @@
                 answers: answers,
                 implementationDelay: implementationDelay
             };
-            document.getElementById('role-display').textContent = currentParams.name;
-            document.getElementById('ai-readiness-display').textContent = 
-                `${(aiReadiness * 20).toFixed(0)}/100`;
-            document.getElementById('task-adapt-display').textContent = 
-                `${((6 - taskAdapt) * 20).toFixed(0)}/100`;
-            document.getElementById('friction-display').textContent = 
-                `${(friction * 20).toFixed(0)}/100`;
-            document.getElementById('firm-display').textContent =
-                `${(firmReadiness * 20).toFixed(0)}/100`;
-            document.getElementById('personal-display').textContent =
-                `${(personalAdapt * 20).toFixed(0)}/100`;
-            
+
             updatePersonalTimeline();
             initChart();
             updateChart();
