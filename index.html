@@ -1976,17 +1976,47 @@
                 </div>
             </div>
 
-            <div class="model-insights">
-                <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
-                <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
-                <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
-                <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
-                <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="model-insights">
+                    <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
+                    <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
+                    <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
+                    <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
+                    <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
+                </div>
 
-                <div class="task-breakdown" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #495057;">Your Task Duration Profile</h4>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: #6c757d;">Based on your role's seniority, task structure, standardization, and context dependency:</p>
-                    <div id="task-weight-display" style="font-family: monospace; font-size: 12px; line-height: 1.8;"></div>
+                <div class="task-breakdown-container">
+                    <button id="toggle-task-breakdown" style="
+                        width: 100%;
+                        padding: 12px 15px;
+                        background: #f8f9fa;
+                        border: 1px solid #dee2e6;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        text-align: left;
+                        font-family: inherit;
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #495057;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        transition: background-color 0.2s ease;
+                    " onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor='#f8f9fa'">
+                        <span>View Task Duration Profile</span>
+                        <span id="toggle-icon" style="font-size: 12px; transition: transform 0.2s ease;">▼</span>
+                    </button>
+                    <div id="task-breakdown-content" style="
+                        display: none;
+                        margin-top: 10px;
+                        padding: 15px;
+                        background: #f8f9fa;
+                        border: 1px solid #dee2e6;
+                        border-radius: 8px;
+                    ">
+                        <p style="margin: 0 0 10px 0; font-size: 12px; color: #6c757d;">Based on your role's seniority, task structure, standardization, and context dependency:</p>
+                        <div id="task-weight-display" style="font-family: monospace; font-size: 12px; line-height: 1.8;"></div>
+                    </div>
                 </div>
             </div>
             <section class="ai-equation">
@@ -3489,6 +3519,25 @@
             console.log('[Slider] AI Reliability:', reliabilityValue + '%',
                        '→ expect', reliabilityValue > 95 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
+        });
+
+        // Toggle task breakdown visibility
+        document.getElementById('toggle-task-breakdown')?.addEventListener('click', function() {
+            const content = document.getElementById('task-breakdown-content');
+            const icon = document.getElementById('toggle-icon');
+            const button = document.getElementById('toggle-task-breakdown');
+
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▲';
+                icon.style.transform = 'rotate(180deg)';
+                button.querySelector('span:first-child').textContent = 'Hide Task Duration Profile';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▼';
+                icon.style.transform = 'rotate(0deg)';
+                button.querySelector('span:first-child').textContent = 'View Task Duration Profile';
+            }
         });
 
         // Auto-initialize: select custom role and trigger analysis on page load
