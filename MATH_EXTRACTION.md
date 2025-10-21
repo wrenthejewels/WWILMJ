@@ -23,27 +23,29 @@ P_loss(t) = 1 - S(t) = 1 - exp(-∫[0 to t] λ_total(s) ds)
 ```
 
 Where:
-- h_AI = 0.50 (max 50% annual hazard)
+- h_AI = 0.40 (max base annual hazard, 40% per year at full automation)
 - γ = 8.0 (logistic steepness)
-- θ_0 = 0.75 (75% task readiness threshold)
-- userMult ∈ [0.5, 2.0] (bounded multiplier from questions)
+- θ_0 = 0.50 (50% task readiness threshold baseline, adjustable 0.35-0.72)
+- userMult ∈ [0.33, 3.0] (bounded multiplier from questions)
+- Effective max clamped to 0.95 yr⁻¹
 
 ---
 
 ## 2. METR Capability Engine
 
-### AI Capability Function (Task Completion Time)
+### AI Capability Function (Maximum Task Length)
 
 ```
-H_r(t) = H_{50,0} / (2^(months_elapsed / D_eff) × f(r))
+H_r(t) = [H_{50,0} × 2^(months_elapsed / D_eff)] / f(r)
 ```
 
 Where:
-- **H_{50,0}** = 50 minutes (baseline task time, March 2025)
+- **H_{50,0}** = 137 minutes (baseline max task length at 50% reliability, GPT-5 Aug 2025)
 - **months_elapsed** = t × 12 (time in months)
 - **D_eff** = D_base × computeFriction × industryFriction
 - **D_base** = 7 months (METR baseline doubling time)
-- **f(r)** = ln(r) / ln(0.5) (reliability adjustment factor)
+- **f(r)** = exp(-σ · logit(r)) (reliability adjustment factor, logistic calibration)
+- **σ** ≈ 1.19 (fitted from METR's H50/H80 ratio)
 - **r** = 0.95 (95% reliability target, default)
 
 **Effective Doubling Time:**
@@ -56,18 +58,31 @@ Where:
 - **industryFriction** = resolvedDomainPace() (slider value, default 1.0)
 - Higher friction → longer doubling time → slower automation
 
-**Reliability Factor:**
+**Reliability Factor (Logistic Calibration):**
 ```
-f(r) = \exp(-\sigma \cdot \operatorname{logit}(r)),\quad \sigma \approx 1.19
+f(r) = exp(-σ · logit(r))
+where logit(r) = ln(r / (1-r))
+and σ = ln(H_{50,0} / H_{80,0}) / logit(0.8) ≈ 1.19
+
+Calibration anchors:
+H_{50,0} = 137 minutes (50% reliability horizon, GPT-5 Aug 2025)
+H_{80,0} = 26.37 minutes (80% reliability horizon, GPT-5 Aug 2025)
 
 Examples:
-f(0.50) = 1.0    (no adjustment)
-f(0.80) ≈ 5.21  (requires ~5× more capability)
-f(0.95) ≈ 33.3  (requires ~33× more capability)
-f(0.99) ≈ 237   (requires ~235× more capability)
+f(0.50) = 1.00   (no adjustment - baseline)
+f(0.80) ≈ 5.19   (requires ~5.2× more capability, validated by H50/H80 ratio)
+f(0.95) ≈ 33.1   (requires ~33× more capability)
+f(0.99) ≈ 235    (requires ~235× more capability)
 ```
 
-**Key Property:** Lower H_r(t) = higher AI capability (faster task completion)
+**Effect on H_r(t):**
+Since we divide by f(r), higher reliability requirements reduce the effective task horizon:
+- H_r(0, r=0.50) = 137 min (baseline)
+- H_r(0, r=0.80) = 26.4 min (can only handle shorter tasks)
+- H_r(0, r=0.95) = 4.1 min (much more restrictive)
+- H_r(0, r=0.99) = 0.6 min (extremely restrictive)
+
+**Key Property:** Higher H_r(t) = higher AI capability (can handle longer/harder tasks)
 
 ---
 
@@ -136,12 +151,14 @@ fricMult = e^(sumFric)  [range: ~0.14× to ~7.4×]
 ```
 rawMult = ampMult × fricMult × seniorityMult
 
-userMult = clamp(rawMult, 0.5, 2.0)
+userMult = clamp(rawMult, 0.33, 3.0)
 ```
 
 Where:
 - **seniorityMult** = 1 - hazardShield
-- **hazardShield** varies by seniority level (0.00 to 0.18)
+- **hazardShield** varies by seniority level (0.00 to 0.10)
+
+**Note:** Original bounds were [0.5, 2.0] but were widened to [0.33, 3.0] for better slider responsiveness and to eliminate dead zones in question weight space.
 
 ---
 
@@ -234,11 +251,11 @@ probability = clamp(probability, 0.1, 0.85)
 
 | Level | Label | θ_0 Lift | Hazard Shield | Delay Shift | Reemployment Boost |
 |-------|-------|----------|---------------|-------------|-------------------|
-| 1 | Entry | 0.000 | 0.00 | -0.4 | 1.00 |
-| 2 | Mid-Level | 0.015 | 0.05 | -0.1 | 1.03 |
-| 3 | Senior | 0.035 | 0.10 | +0.2 | 1.06 |
-| 4 | Lead/Principal | 0.055 | 0.14 | +0.4 | 1.08 |
-| 5 | Executive | 0.070 | 0.18 | +0.6 | 1.10 |
+| 1 | Entry | -0.02 | 0.00 | -0.4 | 1.00 |
+| 2 | Mid-Level | 0.00 | 0.02 | -0.1 | 1.03 |
+| 3 | Senior | 0.03 | 0.05 | +0.2 | 1.06 |
+| 4 | Lead/Principal | 0.05 | 0.08 | +0.4 | 1.08 |
+| 5 | Executive | 0.08 | 0.10 | +0.6 | 1.10 |
 
 **Note:** In the new model, θ_0 Lift is not directly applied. Seniority affects:
 - Hazard Shield (reduces userMult via seniorityMult)
@@ -494,10 +511,12 @@ findYearForProbability(targetProb):
 
 ### METR Capability Engine
 ```
-H_{50,0} = 50 minutes           (baseline task time)
+H_{50,0} = 137 minutes          (baseline 50% task horizon, GPT-5 Aug 2025)
+H_{80,0} = 26.37 minutes        (baseline 80% task horizon, GPT-5 Aug 2025)
 D_base = 7 months               (METR doubling)
-r = 0.95                        (95% reliability)
-f(0.95) = 14.4                  (reliability factor)
+r = 0.95                        (95% reliability target)
+σ ≈ 1.19                        (logistic calibration parameter)
+f(0.95) ≈ 33.1                  (reliability factor)
 ```
 
 ### Task Buckets
@@ -513,11 +532,21 @@ s = 0.45                        (logistic softness)
 
 ### Hazard Parameters
 ```
-h_AI = 0.50 yr⁻¹               (max 50% annual hazard)
+h_AI = 0.40 yr⁻¹               (max base annual hazard)
 γ = 8.0                        (logistic steepness)
-θ_0 = 0.75                     (75% readiness threshold)
-userMult ∈ [0.5, 2.0]          (bounded multiplier)
+θ_0 = 0.50                     (50% readiness threshold baseline, adjustable 0.35-0.72)
+userMult ∈ [0.33, 3.0]         (bounded multiplier)
+λ_AI max = 0.95 yr⁻¹           (effective max after userMult × h_AI, hard-clamped)
 ```
+
+**Maximum Hazard Interpretation:**
+- Theoretical max: h_AI × userMult_max = 0.40 × 3.0 = 1.20 yr⁻¹
+- Effective max (clamped): λ_AI = 0.95 yr⁻¹ corresponds to:
+  - Half-life ≈ 8.8 months (time for 50% displacement probability)
+  - P(loss in 1 year) ≈ 61%
+  - P(loss in 2 years) ≈ 85%
+- Represents most automation-prone scenario: AI fully capable (A=1.0) + max amplifying factors (userMult=3.0)
+- Clamp prevents extreme scenarios from exceeding realistic displacement rates
 
 ### Implementation
 ```
@@ -603,7 +632,7 @@ Note: The NEW model treats sliders as friction/barriers that slow down automatio
 ✅ **METR Grounding:**
 - Empirical 7-month doubling benchmark
 - Reliability adjustment f(r)
-- Task completion time metric
+- Maximum task length capability metric
 
 ✅ **Bounded Readiness:**
 - A(t) ∈ [0, 1] guaranteed
@@ -633,31 +662,31 @@ Note: The NEW model treats sliders as friction/barriers that slow down automatio
 ```
 D_eff = 7 × 1.0 × 1.0 = 7 months
 months = 5 × 12 = 60
-f(0.95) = 14.4
+f(0.95) ≈ 33.1
 
-H_r(5) = 50 / (2^(60/7) × 14.4)
-       = 50 / (2^8.57 × 14.4)
-       = 50 / (378.8 × 14.4)
-       = 50 / 5454.7
-       = 0.0092 minutes
+H_r(5) = [137 × 2^(60/7)] / 33.1
+       = [137 × 2^8.57] / 33.1
+       = [137 × 378.8] / 33.1
+       = 51895 / 33.1
+       = 1568 minutes
 ```
 
 **Step 2: Task Gates**
 ```
-G(0.0092, 2.5, 0.45) = 1 / (1 + exp(-(ln(0.0092) - ln(2.5)) / 0.45))
-                      ≈ 0.9999 (AI masters <5min tasks)
+G(1568, 2.5, 0.45) = 1 / (1 + exp(-(ln(1568) - ln(2.5)) / 0.45))
+                    ≈ 1.0000 (AI masters <5min tasks)
 
-G(0.0092, 10, 0.45) ≈ 0.9984 (AI masters 5-15min tasks)
-G(0.0092, 37.5, 0.45) ≈ 0.9813 (AI masters 15-60min tasks)
-G(0.0092, 120, 0.45) ≈ 0.8352 (AI handles 1-3hr tasks)
-G(0.0092, 360, 0.45) ≈ 0.4021 (AI struggles with >3hr tasks)
+G(1568, 10, 0.45) ≈ 1.0000 (AI masters 5-15min tasks)
+G(1568, 37.5, 0.45) ≈ 1.0000 (AI masters 15-60min tasks)
+G(1568, 120, 0.45) ≈ 1.0000 (AI handles 1-3hr tasks)
+G(1568, 360, 0.45) ≈ 0.9996 (AI can do >3hr tasks)
 ```
 
 **Step 3: AI Readiness**
 ```
-A(5) = 0.25×0.9999 + 0.35×0.9984 + 0.25×0.9813 + 0.10×0.8352 + 0.05×0.4021
-     = 0.2500 + 0.3494 + 0.2453 + 0.0835 + 0.0201
-     = 0.9483 (AI can do 95% of job tasks)
+A(5) = 0.25×1.0000 + 0.35×1.0000 + 0.25×1.0000 + 0.10×1.0000 + 0.05×0.9996
+     = 0.2500 + 0.3500 + 0.2500 + 0.1000 + 0.0500
+     ≈ 1.0000 (AI can do ~100% of job tasks)
 ```
 
 **Step 4: Hazard**
@@ -666,11 +695,11 @@ Neutral answers → ampMult ≈ 1.0, fricMult ≈ 1.0
 seniorityMult = 1 - 0.00 = 1.0
 userMult = clamp(1.0 × 1.0 × 1.0, 0.5, 2.0) = 1.0
 
-λ_AI(5) = [0.50 / (1 + exp(-8.0 × (0.9483 - 0.75)))] × 1.0
-        = [0.50 / (1 + exp(-1.5864))]
-        = [0.50 / (1 + 0.2046)]
-        = [0.50 / 1.2046]
-        = 0.415 yr⁻¹ (41.5% annual hazard)
+λ_AI(5) = [0.50 / (1 + exp(-8.0 × (1.0000 - 0.75)))] × 1.0
+        = [0.50 / (1 + exp(-2.0))]
+        = [0.50 / (1 + 0.1353)]
+        = [0.50 / 1.1353]
+        = 0.440 yr⁻¹ (44.0% annual hazard)
 ```
 
 **Step 5: Cumulative Risk**

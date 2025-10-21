@@ -2021,7 +2021,7 @@
                     <div class="equation-display">$$A(t) = \sum_{i} w_i \cdot G(H_r(t), L_i, s), \quad \sum_{i} w_i = 1$$</div>
                 </div>
 
-                <p><strong>How it works:</strong> METR defines how AI capability grows exponentially (H<sub>r</sub> decreases as AI gets faster). Task bucket mapping translates raw capability into job-specific readiness A(t), bounded between 0 (can't do any tasks) and 1 (can do all tasks). Reliability r (e.g., 95%) requires extra capability margin, delaying milestones. Faster doubling (smaller D) accelerates the timeline.</p>
+                <p><strong>How it works:</strong> METR defines how AI capability grows exponentially (H<sub>r</sub> increases as AI gets more capable). Task bucket mapping translates raw capability into job-specific readiness A(t), bounded between 0 (can't do any tasks) and 1 (can do all tasks). Reliability r (e.g., 95%) requires extra capability margin, delaying milestones. Faster doubling (smaller D) accelerates the timeline.</p>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">AI Hazard Core</h4>
 
@@ -2035,14 +2035,14 @@
                     <li><strong>H<sub>r</sub>(t):</strong> AI capability (max task length in minutes; higher = more capable)</li>
                     <li><strong>A(t):</strong> AI Readiness ∈ [0,1] (fraction of job tasks AI can perform)</li>
                     <li><strong>D:</strong> Doubling period (7 months baseline, from METR benchmarks)</li>
-                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 14.4× capability margin)</li>
+                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 33× capability margin)</li>
                     <li><strong>L<sub>i</sub>:</strong> Task duration thresholds (e.g., 2.5, 10, 37.5, 120, 360 minutes)</li>
                     <li><strong>w<sub>i</sub>:</strong> Task bucket weights (sum to 1.0, e.g., 25%, 35%, 25%, 10%, 5%)</li>
                     <li><strong>s:</strong> Logistic softness (0.45 default, controls gate steepness)</li>
-                    <li><strong>h<sub>AI</sub>:</strong> Max annual hazard (0.50 = 50% per year at full automation)</li>
+                    <li><strong>h<sub>AI</sub>:</strong> Max base annual hazard (0.40 = 40% per year at full automation)</li>
                     <li><strong>γ:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
                     <li><strong>θ<sub>0</sub>:</strong> Readiness threshold (0.50 = automation kicks in at 50% task coverage)</li>
-                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.5× to 2.0×)</li>
+                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.33× to 3.0×)</li>
                 </ul>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Risk Curves: Blue vs Green</h4>
@@ -2071,8 +2071,8 @@
                     <li><strong>s:</strong> 0.45 (logistic softness)</li>
                     <li><strong>θ<sub>0</sub>:</strong> 0.50 (50% readiness threshold)</li>
                     <li><strong>γ:</strong> 8.0 (hazard gate steepness)</li>
-                    <li><strong>h<sub>AI</sub>:</strong> 0.50 yr<sup>-1</sup> (max 50% annual hazard)</li>
-                    <li><strong>userMult range:</strong> 0.5× (max protection from unions/trust/liability) to 2.0× (max acceleration)</li>
+                    <li><strong>h<sub>AI</sub>:</strong> 0.40 yr<sup>-1</sup> (max base annual hazard)</li>
+                    <li><strong>userMult range:</strong> 0.33× (max protection from unions/trust/liability) to 3.0× (max acceleration, clamped to 0.95 yr<sup>-1</sup> effective max hazard)</li>
                 </ul>
 
                 <p><strong>Question effects:</strong> Explicit vs. implicit task mix modifies bucket weights (w<sub>i</sub>) and softness (s). Union strength, trust requirements, and liability concerns move implementation delay (Δ) rather than amplifying hazard directly, since these are adoption barriers, not capability limits. Major protective factors shift θ<sub>0</sub> higher (AI must master more tasks before displacement begins).</p>
@@ -2294,10 +2294,10 @@
 
         // METR-based capability functions
 
-        // Reliability adjustment factor fitted to METR empirical data
-        // METR shows p50/p80 ≈ 5.54× across models, which gives exponent k ≈ -3.643
-        // Formula: f(r) = (0.50/r)^k where k = log(5.54) / log(0.50/0.80)
-        // Higher reliability requires shorter/easier tasks: f(0.50)=1.0×, f(0.80)=5.54×, f(0.95)=10.36×
+        // Reliability adjustment factor fitted to METR empirical data (logistic calibration)
+        // Uses f(r) = exp(-σ · logit(r)) where logit(r) = ln(r/(1-r))
+        // σ is calibrated from METR's H50_0/H80_0 ratio (137/26.37 ≈ 5.19×)
+        // Examples: f(0.50)=1.0×, f(0.80)≈5.2×, f(0.95)≈33.1×, f(0.99)≈235×
         // We DIVIDE H by f(r), so higher reliability → lower H → AI can only handle shorter tasks
         function reliabilityFactor(r) {
             const lower = 0.5 + RELIABILITY_GUARD;
@@ -2381,21 +2381,6 @@
         }
 
         // Legacy compatibility functions (kept for now but unused)
-        function dEff() {
-            const computeMultiplier = resolvedComputeMultiplier();
-            const domainPace = resolvedDomainPace();
-            const doublingMonths = resolvedBaseDoublingMonths();
-            return doublingMonths / (computeMultiplier * domainPace);
-        }
-
-        function A_explicit(tYears) {
-            return Math.pow(2, tYears / (dEff() / 12));
-        }
-
-        function A_tacit(tYears) {
-            return 1 + deltaTacit * tYears;
-        }
-
         // METR model acceptance tests
         function runMETRAcceptanceTests() {
             console.log('\n=== METR MODEL ACCEPTANCE TESTS ===\n');
@@ -3068,7 +3053,7 @@
         function hazardAI(tYears) {
             if (!currentParams) return 0;
 
-            const hAI = 0.50;           // Max annual hazard (50% per year at full automation)
+            const hAI = 0.40;           // Max base annual hazard (40% per year at full automation)
             const gammaDefault = 8.0;   // Steepness of logistic gate baseline
 
             const seniorityLevel = currentParams.seniority || 1;
@@ -3091,11 +3076,6 @@
             const hazard = baseHazard * userMult;
 
             return Math.min(0.95, hazard);
-        }
-
-        // Legacy function kept for backward compatibility
-        function otherFrictionMultipliers(tYears) {
-            return getUserMultiplier();
         }
 
         // Cumulative risk from hazard series using survival function
