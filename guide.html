@@ -493,7 +493,7 @@
 
                             <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task-length horizon has compounded by roughly seven months per doubling since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
 
-                            <p>The calculator borrows METR's observed 7-month doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's p50 performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx 1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than p50), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
+                            <p>The calculator uses METR's observed 7-month doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's p50 performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx 1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than p50), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
 
                             <ul class="detail-list">
 
@@ -521,7 +521,7 @@
                     </section>
                     <section>
                         <h2>What the calculator actually simulates</h2>
-                        <p>The calculator models job displacement as a survival problem where multiple hazard channels compound over time. Currently, only the AI capability channel is active—the other channels (macro cycles, firm execution, role design, personal leverage) are reserved for future calibration when we have sufficient empirical data.</p>
+                        <p>The calculator models job displacement as a survival problem where multiple hazard channels compound over time. A true stacked hazard model should consider all other possibilities for displacement, including macroeconomic forces, firm-level performance, reduction-in-forces, non-AI displacement hazards, and personal leverage. This calculator focuses only on AI-related hazards at the role, personal, and firm level—consider that it is only a portion of your total displacement risk. This model will update over time with new AI-related data and risk considerations.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Survival relationship</span>
                             <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
@@ -546,18 +546,18 @@
                             <li><strong>Coverage bar $\theta$:</strong> Baseline $0.50$ shifts with seniority, explicitness ($s_e$), and domain alignment. Digital, well-documented work can pull $\theta$ down toward $0.38$, while tacit or compliance-heavy roles push it up toward ~$0.68$ before the hazard opens. This gate controls how much of the job must be automatable; the reliability slider governs how well each task must be performed.</li>
                             <li><strong>User multipliers $M_{\text{user}}(s)$:</strong> Questionnaire responses exponentiate into amplifier and friction sums, then are capped between $0.33\times$ and $3\times$ for responsiveness.</li>
                         </ul>
-                        <p>We still integrate the hazard with Simpson's rule to get the blue technical-feasibility curve.</p>
+                        <p>Questionnaire multipliers only scale the hazard after that gate. We integrate the hazard with Simpson's rule to get the blue technical-feasibility curve.</p>
                     </section>
 
                     <section>
                         <h2>How your answers move the curve</h2>
-                        <p>Each questionnaire response maps to a coded value $x_i$. All responses use the same coding rule: Likert 1..5 responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$ (i.e., $1\to -2, 3\to 0, 5\to +2$). Effects run in the correct direction via the weight's sign. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, multiply the results, then bound the overall multiplier to $[0.33, 3.0]$ for responsiveness.</p>
+                        <p>Each questionnaire response maps to a coded value $x_i$. All responses use the same coding rule: Likert 1-5 responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$ (i.e., $1\to -2, 3\to 0, 5\to +2$). Effects run in the correct direction via the weight's sign. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, multiply the results, then bound the overall multiplier to $[0.33, 3.0]$ for responsiveness.</p>
                         <p>The prompts cluster into four themes:</p>
                         <ul class='detail-list'>
                             <li><strong>AI readiness (Q1-Q4):</strong> High scores strengthen the amplifier channel when you indicate strong capability for AI learning and completing your tasks.</li>
                             <li><strong>Task structure (Q5-Q9):</strong> Structured, decomposable tasks (Q5, Q6 high) accelerate adoption via the amplifier channel, while tacit knowledge (Q9) and context dependency (Q7) feed the protective friction channel and the domain-alignment penalty. Rapid feedback loops (Q8) amplify risk by helping AI learn faster.</li>
-                            <li><strong>Human moat (Q10-Q12):</strong> Relationship intensity, physical presence, and trust demands all load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
-                            <li><strong>Firm and personal context (Q13-Q19):</strong> Company levers shape implementation delay. Job performance (Q19) delays displacement for top performers while also helping re-employment. Adaptability (Q18) and transferability (Q17) drive re-employment probability.</li>
+                            <li><strong>Human moat (Q10-Q11):</strong> Relationship intensity and physical presence both load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
+                            <li><strong>Firm and personal context (Q12-Q18):</strong> Company levers shape implementation delay. Job performance (Q18) delays displacement for top performers while also helping re-employment. Adaptability (Q17) and transferability (Q16) drive re-employment probability.</li>
                         </ul>
                         <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
                         <div class='insight-callout'>
@@ -595,7 +595,7 @@
                             <li>Stress-test the extremes: set AI readiness to five while leaving friction high, then flip it. The distance between those runs is a map of where to invest your energy.</li>
                             <li>Pair the re-employment score with the green curve. A fast hazard plus weak re-employment is the trigger for up-skilling or a job search; a slow hazard plus strong re-employment buys time for deliberate moves.</li>
                         </ol>
-                        <p>Remember that this model isolates the AI capability channel. Macro cycles, regulation, leadership changes, and your own agency remain outside the frame. Use the weight structure as a checklist: strengthen the protective items you can influence, document the assumptions you cannot, and revisit the calculator as real-world signals shift.</p>
+                        <p>Use the weight structure as a checklist: strengthen the protective items you can influence, document the assumptions you cannot, and revisit the calculator as real-world signals shift.</p>
                     </section>
                 </div>
             </article>
