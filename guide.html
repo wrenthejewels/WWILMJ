@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang='en'>
 
 <head>
@@ -491,13 +491,13 @@
 
                             </a>
 
-                            <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task-length horizon has compounded by roughly seven months per doubling since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
+                            <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task horizon has doubled roughly every seven months since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
 
-                            <p>The calculator uses METR's observed 7-month doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's p50 performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx 1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than p50), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
+                            <p>The calculator uses METR's observed 7-month doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's 50th percentile performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx 1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than the 50th percentile), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
 
                             <ul class="detail-list">
 
-                                <li><strong>Doubling trend:</strong> METR's empirical 7-month doubling time drives how fast AI capability improves. Every 7 months, AI can handle 2× longer tasks at the same success rate.</li>
+                                <li><strong>Doubling trend:</strong> METR's empirical 7-month doubling time drives how fast AI capability improves. Every 7 months, AI can handle 2Ã— longer tasks at the same success rate.</li>
 
                                 <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. Technical capability requires a high bar to outperform human error, though the calculator allows a custom reliability gate if tasks can feasibly be automated at a lower success rate.</li>
 
@@ -521,14 +521,14 @@
                     </section>
                     <section>
                         <h2>What the calculator actually simulates</h2>
-                        <p>The calculator models job displacement as a survival problem where multiple hazard channels compound over time. A true stacked hazard model should consider all other possibilities for displacement, including macroeconomic forces, firm-level performance, reduction-in-forces, non-AI displacement hazards, and personal leverage. This calculator focuses only on AI-related hazards at the role, personal, and firm level—consider that it is only a portion of your total displacement risk. This model will update over time with new AI-related data and risk considerations.</p>
+                        <p>The calculator models job displacement as a survival problem where multiple hazard channels compound over time. A true stacked hazard model should consider all other possibilities for displacement, including macroeconomic forces, firm-level performance, reductions in force (RIFs), non-AI displacement hazards, and personal leverage. This calculator focuses only on AI-related hazards at the role, personal, and firm levels. Consider that it is only a portion of your total displacement risk. This model will update over time with new AI-related data and risk considerations.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Survival relationship</span>
                             <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
                             <span class='callout-label'>Stacked hazard model</span>
                             <div class='equation-display'>$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
                         </div>
-                        <p>The active AI hazard channel ($\lambda_{\text{AI}}(s)$) generates the blue technical-feasibility curve. Your firm and personal questionnaire responses then shift this curve forward in time to create the green implementation curve. The same data also determines your re-employment probability.</p>
+                        <p>The active AI hazard channel ($\lambda_{\text{AI}}(s)$) generates the blue technical feasibility curve. Your firm and personal questionnaire responses then shift this curve forward in time to create the green implementation curve. The same data also determines your re-employment probability.</p>
                         <ul class='detail-list'>
                             <li><strong>AI hazard:</strong> METR task-length data map capability progress into the blue curve.</li>
                             <li><strong>Adaptability delay:</strong> Firm and personal answers shift the AI hazard forward in time to produce the green curve.</li>
@@ -546,7 +546,6 @@
                             <li><strong>Coverage bar $\theta$:</strong> Baseline $0.50$ shifts with seniority, explicitness ($s_e$), and domain alignment. Digital, well-documented work can pull $\theta$ down toward $0.38$, while tacit or compliance-heavy roles push it up toward ~$0.68$ before the hazard opens. This gate controls how much of the job must be automatable; the reliability slider governs how well each task must be performed.</li>
                             <li><strong>User multipliers $M_{\text{user}}(s)$:</strong> Questionnaire responses exponentiate into amplifier and friction sums, then are capped between $0.33\times$ and $3\times$ for responsiveness.</li>
                         </ul>
-                        <p>Questionnaire multipliers only scale the hazard after that gate. We integrate the hazard with Simpson's rule to get the blue technical-feasibility curve.</p>
                     </section>
 
                     <section>
@@ -572,15 +571,15 @@
                             <span class='callout-label'>Delay function</span>
                             <div class='equation-display'>$$\text{delay} = \operatorname{clip}(1.75 - 1.25 s_{\text{delay}}, 0.5, 3.0) + \Delta_{\text{seniority}},\quad s_{\text{delay}} \in [-2,2],\; \Delta_{\text{seniority}} \in \{-0.4,-0.1,+0.2,+0.4,+0.6\}$$</div>
                         </div>
-                        <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can collapse the gap toward $0.5$ years, while defensive environments stretch it beyond three. Senior leaders pick up additive shifts (up to +0.6 years) because coordinated change takes longer at the top.</p>
-                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, add or subtract up to $20$ points based on transferable skills and learning speed, subtract up to $30$ points if the median technical hazard lands within three years, and then apply the seniority boost from the profile (roughly +0% to +10%). The result is clamped between $10\%$ and $85\%$ &mdash; nobody is guaranteed, but nobody is written off.</p>
+                        <p>Positive scores mean less delay: an early-adopting firm with high wage pressure can reduce the delay to as low as $0.5$ years, while defensive environments stretch it beyond three. Senior leaders pick up additive shifts (up to +0.6 years) because coordinated change takes longer at the top.</p>
+                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, add or subtract up to $20$ points based on transferable skills and learning speed, subtract up to $30$ points if the median technical hazard lands within three years, and then apply the seniority boost from the profile (roughly +0% to +10%). The result is clamped between $10\%$ and $85\%$ &mdash; No one is guaranteed, but no one is written off.</p>
                     </section>
 
                     <section>
                         <h2>Reading the outputs</h2>
                         <p>The chart shows two survival complements: blue for technical feasibility and green for realized displacement once friction and delay kick in. Because we integrate $\lambda(s)$ with Simpson's rule, the area under each curve is the cumulative probability that automation has already happened.</p>
                         <ul class='detail-list'>
-                            <li><strong>Median timeline:</strong> We binary-search for the year where cumulative probability hits $50\%$. That becomes the headline median job-loss metric.</li>
+                            <li><strong>Median timeline:</strong> We use a binary search to find the year where cumulative probability hits $50\%$. That becomes the headline median job-loss metric.</li>
                             <li><strong>Risk by 2030 or 2031:</strong> The model evaluates $P_{\text{loss}}$ at $5.35$ and $6.35$ years from $2024.65$, matching the scenario years shown on the card.</li>
                             <li><strong>Personal timeline:</strong> We surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
                             <li><strong>Re-employment label:</strong> The probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
@@ -593,7 +592,7 @@
                         <ol class='action-list'>
                             <li>Start with the preset that feels closest to your role, then tweak one cluster of questions at a time so you can see which dimensions move the hazard.</li>
                             <li>Stress-test the extremes: set AI readiness to five while leaving friction high, then flip it. The distance between those runs is a map of where to invest your energy.</li>
-                            <li>Pair the re-employment score with the green curve. A fast hazard plus weak re-employment is the trigger for up-skilling or a job search; a slow hazard plus strong re-employment buys time for deliberate moves.</li>
+                            <li>Pair the re-employment score with the green curve. A fast hazard plus weak re-employment is the trigger for upskilling or a job search; a slow hazard plus strong re-employment buys time for deliberate moves.</li>
                         </ol>
                         <p>Use the weight structure as a checklist: strengthen the protective items you can influence, document the assumptions you cannot, and revisit the calculator as real-world signals shift.</p>
                     </section>
@@ -618,3 +617,5 @@
 </body>
 
 </html>
+
+
