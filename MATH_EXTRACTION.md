@@ -1,4 +1,4 @@
-# Complete Mathematical Model Extraction - AI Job Automation Risk Calculator
+﻿# Complete Mathematical Model Extraction - AI Job Automation Risk Calculator
 ## METR-Powered Model (Updated)
 
 ---
@@ -9,55 +9,55 @@
 
 **Survival Function (Job Loss Probability):**
 ```
-P_loss(t) = 1 - S(t) = 1 - exp(-∫[0 to t] λ_total(s) ds)
+P_loss(t) = 1 - S(t) = 1 - exp(-âˆ«[0 to t] Î»_total(s) ds)
 ```
 
 **Total Hazard (Stacked Framework):**
 ```
-λ_total(s) = λ_AI(s) + λ_macro(s) + λ_firm(s) + λ_role(s) + λ_personal(s)
+Î»_total(s) = Î»_AI(s) + Î»_macro(s) + Î»_firm(s) + Î»_role(s) + Î»_personal(s)
 ```
 
 **AI Hazard Component (NEW - Logistic Gate):**
 ```
-λ_AI(t) = [h_AI / (1 + exp(-γ · (A(t) - θ_0)))] × userMult
+Î»_AI(t) = [h_AI / (1 + exp(-Î³ Â· (A(t) - Î¸_0)))] Ã— userMult
 ```
 
 Where:
 - h_AI = 0.40 (max base annual hazard, 40% per year at full automation)
-- γ = 8.0 baseline (logistic steepness, dynamically adjusted via kEff() and clamped to [3.0, 16.0])
-- θ_0 = 0.50 baseline (task readiness threshold, dynamically adjusted and clamped to [0.35, 0.72])
-- userMult ∈ [0.33, 3.0] (bounded multiplier from questions)
-- Effective max clamped to 0.95 yr⁻¹
+- Î³ = 8.0 baseline (logistic steepness, dynamically adjusted via kEff() and clamped to [3.0, 16.0])
+- Î¸_0 = 0.50 baseline (task readiness threshold, dynamically adjusted and clamped to [0.35, 0.72])
+- userMult âˆˆ [0.33, 3.0] (bounded multiplier from questions)
+- Effective max clamped to 0.95 yrâ»Â¹
 
 **Dynamic Adjustments:**
 
-γ (Logistic Steepness):
+Î³ (Logistic Steepness):
 ```
-γ = kEff(8.0, answers) = 8.0 × exp(sumK)
-sumK = Σ K_WEIGHTS[i] × x[i], clamped to [-1.0, +1.0]
-γ = clamp(γ, 3.0, 16.0)
+Î³ = kEff(8.0, answers) = 8.0 Ã— exp(sumK)
+sumK = Î£ K_WEIGHTS[i] Ã— x[i], clamped to [-1.0, +1.0]
+Î³ = clamp(Î³, 3.0, 16.0)
 
 K_WEIGHTS (affects curve steepness):
 Accelerators: Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q8: +0.12
 Decelerators: Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q11: -0.15
 ```
 
-θ (Coverage Threshold):
+Î¸ (Coverage Threshold):
 ```
-θ = θ_base + thetaLift + alignmentShift + explicitnessShift - feasibilityBonus
-alignmentShift = 0.12 × (0.5 - domainAlignment)
-explicitnessShift = 0.10 × (0.5 - s_e)
-feasibilityBonus = 0.05×(norm(Q2)-0.5) + 0.04×(norm(Q6)-0.5) + 0.03×(norm(Q8)-0.5)
-θ = clamp(θ, 0.35, 0.72)
+Î¸ = Î¸_base + thetaLift + alignmentShift + explicitnessShift - feasibilityBonus
+alignmentShift = 0.12 Ã— (0.5 - domainAlignment)
+explicitnessShift = 0.10 Ã— (0.5 - s_e)
+feasibilityBonus = 0.05Ã—(norm(Q2)-0.5) + 0.04Ã—(norm(Q6)-0.5) + 0.03Ã—(norm(Q8)-0.5)
+Î¸ = clamp(Î¸, 0.35, 0.72)
 
 Where:
-- θ_base = 0.50 (Entry level baseline)
+- Î¸_base = 0.50 (Entry level baseline)
 - thetaLift from seniority profile (see section 8)
-- domainAlignment ∈ [0, 1] from domain mismatch calculation
+- domainAlignment âˆˆ [0, 1] from domain mismatch calculation
 - s_e = explicitness score from questions
 - feasibilityBonus: Data-rich (Q2), standardized (Q6), fast-feedback (Q8) jobs
-  can be automated at LOWER AI capability (lower θ means easier to automate)
-- Negative bonus (subtracts from θ) = easier automation at lower capability
+  can be automated at LOWER AI capability (lower Î¸ means easier to automate)
+- Negative bonus (subtracts from Î¸) = easier automation at lower capability
 ```
 
 ---
@@ -67,16 +67,16 @@ Where:
 ### AI Capability Function (Maximum Task Length)
 
 ```
-H_r(t) = [H_{50,0} × 2^(months_elapsed / D_eff)] / [p_domain × f(r)]
+H_r(t) = [H_{50,0} Ã— 2^(months_elapsed / D_eff)] / [p_domain Ã— f(r)]
 ```
 
 Where:
 - **H_{50,0}** = 137 minutes (baseline max task length at 50% reliability, GPT-5 Aug 2025)
-- **months_elapsed** = t × 12 (time in months)
-- **D_eff** = D_base × computeFriction × industryFriction
+- **months_elapsed** = t Ã— 12 (time in months)
+- **D_eff** = D_base Ã— domainFriction Ã— industryFriction
 - **D_base** = 7 months (METR baseline doubling time)
-- **p_domain** ∈ [0.5, 3.0] (domain alignment penalty; dampens capability for tacit or physical work)
-- **f(r)** = exp(-σ · logit(r)) (reliability adjustment factor, logistic calibration)
+- **p_domain** âˆˆ [0.5, 3.0] (domain alignment penalty; dampens capability for tacit or physical work)
+- **f(r)** = exp(-Ïƒ Â· logit(r)) (reliability adjustment factor, logistic calibration)
 
 **Domain Alignment Penalty Calculation:**
 ```
@@ -89,34 +89,34 @@ DOMAIN_ALIGNMENT_WEIGHTS:
 - Q10: -0.34 [Human judgment & relationships]
 - Q11: -0.38 [Physical presence]
 
-weightedSum = Σ(DOMAIN_ALIGNMENT_WEIGHTS[i] × x[i])
+weightedSum = Î£(DOMAIN_ALIGNMENT_WEIGHTS[i] Ã— x[i])
 weightedSum = clamp(weightedSum, -3.0, +3.0)
 p_domain = clamp(exp(-weightedSum), 0.5, 3.0)
-domainAlignment = clamp(0.5 + 0.18 × weightedSum, 0, 1)
+domainAlignment = clamp(0.5 + 0.18 Ã— weightedSum, 0, 1)
 ```
 Higher p_domain (closer to 3.0) means AI is less capable for this domain (more penalty).
 Lower p_domain (closer to 0.5) means AI is highly capable for this domain (less penalty).
-- **σ** ≈ -1.19 (fitted from METR's H50/H80 ratio)
+- **Ïƒ** â‰ˆ -1.19 (fitted from METR's H50/H80 ratio)
 - **r** = 0.95 (95% reliability target, default)
 
 **Effective Doubling Time:**
 ```
-D_eff = D_base × domainFriction
+D_eff = D_base Ã— domainFriction
 ```
 
 Where:
 - **D_base** = 7 months (METR baseline - observed frontier capability growth)
-- **domainFriction** ∈ [1.0, 2.0] (domain-specific barriers)
+- **domainFriction** âˆˆ [1.0, 2.0] (domain-specific barriers)
   - Floor at 1.0: Cannot be faster than METR's observed frontier
-  - Ceiling at 2.0: Maximum 2× slower for highly mismatched domains
-- **domainFriction** = inferredDomainFriction(Q7, Q9, Q10, Q11) × slider
-- Higher friction → longer doubling time → slower capability transfer to this domain
+  - Ceiling at 2.0: Maximum 2Ã— slower for highly mismatched domains
+- **domainFriction** = inferredDomainFriction(Q7, Q9, Q10, Q11) Ã— slider
+- Higher friction â†’ longer doubling time â†’ slower capability transfer to this domain
 
 **Reliability Factor (Logistic Calibration):**
 ```
-f(r) = exp(-σ · logit(r))
+f(r) = exp(-Ïƒ Â· logit(r))
 where logit(r) = ln(r / (1-r))
-and σ = ln(H_{80,0} / H_{50,0}) / logit(0.8) ≈ -1.19
+and Ïƒ = ln(H_{80,0} / H_{50,0}) / logit(0.8) â‰ˆ -1.19
 
 Calibration anchors:
 H_{50,0} = 137 minutes (50% reliability horizon, GPT-5 Aug 2025)
@@ -124,9 +124,9 @@ H_{80,0} = 26.37 minutes (80% reliability horizon, GPT-5 Aug 2025)
 
 Examples:
 f(0.50) = 1.00   (no adjustment - baseline)
-f(0.80) ≈ 5.19   (requires ~5.2× more capability, validated by H50/H80 ratio)
-f(0.95) ≈ 33.1   (requires ~33× more capability)
-f(0.99) ≈ 235    (requires ~235× more capability)
+f(0.80) â‰ˆ 5.19   (requires ~5.2Ã— more capability, validated by H50/H80 ratio)
+f(0.95) â‰ˆ 33.1   (requires ~33Ã— more capability)
+f(0.99) â‰ˆ 235    (requires ~235Ã— more capability)
 ```
 
 **Effect on H_r(t):**
@@ -158,10 +158,10 @@ Where:
 ### AI Readiness (Bounded [0,1])
 
 ```
-A(t) = Σ w_i · G(H_r(t), L_i, s)
+A(t) = Î£ w_i Â· G(H_r(t), L_i, s)
 ```
 
-Subject to: Σ w_i = 1.0
+Subject to: Î£ w_i = 1.0
 
 **Task Bucket Thresholds (Fixed):**
 
@@ -180,50 +180,50 @@ The weights are **dynamically calculated** based on seniority and answers to Q5,
 ```
 Baseline weights: [0.25, 0.35, 0.25, 0.10, 0.05]
 
-1. Seniority shift (entry → exec):
+1. Seniority shift (entry â†’ exec):
    seniorityShift = (level - 1) / 4
-   w[0] -= 0.15 × seniorityShift  (reduce <5min)
-   w[1] -= 0.15 × seniorityShift  (reduce 5-15min)
-   w[2] += 0.05 × seniorityShift  (increase 15-60min)
-   w[3] += 0.15 × seniorityShift  (increase 1-3hr)
-   w[4] += 0.10 × seniorityShift  (increase >3hr)
+   w[0] -= 0.15 Ã— seniorityShift  (reduce <5min)
+   w[1] -= 0.15 Ã— seniorityShift  (reduce 5-15min)
+   w[2] += 0.05 Ã— seniorityShift  (increase 15-60min)
+   w[3] += 0.15 Ã— seniorityShift  (increase 1-3hr)
+   w[4] += 0.10 Ã— seniorityShift  (increase >3hr)
 
-2. Task Decomposability (Q5: 1=complex → 5=structured):
+2. Task Decomposability (Q5: 1=complex â†’ 5=structured):
    structureShift = (Q5 - 3) / 2
-   w[0] += 0.10 × structureShift  (structured → more quick)
-   w[1] += 0.08 × structureShift  (structured → more short)
-   w[3] -= 0.10 × structureShift  (complex → more long)
-   w[4] -= 0.08 × structureShift  (complex → more very long)
+   w[0] += 0.10 Ã— structureShift  (structured â†’ more quick)
+   w[1] += 0.08 Ã— structureShift  (structured â†’ more short)
+   w[3] -= 0.10 Ã— structureShift  (complex â†’ more long)
+   w[4] -= 0.08 Ã— structureShift  (complex â†’ more very long)
 
-3. Task Standardization (Q6: 1=variable → 5=standardized):
+3. Task Standardization (Q6: 1=variable â†’ 5=standardized):
    stdShift = (Q6 - 3) / 2
-   w[1] += 0.08 × stdShift   (standardized → more short)
-   w[2] += 0.06 × stdShift   (standardized → more medium)
-   w[0] -= 0.08 × stdShift   (variable → more quick)
-   w[4] -= 0.06 × stdShift   (variable → less very long)
+   w[1] += 0.08 Ã— stdShift   (standardized â†’ more short)
+   w[2] += 0.06 Ã— stdShift   (standardized â†’ more medium)
+   w[0] -= 0.08 Ã— stdShift   (variable â†’ more quick)
+   w[4] -= 0.06 Ã— stdShift   (variable â†’ less very long)
 
-4. Context Dependency (Q7: 1=minimal → 5=critical):
+4. Context Dependency (Q7: 1=minimal â†’ 5=critical):
    contextShift = (Q7 - 3) / 2
-   w[0] -= 0.08 × contextShift  (high context → fewer quick)
-   w[1] -= 0.06 × contextShift  (high context → fewer short)
-   w[3] += 0.08 × contextShift  (high context → more long)
-   w[4] += 0.06 × contextShift  (high context → more very long)
+   w[0] -= 0.08 Ã— contextShift  (high context â†’ fewer quick)
+   w[1] -= 0.06 Ã— contextShift  (high context â†’ fewer short)
+   w[3] += 0.08 Ã— contextShift  (high context â†’ more long)
+   w[4] += 0.06 Ã— contextShift  (high context â†’ more very long)
 
 5. Normalize:
    w_i = max(0.01, w_i)  (ensure positive)
-   w_i = w_i / Σw_i      (ensure sum to 1.0)
+   w_i = w_i / Î£w_i      (ensure sum to 1.0)
 ```
 
 **Examples:**
 - **Entry-level customer service** (seniority=1, Q5=5, Q6=5, Q7=1):
   - Weights: [0.40, 0.35, 0.20, 0.04, 0.01]
-  - Most work is quick/short tasks → automates faster
+  - Most work is quick/short tasks â†’ automates faster
 
 - **Senior software architect** (seniority=4, Q5=2, Q6=2, Q7=4):
   - Weights: [0.12, 0.24, 0.28, 0.24, 0.12]
-  - More medium/long tasks → automates slower
+  - More medium/long tasks â†’ automates slower
 
-**Key Property:** A(t) ∈ [0, 1] represents fraction of job tasks AI can perform. Jobs with more long-duration tasks require higher H_r(t) before A(t) crosses automation threshold θ.
+**Key Property:** A(t) âˆˆ [0, 1] represents fraction of job tasks AI can perform. Jobs with more long-duration tasks require higher H_r(t) before A(t) crosses automation threshold Î¸.
 
 ---
 
@@ -233,27 +233,27 @@ Baseline weights: [0.25, 0.35, 0.25, 0.10, 0.05]
 ```
 codeAnswer(qid, raw):
   if raw is 1-5: return raw - 3  (yields -2 to +2)
-  if raw is boolean: return ±1
+  if raw is boolean: return Â±1
   else: return 0
 ```
 
 ### Amplification and Friction Multipliers
 
 ```
-sumAmp = Σ(w_amp[i] × x[i]) for all questions
-sumFric = Σ(w_fric[i] × x[i]) for all questions
+sumAmp = Î£(w_amp[i] Ã— x[i]) for all questions
+sumFric = Î£(w_fric[i] Ã— x[i]) for all questions
 
 sumAmp = clamp(sumAmp, -2.0, +2.0)
 sumFric = clamp(sumFric, -2.0, +2.0)
 
-ampMult = e^(sumAmp)    [range: ~0.14× to ~7.4×]
-fricMult = e^(sumFric)  [range: ~0.14× to ~7.4×]
+ampMult = e^(sumAmp)    [range: ~0.14Ã— to ~7.4Ã—]
+fricMult = e^(sumFric)  [range: ~0.14Ã— to ~7.4Ã—]
 ```
 
 ### Final User Multiplier (Bounded)
 
 ```
-rawMult = ampMult × fricMult × seniorityMult
+rawMult = ampMult Ã— fricMult Ã— seniorityMult
 
 userMult = clamp(rawMult, 0.33, 3.0)
 ```
@@ -292,10 +292,10 @@ Where:
 ## 6. Implementation Delay (Green Curve Shift)
 
 ```
-delayScore = Σ(IMPLEMENTATION_WEIGHTS[i] × x[i])
+delayScore = Î£(IMPLEMENTATION_WEIGHTS[i] Ã— x[i])
 delayScore = clamp(delayScore, -2.0, +2.0)
 
-delay = 1.75 - (delayScore × 1.25)
+delay = 1.75 - (delayScore Ã— 1.25)
 delay = clamp(delay, 0.5, 3.0)
 
 final_delay = clamp(delay + delayShift, 0.3, 4.0)
@@ -313,28 +313,28 @@ final_delay = clamp(delay + delayShift, 0.3, 4.0)
 - Q18: -0.35  [Job Performance - Top 10% = more delay]
 
 **Formula yields:**
-- High positive delayScore → Low delay (0.5-1.0 years)
-- Low/negative delayScore → High delay (2.0-3.0 years)
+- High positive delayScore â†’ Low delay (0.5-1.0 years)
+- Low/negative delayScore â†’ High delay (2.0-3.0 years)
 
 ---
 
 ## 7. Re-employment Probability
 
 ```
-reemployScore = Σ(REEMPLOYMENT_WEIGHTS[i] × x[i])
+reemployScore = Î£(REEMPLOYMENT_WEIGHTS[i] Ã— x[i])
 reemployScore = clamp(reemployScore, -2.0, +2.0)
 
-base_probability = 0.6 + (reemployScore × 0.2)
+base_probability = 0.6 + (reemployScore Ã— 0.2)
 ```
 
 **Timing Penalty:**
 ```
 if medianTechYears < 3:  timingPenalty = 0.30
-if 3 ≤ medianTechYears < 7:  timingPenalty = 0.15
-if 7 ≤ medianTechYears < 12: timingPenalty = 0.05
-if medianTechYears ≥ 12: timingPenalty = 0.00
+if 3 â‰¤ medianTechYears < 7:  timingPenalty = 0.15
+if 7 â‰¤ medianTechYears < 12: timingPenalty = 0.05
+if medianTechYears â‰¥ 12: timingPenalty = 0.00
 
-probability = (base_probability - timingPenalty) × reemploymentBoost
+probability = (base_probability - timingPenalty) Ã— reemploymentBoost
 probability = clamp(probability, 0.1, 0.85)
 ```
 
@@ -347,7 +347,7 @@ probability = clamp(probability, 0.1, 0.85)
 
 ## 8. Seniority Profiles
 
-| Level | Label | θ_0 Lift | Hazard Shield | Delay Shift | Reemployment Boost |
+| Level | Label | Î¸_0 Lift | Hazard Shield | Delay Shift | Reemployment Boost |
 |-------|-------|----------|---------------|-------------|-------------------|
 | 1 | Entry | -0.02 | 0.00 | -0.4 | 1.00 |
 | 2 | Mid-Level | 0.00 | 0.02 | -0.1 | 1.03 |
@@ -355,7 +355,7 @@ probability = clamp(probability, 0.1, 0.85)
 | 4 | Lead/Principal | 0.05 | 0.08 | +0.4 | 1.08 |
 | 5 | Executive | 0.08 | 0.10 | +0.6 | 1.10 |
 
-**Note:** In the new model, θ_0 Lift is not directly applied. Seniority affects:
+**Note:** In the new model, Î¸_0 Lift is not directly applied. Seniority affects:
 - Hazard Shield (reduces userMult via seniorityMult)
 - Delay Shift (added to implementation delay)
 - Reemployment Boost (multiplies re-employment probability)
@@ -372,17 +372,17 @@ pace = clamp(1.0 + adjustments, 0.6, 1.8)
 ```
 
 **Adjustments:**
-- +0.20 × (norm(Q2) - 0.5)  [Data availability]
-- +0.15 × (norm(Q17) - 0.5) [IT infrastructure]
-- +0.15 × (norm(Q14) - 0.5) [Company AI adoption]
-- +0.10 × (norm(Q8) - 0.5)  [Feedback loop speed]
-- +0.10 × (norm(Q6) - 0.5)  [Task standardization]
+- +0.20 Ã— (norm(Q2) - 0.5)  [Data availability]
+- +0.15 Ã— (norm(Q17) - 0.5) [IT infrastructure]
+- +0.15 Ã— (norm(Q14) - 0.5) [Company AI adoption]
+- +0.10 Ã— (norm(Q8) - 0.5)  [Feedback loop speed]
+- +0.10 Ã— (norm(Q6) - 0.5)  [Task standardization]
 
 Where: norm(x) = clamp((x - 1) / 4, 0, 1)
 
 **Resolved Domain Pace (from slider):**
 ```
-resolvedDomainPace() = (sliderValue / baseline) × basePace
+resolvedDomainPace() = (sliderValue / baseline) Ã— basePace
 ```
 - Slider range: 0.5 to 2.0 (default 1.0)
 - Higher value = more friction = slower automation
@@ -390,7 +390,7 @@ resolvedDomainPace() = (sliderValue / baseline) × basePace
 
 **Compute Multiplier (from slider):**
 ```
-resolvedComputeMultiplier() = (sliderValue / baseline) × baseMultiplier
+resolvedComputeMultiplier() = (sliderValue / baseline) Ã— baseMultiplier
 ```
 - Slider range: 1.5 to 5.0 (default 3.4)
 - Higher value = more barriers = slower AI progress
@@ -403,7 +403,7 @@ resolvedComputeMultiplier() = (sliderValue / baseline) × baseMultiplier
 ### Cumulative Risk from Hazard (Simpson's Rule Integration)
 
 ```
-Risk(t) = 1 - exp(-∫[0 to t] λ_AI(u) du)
+Risk(t) = 1 - exp(-âˆ«[0 to t] Î»_AI(u) du)
 ```
 
 **Implementation:** Simpson's rule with n=100 steps:
@@ -412,17 +412,17 @@ integral = 0
 dt = t / n
 
 for i = 0 to n:
-  s = i × dt
-  rate = λ_AI(s)
+  s = i Ã— dt
+  rate = Î»_AI(s)
 
   if i == 0 or i == n:
     integral += rate
   else if i is odd:
-    integral += 4 × rate
+    integral += 4 Ã— rate
   else:
-    integral += 2 × rate
+    integral += 2 Ã— rate
 
-integral = integral × dt / 3
+integral = integral Ã— dt / 3
 return 1 - exp(-integral)
 ```
 
@@ -430,17 +430,17 @@ return 1 - exp(-integral)
 
 **Blue Curve - Technical Feasibility:**
 ```
-Risk_tech(t) = 1 - exp(-∫[0 to t] λ_AI(u) du)
+Risk_tech(t) = 1 - exp(-âˆ«[0 to t] Î»_AI(u) du)
 ```
 
 **Green Curve - Actual Job Loss:**
 ```
-Risk_actual(t) = Risk_tech(t - Δ)
+Risk_actual(t) = Risk_tech(t - Î”)
 
-where Δ = implementationDelay
+where Î” = implementationDelay
 ```
 
-**Key Property:** Green curve is Blue curve shifted right by Δ years
+**Key Property:** Green curve is Blue curve shifted right by Î” years
 
 ---
 
@@ -449,83 +449,83 @@ where Δ = implementationDelay
 ### AI & Task Characteristics (Q1-Q4)
 
 **Q1. AI Performance**
-- Scale: 1=Far Behind → 5=State-of-the-Art
+- Scale: 1=Far Behind â†’ 5=State-of-the-Art
 - Weight: amp +0.80
 
 **Q2. Data Availability**
-- Scale: 1=Almost None → 5=Extensive
+- Scale: 1=Almost None â†’ 5=Extensive
 - Weight: amp +0.40
 
 **Q3. Benchmark Clarity**
-- Scale: 1=Very Difficult → 5=Very Easy
+- Scale: 1=Very Difficult â†’ 5=Very Easy
 - Weight: amp +0.35
 
 **Q4. Task Digitization**
-- Scale: 1=0-20% → 5=81-100%
+- Scale: 1=0-20% â†’ 5=81-100%
 - Weight: amp +0.55
 
 ### Task Structure & Adaptability (Q5-Q9)
 
 **Q5. Task Decomposability**
-- Scale: 1=Highly Structured → 5=Very Complex
+- Scale: 1=Highly Structured â†’ 5=Very Complex
 - Weight: fric -0.50
 
 **Q6. Task Standardization**
-- Scale: 1=Highly Standardized → 5=Highly Variable
+- Scale: 1=Highly Standardized â†’ 5=Highly Variable
 - Weight: amp +0.45
 
 **Q7. Context Dependency**
-- Scale: 1=Minimal → 5=Critical
+- Scale: 1=Minimal â†’ 5=Critical
 - Weight: fric -0.50
 
 **Q8. Feedback Loop Speed**
-- Scale: 1=Months/Years → 5=Minutes/Instant
+- Scale: 1=Months/Years â†’ 5=Minutes/Instant
 - Weight: amp +0.45
 
 **Q9. Tacit Knowledge**
-- Scale: 1=Fully Documented → 5=Mostly Tacit
+- Scale: 1=Fully Documented â†’ 5=Mostly Tacit
 - Weight: fric -0.40
 
 ### Human & Organizational Factors (Q10-Q11)
 
 **Q10. Human Judgment & Relationships**
-- Scale: 1=Minimal → 5=Essential
+- Scale: 1=Minimal â†’ 5=Essential
 - Weight: fric -0.45
 
 **Q11. Physical Presence**
-- Scale: 1=None → 5=Essential
+- Scale: 1=None â†’ 5=Essential
 - Weight: fric -0.60
 
 ### Company & Industry Context (Q12-Q15)
 
 **Q12. Company AI Adoption Readiness**
-- Scale: 1=Resistant → 5=Leading Edge
+- Scale: 1=Resistant â†’ 5=Leading Edge
 - Weight: Implementation +0.40
 
 **Q13. Labor Cost Pressure**
-- Scale: 1=Not Sensitive → 5=Extremely Sensitive
+- Scale: 1=Not Sensitive â†’ 5=Extremely Sensitive
 - Weight: Implementation +0.30
 
 **Q14. Labor Market Tightness**
-- Scale: 1=Very Easy to Hire → 5=Very Difficult to Hire
+- Scale: 1=Very Easy to Hire â†’ 5=Very Difficult to Hire
 - Weight: Implementation -0.35
 
 **Q15. IT Infrastructure**
-- Scale: 1=Very Outdated → 5=Cutting Edge
+- Scale: 1=Very Outdated â†’ 5=Cutting Edge
 - Weight: Implementation +0.35
 
 ### Personal Adaptability (Q16-Q18)
 
 **Q16. Skill Transferability**
-- Scale: 1=Highly Specific → 5=Highly Transferable
+- Scale: 1=Highly Specific â†’ 5=Highly Transferable
 - Weight: Reemployment +0.50
 
 **Q17. Adaptability/Learning**
-- Scale: 1=Very Slow → 5=Very Fast
+- Scale: 1=Very Slow â†’ 5=Very Fast
 - Weight: Reemployment +0.50
 
 **Q18. Job Performance**
-- Scale: 1=Below Average → 5=Top Performer
+- Scale: 1=Below Average â†’ 5=Top Performer
 - Weight: Implementation -0.35, Reemployment +0.30
 
 ---
@@ -537,31 +537,31 @@ These are calculated for display but don't directly affect the METR model:
 **AI Readiness Score:**
 ```
 aiReadiness = (Q1 + Q2 + Q3 + Q4) / 4
-Display = (aiReadiness × 20) / 100
+Display = (aiReadiness Ã— 20) / 100
 ```
 
 **Task Adaptability Score:**
 ```
 taskAdapt = (Q5 + Q6 + Q7 + Q8 + Q9) / 5
-Display = ((6 - taskAdapt) × 20) / 100
+Display = ((6 - taskAdapt) Ã— 20) / 100
 ```
 
 **Friction Score:**
 ```
 friction = (Q10 + Q11) / 2
-Display = (friction × 20) / 100
+Display = (friction Ã— 20) / 100
 ```
 
 **Firm Readiness Score:**
 ```
 firmReadiness = (Q12 + Q13 + Q14 + Q15) / 4
-Display = (firmReadiness × 20) / 100
+Display = (firmReadiness Ã— 20) / 100
 ```
 
 **Personal Adaptability Score:**
 ```
 personalAdapt = (Q16 + Q17 + Q18) / 3
-Display = (personalAdapt × 20) / 100
+Display = (personalAdapt Ã— 20) / 100
 ```
 
 ---
@@ -601,9 +601,9 @@ H_{50,0} = 137 minutes          (baseline 50% task horizon, GPT-5 Aug 2025)
 H_{80,0} = 26.37 minutes        (baseline 80% task horizon, GPT-5 Aug 2025)
 D_base = 7 months               (METR doubling)
 r = 0.95                        (95% reliability target)
-σ ≈ -1.19                       (logistic calibration parameter)
-f(0.95) ≈ 33.1                  (reliability factor)
-p_domain ∈ [0.5, 3.0]           (domain alignment penalty)
+Ïƒ â‰ˆ -1.19                       (logistic calibration parameter)
+f(0.95) â‰ˆ 33.1                  (reliability factor)
+p_domain âˆˆ [0.5, 3.0]           (domain alignment penalty)
 ```
 
 ### Task Buckets
@@ -619,19 +619,19 @@ s = 0.45                        (logistic softness)
 
 ### Hazard Parameters
 ```
-h_AI = 0.40 yr⁻¹               (max base annual hazard)
-γ = 8.0 baseline               (logistic steepness, dynamically adjusted and clamped to [3.0, 16.0])
-θ_0 = 0.50 baseline            (readiness threshold, dynamically adjusted and clamped to [0.35, 0.72])
-userMult ∈ [0.33, 3.0]         (bounded multiplier)
-λ_AI max = 0.95 yr⁻¹           (effective max after userMult × h_AI, hard-clamped)
+h_AI = 0.40 yrâ»Â¹               (max base annual hazard)
+Î³ = 8.0 baseline               (logistic steepness, dynamically adjusted and clamped to [3.0, 16.0])
+Î¸_0 = 0.50 baseline            (readiness threshold, dynamically adjusted and clamped to [0.35, 0.72])
+userMult âˆˆ [0.33, 3.0]         (bounded multiplier)
+Î»_AI max = 0.95 yrâ»Â¹           (effective max after userMult Ã— h_AI, hard-clamped)
 ```
 
 **Maximum Hazard Interpretation:**
-- Theoretical max: h_AI × userMult_max = 0.40 × 3.0 = 1.20 yr⁻¹
-- Effective max (clamped): λ_AI = 0.95 yr⁻¹ corresponds to:
-  - Half-life ≈ 8.8 months (time for 50% displacement probability)
-  - P(loss in 1 year) ≈ 61%
-  - P(loss in 2 years) ≈ 85%
+- Theoretical max: h_AI Ã— userMult_max = 0.40 Ã— 3.0 = 1.20 yrâ»Â¹
+- Effective max (clamped): Î»_AI = 0.95 yrâ»Â¹ corresponds to:
+  - Half-life â‰ˆ 8.8 months (time for 50% displacement probability)
+  - P(loss in 1 year) â‰ˆ 61%
+  - P(loss in 2 years) â‰ˆ 85%
 - Represents most automation-prone scenario: AI fully capable (A=1.0) + max amplifying factors (userMult=3.0)
 - Clamp prevents extreme scenarios from exceeding realistic displacement rates
 
@@ -645,9 +645,9 @@ delayRange = [0.3, 4.0] years
 
 ## 15. Mathematical Flow Summary
 
-1. **User inputs** → 21 questions (Likert 1-5) + seniority level (1-5)
+1. **User inputs** â†’ 21 questions (Likert 1-5) + seniority level (1-5)
 
-2. **Questions coded** → -2 to +2 scale via codeAnswer()
+2. **Questions coded** â†’ -2 to +2 scale via codeAnswer()
 
 3. **METR capability calculated:**
    - D_eff from compute/domain sliders
@@ -658,10 +658,10 @@ delayRange = [0.3, 4.0] years
 4. **Hazard multipliers computed:**
    - ampMult, fricMult from question weights
    - seniorityMult from hazard shield
-   - userMult = clamp(ampMult × fricMult × seniorityMult, 0.33, 3.0)
+   - userMult = clamp(ampMult Ã— fricMult Ã— seniorityMult, 0.33, 3.0)
 
 5. **Hazard function evaluated:**
-   - λ_AI(t) = [h_AI / (1 + exp(-γ(A(t) - θ_0)))] × userMult
+   - Î»_AI(t) = [h_AI / (1 + exp(-Î³(A(t) - Î¸_0)))] Ã— userMult
    - Pure logistic gate, no time decay
 
 6. **Implementation delay calculated:**
@@ -669,7 +669,7 @@ delayRange = [0.3, 4.0] years
    - Range: 0.3 to 4.0 years
 
 7. **Cumulative risk computed:**
-   - Integration of λ_AI(t) using Simpson's rule
+   - Integration of Î»_AI(t) using Simpson's rule
    - Blue: Risk_tech(t)
    - Green: Risk_actual(t) = Risk_tech(t - delay)
 
@@ -683,56 +683,56 @@ delayRange = [0.3, 4.0] years
 
 ### Removed Components
 
-❌ **Explicit/Tacit Split:**
+âŒ **Explicit/Tacit Split:**
 ```
-OLD: A_job(t) = s_e × A_explicit(t) + (1 - s_e) × A_tacit(t)
-NEW: A(t) = Σ w_i × G(H_r(t), L_i, s)  [task buckets]
-```
-
-❌ **Artificial Time Decay:**
-```
-OLD: λ_AI(t) = F_0 × e^(-λt) × ...
-NEW: λ_AI(t) = h_AI / (1 + exp(...))  [no decay]
+OLD: A_job(t) = s_e Ã— A_explicit(t) + (1 - s_e) Ã— A_tacit(t)
+NEW: A(t) = Î£ w_i Ã— G(H_r(t), L_i, s)  [task buckets]
 ```
 
-❌ **Threshold Ratio with Power Law:**
+âŒ **Artificial Time Decay:**
 ```
-OLD: [max(0, A_job/θ - 1)]^γ
-NEW: 1 / (1 + exp(-γ(A - θ_0)))  [logistic gate]
-```
-
-❌ **Unbounded Capability:**
-```
-OLD: A_explicit → ∞ as t → ∞
-NEW: A(t) ∈ [0, 1] always
+OLD: Î»_AI(t) = F_0 Ã— e^(-Î»t) Ã— ...
+NEW: Î»_AI(t) = h_AI / (1 + exp(...))  [no decay]
 ```
 
-❌ **Division for Effective Doubling:**
+âŒ **Threshold Ratio with Power Law:**
 ```
-OLD: D_eff = D_base / (computeMultiplier × domainPace)
-NEW: D_eff = D_base × computeFriction × industryFriction  [multiplication]
+OLD: [max(0, A_job/Î¸ - 1)]^Î³
+NEW: 1 / (1 + exp(-Î³(A - Î¸_0)))  [logistic gate]
+```
+
+âŒ **Unbounded Capability:**
+```
+OLD: A_explicit â†’ âˆž as t â†’ âˆž
+NEW: A(t) âˆˆ [0, 1] always
+```
+
+âŒ **Division for Effective Doubling:**
+```
+OLD: D_eff = D_base / (computeMultiplier Ã— domainPace)
+NEW: D_eff = D_base Ã— domainFriction Ã— industryFriction  [multiplication]
 ```
 Note: The NEW model treats sliders as friction/barriers that slow down automation by INCREASING doubling time.
 
 ### New Components
 
-✅ **METR Grounding:**
+âœ… **METR Grounding:**
 - Empirical 7-month doubling benchmark
 - Reliability adjustment f(r)
 - Maximum task length capability metric
 
-✅ **Bounded Readiness:**
-- A(t) ∈ [0, 1] guaranteed
+âœ… **Bounded Readiness:**
+- A(t) âˆˆ [0, 1] guaranteed
 - Clear interpretation (% of tasks)
 - Weighted task buckets
 
-✅ **Clean Hazard:**
+âœ… **Clean Hazard:**
 - Pure logistic S-curve
 - No artificial decay
 - Explicit max hazard (50% annual)
 
-✅ **Bounded Multipliers:**
-- userMult ∈ [0.33, 3.0]
+âœ… **Bounded Multipliers:**
+- userMult âˆˆ [0.33, 3.0]
 - Prevents extreme outliers
 - More predictable behavior
 
@@ -747,13 +747,13 @@ Note: The NEW model treats sliders as friction/barriers that slow down automatio
 
 **Step 1: METR Capability**
 ```
-D_eff = 7 × 1.0 × 1.0 = 7 months
-months = 5 × 12 = 60
-f(0.95) ≈ 33.1
+D_eff = 7 Ã— 1.0 Ã— 1.0 = 7 months
+months = 5 Ã— 12 = 60
+f(0.95) â‰ˆ 33.1
 
-H_r(5) = [137 × 2^(60/7)] / 33.1
-       = [137 × 2^8.57] / 33.1
-       = [137 × 378.8] / 33.1
+H_r(5) = [137 Ã— 2^(60/7)] / 33.1
+       = [137 Ã— 2^8.57] / 33.1
+       = [137 Ã— 378.8] / 33.1
        = 51895 / 33.1
        = 1568 minutes
 ```
@@ -761,39 +761,39 @@ H_r(5) = [137 × 2^(60/7)] / 33.1
 **Step 2: Task Gates**
 ```
 G(1568, 2.5, 0.45) = 1 / (1 + exp(-(ln(1568) - ln(2.5)) / 0.45))
-                    ≈ 1.0000 (AI masters <5min tasks)
+                    â‰ˆ 1.0000 (AI masters <5min tasks)
 
-G(1568, 10, 0.45) ≈ 1.0000 (AI masters 5-15min tasks)
-G(1568, 37.5, 0.45) ≈ 1.0000 (AI masters 15-60min tasks)
-G(1568, 120, 0.45) ≈ 1.0000 (AI handles 1-3hr tasks)
-G(1568, 360, 0.45) ≈ 0.9996 (AI can do >3hr tasks)
+G(1568, 10, 0.45) â‰ˆ 1.0000 (AI masters 5-15min tasks)
+G(1568, 37.5, 0.45) â‰ˆ 1.0000 (AI masters 15-60min tasks)
+G(1568, 120, 0.45) â‰ˆ 1.0000 (AI handles 1-3hr tasks)
+G(1568, 360, 0.45) â‰ˆ 0.9996 (AI can do >3hr tasks)
 ```
 
 **Step 3: AI Readiness**
 ```
-A(5) = 0.25×1.0000 + 0.35×1.0000 + 0.25×1.0000 + 0.10×1.0000 + 0.05×0.9996
+A(5) = 0.25Ã—1.0000 + 0.35Ã—1.0000 + 0.25Ã—1.0000 + 0.10Ã—1.0000 + 0.05Ã—0.9996
      = 0.2500 + 0.3500 + 0.2500 + 0.1000 + 0.0500
-     ≈ 1.0000 (AI can do ~100% of job tasks)
+     â‰ˆ 1.0000 (AI can do ~100% of job tasks)
 ```
 
 **Step 4: Hazard**
 ```
-Neutral answers → ampMult ≈ 1.0, fricMult ≈ 1.0
+Neutral answers â†’ ampMult â‰ˆ 1.0, fricMult â‰ˆ 1.0
 seniorityMult = 1 - 0.00 = 1.0
-userMult = clamp(1.0 × 1.0 × 1.0, 0.5, 2.0) = 1.0
+userMult = clamp(1.0 Ã— 1.0 Ã— 1.0, 0.5, 2.0) = 1.0
 
-λ_AI(5) = [0.50 / (1 + exp(-8.0 × (1.0000 - 0.75)))] × 1.0
+Î»_AI(5) = [0.50 / (1 + exp(-8.0 Ã— (1.0000 - 0.75)))] Ã— 1.0
         = [0.50 / (1 + exp(-2.0))]
         = [0.50 / (1 + 0.1353)]
         = [0.50 / 1.1353]
-        = 0.440 yr⁻¹ (44.0% annual hazard)
+        = 0.440 yrâ»Â¹ (44.0% annual hazard)
 ```
 
 **Step 5: Cumulative Risk**
 ```
-Risk_tech(5) = 1 - exp(-∫[0 to 5] λ_AI(u) du)
-             ≈ 1 - exp(-2.1)  [via Simpson's rule]
-             ≈ 0.878 (87.8% probability)
+Risk_tech(5) = 1 - exp(-âˆ«[0 to 5] Î»_AI(u) du)
+             â‰ˆ 1 - exp(-2.1)  [via Simpson's rule]
+             â‰ˆ 0.878 (87.8% probability)
 ```
 
 This demonstrates the complete calculation pipeline from user inputs to final risk estimate.
@@ -805,9 +805,9 @@ This demonstrates the complete calculation pipeline from user inputs to final ri
 The METR-powered model provides:
 
 1. **Empirical grounding** via METR 7-month doubling
-2. **Bounded readiness** A(t) ∈ [0,1] with task bucket interpretation
+2. **Bounded readiness** A(t) âˆˆ [0,1] with task bucket interpretation
 3. **Clean hazard** logistic gate without artificial decay
-4. **Controlled multipliers** user effects bounded [0.5×, 2.0×]
+4. **Controlled multipliers** user effects bounded [0.5Ã—, 2.0Ã—]
 5. **Clear separation** capability (Blue) vs adoption (Green = Blue shifted)
 
 All formulas are mathematically precise, empirically grounded, and produce interpretable, bounded outputs suitable for forecasting automation risk.

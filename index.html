@@ -1905,14 +1905,7 @@
 
             
             <div class="controls-grid">
-                <div class="control-group">
-                    <h3>AI Progress Speed</h3>
-                    <p>Capability doubling time (METR trendline: 7 months)</p>
-                    <div class="slider-container">
-                        <input type="range" id="ai-doubling" min="2" max="24" step="1" value="7">
-                        <span class="value-display" id="ai-doubling-value">7 mo</span>
-                    </div>
-                </div>
+                <!-- Removed compute scaling slider: METR doubling baked in -->
                 <div class="control-group">
                     <h3>Domain Friction</h3>
                     <p>Industry-specific barriers that slow AI capability transfer (≥1.0× METR baseline)</p>
@@ -2335,17 +2328,10 @@
         }
 
         function resolvedBaseDoublingMonths() {
-            const slider = document.getElementById('ai-doubling');
-            if (slider) {
-                const raw = parseFloat(slider.value);
-                if (!Number.isNaN(raw)) {
-                    return raw;
-                }
-            }
             if (currentParams && typeof currentParams.doublingMonths === 'number') {
                 return currentParams.doublingMonths;
             }
-            return baseDoublingMonths;
+            return baseDoublingMonths; // Fixed METR 7-month doubling (no compute scaling slider)
         }
 
         // METR-based capability functions
@@ -2919,7 +2905,7 @@
             const lambda = inferredFrictionDecay(answers);
             const domainPace = inferredDomainFriction(answers);
             const { penalty: domainPenalty, alignment: domainAlignment } = computeDomainMismatch(answers);
-            const doublingMonths = parseFloat(document.getElementById('ai-doubling').value) || baseDoublingMonths;
+            const doublingMonths = resolvedBaseDoublingMonths();
 
             const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
             const thetaProfileBase = thetaBase + (seniorityProfile.thetaLift || 0);
@@ -2959,7 +2945,7 @@
                 domainPace: domainPace,
                 domainPenalty: domainPenalty,
                 domainAlignment: domainAlignment,
-                doublingMonths: Math.max(2, Math.min(24, doublingMonths)),
+                doublingMonths: doublingMonths,
                 aiReadiness: aiReadiness,
                 taskAdapt: taskAdapt,
                 friction_score: friction,
