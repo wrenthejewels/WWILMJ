@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
     <!-- TEMP: wrap test -->
 
@@ -1925,7 +1925,7 @@
 
                 <div class="control-group">
                     <h3>Industry Friction</h3>
-                    <p>More friction → slower adoption → later automation</p>
+                    <p>More friction â†’ slower adoption â†’ later automation</p>
                     <div class="slider-container">
                         <input type="range" id="industry-pace" min="0.5" max="2" step="0.1" value="1">
                         <span class="value-display" id="industry-pace-value">1.0x</span>
@@ -1978,7 +1978,7 @@
 
             <div class="model-insights">
                 <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
-                <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
+                <p><strong>Required quality Î¸:</strong> <span id="insight-theta">-</span></p>
                 <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
                 <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
                 <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
@@ -2002,17 +2002,17 @@
                 </div>
 
 
-                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
+                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability â†’ Readiness</h4>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
                     <div class="equation-callout">
                         <span class="callout-label">AI capability (task completion time)</span>
-                        <div class="equation-display">$$H_r(t) = \frac{H_{50,0}}{2^{(t \cdot 12)/D} \cdot f(r)}, \quad D = 7 \text{ months}, \quad f(r) = \frac{\ln(r)}{\ln(0.5)}$$</div>
+                        <div class="equation-display">$H_r(t) = \\frac{H_{50,0}}{2^{(t \\cdot 12)/D} \\cdot f(r)}, \\quad D = 7 \\text{ months}$</div>                        <div class="equation-display">H_r(t): AI task completion time (minutes); lower = more capable.</div>
                     </div>
 
                     <div class="equation-callout">
                         <span class="callout-label">Task bucket logistic gate</span>
-                        <div class="equation-display">$$G(H, L_i, s) = \frac{1}{1 + \exp\left(-\frac{\ln(H) - \ln(L_i)}{s}\right)}$$</div>
+                        <div class="equation-display">$G(H, L_i, s) = \\frac{1}{1 + \\exp\\left(-\\frac{\\ln(L_i) - \\ln(H)}{s}\\right)}$</div>
                     </div>
                 </div>
 
@@ -2032,17 +2032,17 @@
 
                 <ul class="factor-grid factor-grid--compact">
                     <li><strong>t:</strong> Time (years from present)</li>
-                    <li><strong>H<sub>r</sub>(t):</strong> AI capability (max task length in minutes; higher = more capable)</li>
-                    <li><strong>A(t):</strong> AI Readiness ∈ [0,1] (fraction of job tasks AI can perform)</li>
+                    <li><strong>H<sub>r</sub>(t):</strong> AI task completion time (minutes); lower = more capable</li>
+                    <li><strong>A(t):</strong> AI Readiness âˆˆ [0,1] (fraction of job tasks AI can perform)</li>
                     <li><strong>D:</strong> Doubling period (7 months baseline, from METR benchmarks)</li>
-                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 14.4× capability margin)</li>
+                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 14.4Ã— capability margin)</li>
                     <li><strong>L<sub>i</sub>:</strong> Task duration thresholds (e.g., 2.5, 10, 37.5, 120, 360 minutes)</li>
                     <li><strong>w<sub>i</sub>:</strong> Task bucket weights (sum to 1.0, e.g., 25%, 35%, 25%, 10%, 5%)</li>
                     <li><strong>s:</strong> Logistic softness (0.45 default, controls gate steepness)</li>
                     <li><strong>h<sub>AI</sub>:</strong> Max annual hazard (0.50 = 50% per year at full automation)</li>
-                    <li><strong>γ:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
-                    <li><strong>θ<sub>0</sub>:</strong> Readiness threshold (0.50 = automation kicks in at 50% task coverage)</li>
-                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.5× to 2.0×)</li>
+                    <li><strong>Î³:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
+                    <li><strong>Î¸<sub>0</sub>:</strong> Readiness threshold (0.50 = automation kicks in at 50% task coverage)</li>
+                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.5Ã— to 2.0Ã—)</li>
                 </ul>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Risk Curves: Blue vs Green</h4>
@@ -2059,7 +2059,7 @@
                     </div>
                 </div>
 
-                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard-it's the Blue curve shifted right by implementation delay (Δ). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
+                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard-it's the Blue curve shifted right by implementation delay (Î”). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
 
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Model Defaults</h4>
 
@@ -2069,13 +2069,13 @@
                     <li><strong>r:</strong> 0.95 (95% reliability target)</li>
                     <li><strong>Task buckets:</strong> &lt;5m: 25%, 5-15m: 35%, 15-60m: 25%, 1-3h: 10%, &gt;3h: 5%</li>
                     <li><strong>s:</strong> 0.45 (logistic softness)</li>
-                    <li><strong>θ<sub>0</sub>:</strong> 0.50 (50% readiness threshold)</li>
-                    <li><strong>γ:</strong> 8.0 (hazard gate steepness)</li>
+                    <li><strong>Î¸<sub>0</sub>:</strong> 0.50 (50% readiness threshold)</li>
+                    <li><strong>Î³:</strong> 8.0 (hazard gate steepness)</li>
                     <li><strong>h<sub>AI</sub>:</strong> 0.50 yr<sup>-1</sup> (max 50% annual hazard)</li>
-                    <li><strong>userMult range:</strong> 0.5× (max protection from unions/trust/liability) to 2.0× (max acceleration)</li>
+                    <li><strong>userMult range:</strong> 0.5Ã— (max protection from unions/trust/liability) to 2.0Ã— (max acceleration)</li>
                 </ul>
 
-                <p><strong>Question effects:</strong> Explicit vs. implicit task mix modifies bucket weights (w<sub>i</sub>) and softness (s). Union strength, trust requirements, and liability concerns move implementation delay (Δ) rather than amplifying hazard directly, since these are adoption barriers, not capability limits. Major protective factors shift θ<sub>0</sub> higher (AI must master more tasks before displacement begins).</p>
+                <p><strong>Question effects:</strong> Explicit vs. implicit task mix modifies bucket weights (w<sub>i</sub>) and softness (s). Union strength, trust requirements, and liability concerns move implementation delay (Î”) rather than amplifying hazard directly, since these are adoption barriers, not capability limits. Major protective factors shift Î¸<sub>0</sub> higher (AI must master more tasks before displacement begins).</p>
             </section>
                 </div>
             </div>
@@ -2295,10 +2295,10 @@
         // METR-based capability functions
 
         // Reliability adjustment factor fitted to METR empirical data
-        // METR shows p50/p80 ≈ 5.54× across models, which gives exponent k ≈ -3.643
+        // METR shows p50/p80 â‰ˆ 5.54Ã— across models, which gives exponent k â‰ˆ -3.643
         // Formula: f(r) = (0.50/r)^k where k = log(5.54) / log(0.50/0.80)
-        // Higher reliability requires shorter/easier tasks: f(0.50)=1.0×, f(0.80)=5.54×, f(0.95)=10.36×
-        // We DIVIDE H by f(r), so higher reliability → lower H → AI can only handle shorter tasks
+        // Higher reliability requires shorter/easier tasks: f(0.50)=1.0Ã—, f(0.80)=5.54Ã—, f(0.95)=10.36Ã—
+        // We DIVIDE H by f(r), so higher reliability â†’ lower H â†’ AI can only handle shorter tasks
         function reliabilityFactor(r) {
             const lower = 0.5 + RELIABILITY_GUARD;
             const upper = 0.99 - RELIABILITY_GUARD;
@@ -2308,58 +2308,52 @@
             return Math.exp(-METR_SIGMA * logit);
         }
 
-        // METR capability: H_r(t) = (H50_0 * 2^(months_elapsed / D_eff)) / f(r)
-        // Returns maximum human-equivalent task length (in minutes) AI can handle at time t with reliability r
-        // Higher H = better AI (can handle longer/harder tasks that take humans more time)
-        // As time progresses, H increases (AI improves and tackles longer tasks)
-        // Higher reliability requirement → larger f(r) → lower H → can only automate shorter tasks
-        // Lower reliability requirement → smaller f(r) → higher H → can automate longer tasks
+        // METR capability: H_r(t) = H50_0 / ( 2^(months_elapsed / D_eff) * f(r) * domainPenalty )
+        // Interpretation: H_r(t) is AI task completion time in minutes; LOWER = more capable (faster)
+        // - As time progresses, H_r DECREASES (doublings make AI faster)
+        // - Higher reliability requirement increases f(r) â†’ HIGHER H_r (stricter standard slows effective capability)
+        // - Domain penalty (>1 for misaligned domains) MULTIPLIES time (slower), values <1 speed up time
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = null) {
             const D_months = resolvedBaseDoublingMonths();
             const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
             const industryFriction = resolvedDomainPace();  // Now represents friction
             const reliability = r !== null ? r : resolvedReliabilityTarget(); // Use slider if r not provided
 
-            // Effective doubling time: MULTIPLY by frictions (higher friction → longer doubling → slower automation)
+            // Effective doubling time: MULTIPLY by frictions (higher friction â†’ longer doubling â†’ slower automation)
             const D_eff = D_months * computeFriction * industryFriction;
 
             // Debug logging (only log occasionally to avoid spam)
             if (tYears === 0 && Math.random() < 0.1) {
                 console.log('[H_r] D_months:', D_months, 'computeFriction:', computeFriction.toFixed(2),
-                           'industryFriction:', industryFriction.toFixed(2), '→ D_eff:', D_eff.toFixed(2), 'months',
+                           'industryFriction:', industryFriction.toFixed(2), 'â†’ D_eff:', D_eff.toFixed(2), 'months',
                            'reliability:', (reliability * 100).toFixed(0) + '%');
             }
 
             const monthsElapsed = tYears * 12;
-            const progress = Math.pow(2, monthsElapsed / D_eff);
+            const progress = Math.pow(2, monthsElapsed / D_eff); // growth in capability â†’ faster â†’ lower H_r
             const f_r = reliabilityFactor(reliability);
 
-            // Note: Higher H means better AI (can handle longer human-equivalent tasks)
-            // Domain penalty > 1 decreases H (makes AI relatively worse for domain-mismatched roles)
+            // Domain penalty: >1 slows AI (more minutes); <1 speeds up
             const domainPenalty = currentParams && typeof currentParams.domainPenalty === 'number'
                 ? currentParams.domainPenalty
                 : 1.0;
-            const baselineMinutes = H50_0 / domainPenalty;  // Domain mismatch reduces effective capability
+            const baselineMinutes = H50_0 * domainPenalty;
 
-            // FIXED: Multiply by progress, divide by f_r
-            // - progress increases H over time (AI tackles harder tasks)
-            // - f(r) decreases H for higher reliability (more restrictive threshold)
-            return (baselineMinutes * progress) / f_r;
+            // LOWER is better: divide by progress; MULTIPLY by f(r) to reflect stricter reliability
+            return baselineMinutes / (progress * f_r);
         }
 
-        // Logistic gate for single task bucket: G(H, L_i, s) = 1 / (1 + exp(-(ln(H) - ln(L_i)) / s))
-        // Returns probability that AI can complete tasks of duration L_i given current capability H
-        // H = max task length AI can handle; higher H → better AI → higher readiness
-        // When H > L: AI can handle this task → gate opens (high probability)
-        // When H < L: AI cannot handle this task → gate closes (low probability)
+        // Logistic gate for a task bucket using completion time H (minutes):
+        // G(H, L, s) = 1 / (1 + exp( - (ln(L) - ln(H)) / s ))
+        // Interpretation: LOWER H (faster AI) â†’ HIGHER readiness; when H << L, gate â‰ˆ 1; when H >> L, gate â‰ˆ 0
         function taskGate(H, L, s = METR_DEFAULTS.softness) {
             const logH = Math.log(Math.max(0.01, H));  // Prevent log(0)
             const logL = Math.log(L);
-            const exponent = -(logH - logL) / s;  // FIXED: ln(H) - ln(L) so higher H → higher readiness
-            return 1.0 / (1.0 + Math.exp(exponent));
+            const z = (logL - logH) / s;
+            return 1.0 / (1.0 + Math.exp(-z));
         }
 
-        // AI Readiness: A(t) = Σ w_i * G(H_r(t), L_i, s)
+        // AI Readiness: A(t) = Î£ w_i * G(H_r(t), L_i, s)
         // Returns value in [0, 1] representing fraction of job tasks AI can perform
         // UPDATED: Now uses seniority-based task weights and softness
         function A_job(tYears) {
@@ -2407,13 +2401,13 @@
             testTimes.forEach(t => {
                 const A_t = A_job(t);
                 const bounded = A_t >= 0 && A_t <= 1;
-                console.log(`  A(${t}yr) = ${A_t.toFixed(4)} ${bounded ? '✓' : '✗ OUT OF BOUNDS'}`);
+                console.log(`  A(${t}yr) = ${A_t.toFixed(4)} ${bounded ? 'âœ“' : 'âœ— OUT OF BOUNDS'}`);
                 if (!bounded) allBounded = false;
             });
-            console.log(`  RESULT: ${allBounded ? 'PASS ✓' : 'FAIL ✗'}\n`);
+            console.log(`  RESULT: ${allBounded ? 'PASS âœ“' : 'FAIL âœ—'}\n`);
 
             // Test 2: Increasing r shifts milestones later
-            console.log('TEST 2: Increasing r → later milestones');
+            console.log('TEST 2: Increasing r â†’ later milestones');
             const findMilestone = (r_val, targetProb = 0.5) => {
                 // Temporarily override reliability
                 const origA = A_job;
@@ -2446,21 +2440,21 @@
             console.log(`  50% milestone at r=0.95: ${milestone_r95.toFixed(2)} years`);
             console.log(`  50% milestone at r=0.99: ${milestone_r99.toFixed(2)} years`);
             const shiftCorrect = milestone_r99 > milestone_r95 && milestone_r95 > milestone_r90;
-            console.log(`  RESULT: ${shiftCorrect ? 'PASS ✓' : 'FAIL ✗'}\n`);
+            console.log(`  RESULT: ${shiftCorrect ? 'PASS âœ“' : 'FAIL âœ—'}\n`);
 
             // Test 3: Decreasing D_months shifts earlier
-            console.log('TEST 3: Decreasing D_months → earlier milestones');
+            console.log('TEST 3: Decreasing D_months â†’ earlier milestones');
             console.log('  (Tested via slider - lower doubling = earlier automation)\n');
 
             // Test 4: Blue and Green curves identical except for delay
             console.log('TEST 4: Green = Blue shifted by delay');
             console.log('  Green curve at t=T should equal Blue curve at t=(T-delay)');
-            console.log('  This is enforced by updateChart() implementation ✓\n');
+            console.log('  This is enforced by updateChart() implementation âœ“\n');
 
             // Test 5: Key diagnostic values
             console.log('DIAGNOSTIC VALUES:');
             console.log(`  H_r(0) = ${H_r(0).toFixed(2)} minutes (baseline capability)`);
-            console.log(`  H_r(5) = ${H_r(5).toFixed(4)} minutes (more capable → lower time)`);
+            console.log(`  H_r(5) = ${H_r(5).toFixed(4)} minutes (more capable â†’ lower time)`);
             console.log(`  A(0) = ${A_job(0).toFixed(4)} (should be near 0)`);
             console.log(`  A(5) = ${A_job(5).toFixed(4)} (should be in [0,1])`);
             console.log(`  reliability factor f(0.95) = ${reliabilityFactor(0.95).toFixed(4)}`);
@@ -2482,17 +2476,17 @@
             const gatePass = gateFast > gateSlow;
             console.log(`  taskGate(H=1, L=10) = ${gateFast.toFixed(4)}`);
             console.log(`  taskGate(H=100, L=10) = ${gateSlow.toFixed(4)}`);
-            console.log(`  RESULT: ${gatePass ? 'PASS ✓' : 'FAIL ✗'} (faster AI must have higher readiness)`);
+            console.log(`  RESULT: ${gatePass ? 'PASS âœ“' : 'FAIL âœ—'} (faster AI must have higher readiness)`);
             if (!gatePass) allPassed = false;
 
-            // Test 2: Reliability factor - r=0.95 should be ~13.5×, r=0.99 should be ~69-72×
+            // Test 2: Reliability factor - r=0.95 should be ~13.5Ã—, r=0.99 should be ~69-72Ã—
             console.log('\nTEST 2: Reliability factor');
             const f95 = reliabilityFactor(0.95);
             const f99 = reliabilityFactor(0.99);
             const reliabilityPass = (f95 > 25 && f95 < 45) && (f99 > 180 && f99 < 320);
             console.log(`  f(0.95) = ${f95.toFixed(2)} (expected ~33)`);
             console.log(`  f(0.99) = ${f99.toFixed(2)} (expected ~235)`);
-            console.log(`  RESULT: ${reliabilityPass ? 'PASS ✓' : 'FAIL ✗'}`);
+            console.log(`  RESULT: ${reliabilityPass ? 'PASS âœ“' : 'FAIL âœ—'}`);
             if (!reliabilityPass) allPassed = false;
 
             // Test 3: Green curve clamp - should never sample negative time
@@ -2503,7 +2497,7 @@
             const clampPass = greenAt1 === 0;
             console.log(`  Green(t=1) with delay=2 should = Blue(max(1-2, 0)) = Blue(0) = 0`);
             console.log(`  Actual: ${greenAt1}`);
-            console.log(`  RESULT: ${clampPass ? 'PASS ✓' : 'FAIL ✗'}`);
+            console.log(`  RESULT: ${clampPass ? 'PASS âœ“' : 'FAIL âœ—'}`);
             if (!clampPass) allPassed = false;
 
             // Test 4: Seniority task weight shift - Executive should shift to longer tasks
@@ -2515,7 +2509,7 @@
                              execWeights[1] < baseWeights[1];
             console.log(`  Base weights (Entry): [${baseWeights.map(w => w.toFixed(2)).join(', ')}]`);
             console.log(`  Exec weights: [${execWeights.map(w => w.toFixed(2)).join(', ')}]`);
-            console.log(`  RESULT: ${shiftPass ? 'PASS ✓' : 'FAIL ✗'} (Exec shifts weight to longer tasks)`);
+            console.log(`  RESULT: ${shiftPass ? 'PASS âœ“' : 'FAIL âœ—'} (Exec shifts weight to longer tasks)`);
             if (!shiftPass) allPassed = false;
 
             // Test 5: Doubling dynamics - progress should double in 7 months
@@ -2525,10 +2519,10 @@
             const progress = Math.pow(2, months / D);
             const doublingPass = Math.abs(progress - 2) < 1e-6;
             console.log(`  Progress after 7 months with D=7: ${progress.toFixed(6)}`);
-            console.log(`  RESULT: ${doublingPass ? 'PASS ✓' : 'FAIL ✗'} (should be exactly 2.0)`);
+            console.log(`  RESULT: ${doublingPass ? 'PASS âœ“' : 'FAIL âœ—'} (should be exactly 2.0)`);
             if (!doublingPass) allPassed = false;
 
-            console.log(`\n=== OVERALL: ${allPassed ? 'ALL TESTS PASSED ✓' : 'SOME TESTS FAILED ✗'} ===\n`);
+            console.log(`\n=== OVERALL: ${allPassed ? 'ALL TESTS PASSED âœ“' : 'SOME TESTS FAILED âœ—'} ===\n`);
         }
 
         // WWILMJ PATCH: Regression tests to verify slider direction and weight normalization
@@ -2541,7 +2535,7 @@
             const neutralAnswers = {};
             for (let i = 1; i <= 19; i++) neutralAnswers[`Q${i}`] = 3;
 
-            // Test 1: Q5 direction - moving from 1→5 should INCREASE hazardMult
+            // Test 1: Q5 direction - moving from 1â†’5 should INCREASE hazardMult
             console.log('TEST 1: Q5 direction (decomposability)');
             const q5Low = { ...neutralAnswers, Q5: 1 };  // Very Complex
             const q5High = { ...neutralAnswers, Q5: 5 }; // Highly Structured
@@ -2552,10 +2546,10 @@
             const q5Pass = multQ5High > multQ5Low;
             console.log(`  Q5=1 (complex): hazardMult = ${multQ5Low.toFixed(3)}`);
             console.log(`  Q5=5 (structured): hazardMult = ${multQ5High.toFixed(3)}`);
-            console.log(`  RESULT: ${q5Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should increase hazard)`);
+            console.log(`  RESULT: ${q5Pass ? 'PASS âœ“' : 'FAIL âœ—'} (moving 1â†’5 should increase hazard)`);
             if (!q5Pass) allPassed = false;
 
-            // Test 2: Q11 direction - moving from 1→5 should DECREASE hazardMult
+            // Test 2: Q11 direction - moving from 1â†’5 should DECREASE hazardMult
             console.log('\nTEST 2: Q11 direction (physical presence)');
             const q12Low = { ...neutralAnswers, Q11: 1 };  // None
             const q12High = { ...neutralAnswers, Q11: 5 }; // Essential
@@ -2566,10 +2560,10 @@
             const q12Pass = multQ12High < multQ12Low;
             console.log(`  Q11=1 (none): hazardMult = ${multQ12Low.toFixed(3)}`);
             console.log(`  Q11=5 (essential): hazardMult = ${multQ12High.toFixed(3)}`);
-            console.log(`  RESULT: ${q12Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should decrease hazard)`);
+            console.log(`  RESULT: ${q12Pass ? 'PASS âœ“' : 'FAIL âœ—'} (moving 1â†’5 should decrease hazard)`);
             if (!q12Pass) allPassed = false;
 
-            // Test 3: Q14 direction - moving from 1→5 should INCREASE delayYears
+            // Test 3: Q14 direction - moving from 1â†’5 should INCREASE delayYears
             console.log('\nTEST 3: Q14 direction (labor market tightness)');
             const q16Easy = { ...neutralAnswers, Q14: 1 };       // Very Easy to hire
             const q16Difficult = { ...neutralAnswers, Q14: 5 };  // Very Difficult to hire
@@ -2578,10 +2572,10 @@
             const q16Pass = delayDifficult > delayEasy;
             console.log(`  Q14=1 (easy to hire): delay = ${delayEasy.toFixed(2)} years`);
             console.log(`  Q14=5 (difficult to hire): delay = ${delayDifficult.toFixed(2)} years`);
-            console.log(`  RESULT: ${q16Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should increase delay)`);
+            console.log(`  RESULT: ${q16Pass ? 'PASS âœ“' : 'FAIL âœ—'} (moving 1â†’5 should increase delay)`);
             if (!q16Pass) allPassed = false;
 
-            // Test 4: Calibration - Max(Q1,Q4,Q6)=5 vs all=3 should yield ≥2.5× hazard
+            // Test 4: Calibration - Max(Q1,Q4,Q6)=5 vs all=3 should yield â‰¥2.5Ã— hazard
             console.log('\nTEST 4: High-risk amplifier stack (Q1+Q4+Q6 max)');
             const maxRiskAnswers = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
             const { ampMult: neutralAmp, fricMult: neutralFric } = computeHazardMultipliers(neutralAnswers);
@@ -2592,11 +2586,11 @@
             const calibPass = multRatio >= 2.5;
             console.log(`  Neutral (all 3s): hazardMult = ${neutralMult.toFixed(3)}`);
             console.log(`  Max risk (Q1,Q4,Q6=5): hazardMult = ${maxMult.toFixed(3)}`);
-            console.log(`  Ratio: ${multRatio.toFixed(2)}×`);
-            console.log(`  RESULT: ${calibPass ? 'PASS ✓' : 'FAIL ✗'} (should be ≥2.5×)`);
+            console.log(`  Ratio: ${multRatio.toFixed(2)}Ã—`);
+            console.log(`  RESULT: ${calibPass ? 'PASS âœ“' : 'FAIL âœ—'} (should be â‰¥2.5Ã—)`);
             if (!calibPass) allPassed = false;
 
-            // Test 5: Protective stack - Q7=5, Q9=5, Q11=5, Q14=5 should suppress hazard ≤0.5× AND increase delay ≥0.7y
+            // Test 5: Protective stack - Q7=5, Q9=5, Q11=5, Q14=5 should suppress hazard â‰¤0.5Ã— AND increase delay â‰¥0.7y
             console.log('\nTEST 5: Protective stack (Q7+Q9+Q11 high friction, Q14 high)');
             const protectiveAnswers = { ...neutralAnswers, Q7: 5, Q9: 5, Q11: 5, Q14: 5 };
             const { ampMult: protAmp, fricMult: protFric } = computeHazardMultipliers(protectiveAnswers);
@@ -2606,13 +2600,13 @@
             const protDelay = calculateImplementationDelay(protectiveAnswers, 1);
             const delayIncrease = protDelay - neutralDelay;
             const protPass = protRatio <= 0.5 && delayIncrease >= 0.7;
-            console.log(`  Protective stack: hazardMult = ${protMult.toFixed(3)} (ratio: ${protRatio.toFixed(2)}×)`);
+            console.log(`  Protective stack: hazardMult = ${protMult.toFixed(3)} (ratio: ${protRatio.toFixed(2)}Ã—)`);
             console.log(`  Neutral delay: ${neutralDelay.toFixed(2)}y, Protective delay: ${protDelay.toFixed(2)}y`);
             console.log(`  Delay increase: ${delayIncrease.toFixed(2)}y`);
-            console.log(`  RESULT: ${protPass ? 'PASS ✓' : 'FAIL ✗'} (hazard ≤0.5× AND delay +≥0.7y)`);
+            console.log(`  RESULT: ${protPass ? 'PASS âœ“' : 'FAIL âœ—'} (hazard â‰¤0.5Ã— AND delay +â‰¥0.7y)`);
             if (!protPass) allPassed = false;
 
-            // Test 6: Q1 min→max swing should produce ≥12pp increase in 2030 risk
+            // Test 6: Q1 minâ†’max swing should produce â‰¥12pp increase in 2030 risk
             console.log('\nTEST 6: Q1 swing impact on 2030 risk');
             // Helper to compute risk by 2030
             const computeRisk2030 = (answers) => {
@@ -2641,10 +2635,10 @@
             console.log(`  Q1=1: 2030 risk = ${(riskQ1Min * 100).toFixed(1)}%`);
             console.log(`  Q1=5: 2030 risk = ${(riskQ1Max * 100).toFixed(1)}%`);
             console.log(`  Delta: ${q1Delta.toFixed(1)}pp`);
-            console.log(`  RESULT: ${q1SwingPass ? 'PASS ✓' : 'FAIL ✗'} (should be ≥12pp)`);
+            console.log(`  RESULT: ${q1SwingPass ? 'PASS âœ“' : 'FAIL âœ—'} (should be â‰¥12pp)`);
             if (!q1SwingPass) allPassed = false;
 
-            console.log(`\n=== PATCH TESTS: ${allPassed ? 'ALL PASSED ✓' : 'SOME FAILED ✗'} ===\n`);
+            console.log(`\n=== PATCH TESTS: ${allPassed ? 'ALL PASSED âœ“' : 'SOME FAILED âœ—'} ===\n`);
             return allPassed;
         }
 
@@ -2673,7 +2667,7 @@
 
         // Per-question log-hazard multipliers for TECHNICAL FEASIBILITY (Blue Curve)
         // ONLY factors that determine when AI CAN technically do the job
-        // All sliders: 1→−2, 3→0, 5→+2 (coded uniformly). Direction comes from weight sign.
+        // All sliders: 1â†’âˆ’2, 3â†’0, 5â†’+2 (coded uniformly). Direction comes from weight sign.
         const QUESTION_WEIGHTS = {
             // BLUE: Technical feasibility (amp increases risk, fric protects)
             Q1:  { amp: +0.80 },  // Current AI Performance
@@ -2686,7 +2680,7 @@
             Q8:  { amp: +0.45 },  // Feedback Loop Speed
             Q9:  { fric: -0.40 }, // Tacit Knowledge
             Q10: { fric: -0.45 }, // Human Judgment & Relationships
-            Q11: { fric: -0.60 }, // Physical Presence (FIXED: now fric− channel)
+            Q11: { fric: -0.60 }, // Physical Presence (FIXED: now fricâˆ’ channel)
             // Q12-Q15: Company/Industry context - affects implementation delay only
             // Q16, Q17: Re-employment factors - affects job search success only
             // Q18: Job retention factor - affects implementation delay and re-employment (dual purpose)
@@ -2756,7 +2750,7 @@
                 if (w.fric) sumFric += w.fric * x;
             }
             const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-            sumAmp  = clamp(sumAmp,  -2.0, +2.0);  // ≈ 0.14× .. 7.4×
+            sumAmp  = clamp(sumAmp,  -2.0, +2.0);  // â‰ˆ 0.14Ã— .. 7.4Ã—
             sumFric = clamp(sumFric, -2.0, +2.0);
             return { ampMult: Math.exp(sumAmp), fricMult: Math.exp(sumFric) };
         }
@@ -3064,7 +3058,7 @@
 
         // New logistic gate hazard: lambdaAI(t) = hAI / (1 + exp(-gamma * (A(t) - theta)))
         // No internal time decay (removed e^(-lambda*t))
-        // UPDATED: Now uses seniority-based theta (base θ_0 + thetaLift)
+        // UPDATED: Now uses seniority-based theta (base Î¸_0 + thetaLift)
         function hazardAI(tYears) {
             if (!currentParams) return 0;
 
@@ -3142,20 +3136,20 @@
             const neutralAnswers = {};
             for (let i = 1; i <= 19; i++) neutralAnswers[`Q${i}`] = 3;
 
-            // Test 1: Q1 min->max should increase Risk by 2030 by ≥ +12 percentage points
+            // Test 1: Q1 min->max should increase Risk by 2030 by â‰¥ +12 percentage points
             const q1MinAnswers = { ...neutralAnswers, Q1: 1 };
             const q1MaxAnswers = { ...neutralAnswers, Q1: 5 };
             const riskQ1Min = computeRisk2030(q1MinAnswers);
             const riskQ1Max = computeRisk2030(q1MaxAnswers);
             const q1Delta = (riskQ1Max - riskQ1Min) * 100;
             tests.push({
-                name: 'Q1 min->max increases Risk by 2030 by ≥12pp',
+                name: 'Q1 min->max increases Risk by 2030 by â‰¥12pp',
                 pass: q1Delta >= 12,
                 actual: q1Delta.toFixed(1) + 'pp',
-                expected: '≥12pp'
+                expected: 'â‰¥12pp'
             });
 
-            // Test 2: Q1+Q4+Q6 max yields ≥2.5× hazard vs neutral
+            // Test 2: Q1+Q4+Q6 max yields â‰¥2.5Ã— hazard vs neutral
             const maxRiskAnswers = { ...neutralAnswers, Q1: 5, Q4: 5, Q6: 5 };
             const { ampMult: neutralAmpMult, fricMult: neutralFricMult } = computeHazardMultipliers(neutralAnswers);
             const { ampMult: maxAmpMult, fricMult: maxFricMult } = computeHazardMultipliers(maxRiskAnswers);
@@ -3163,33 +3157,33 @@
             const maxMult = maxAmpMult * maxFricMult;
             const multRatio = maxMult / neutralMult;
             tests.push({
-                name: 'Q1+Q4+Q6 max yields ≥2.5× hazard vs neutral',
+                name: 'Q1+Q4+Q6 max yields â‰¥2.5Ã— hazard vs neutral',
                 pass: multRatio >= 2.5,
-                actual: multRatio.toFixed(2) + '×',
-                expected: '≥2.5×'
+                actual: multRatio.toFixed(2) + 'Ã—',
+                expected: 'â‰¥2.5Ã—'
             });
 
-            // Test 3: Protective stack (Q5+Q7+Q8+Q14 high) suppresses hazard by ≥50%
+            // Test 3: Protective stack (Q5+Q7+Q8+Q14 high) suppresses hazard by â‰¥50%
             const protectiveAnswers = { ...neutralAnswers, Q5: 5, Q7: 5, Q8: 5, Q14: 5 };
             const { ampMult: protAmpMult, fricMult: protFricMult } = computeHazardMultipliers(protectiveAnswers);
             const protMult = protAmpMult * protFricMult;
             const suppression = (1 - protMult / neutralMult) * 100;
             tests.push({
-                name: 'Protective stack suppresses hazard by ≥50%',
+                name: 'Protective stack suppresses hazard by â‰¥50%',
                 pass: suppression >= 50,
                 actual: suppression.toFixed(1) + '%',
-                expected: '≥50%'
+                expected: 'â‰¥50%'
             });
 
             // Log results to console
             console.log('=== CALIBRATION TEST RESULTS ===');
             tests.forEach(t => {
-                const status = t.pass ? '✓ PASS' : '✗ FAIL';
+                const status = t.pass ? 'âœ“ PASS' : 'âœ— FAIL';
                 console.log(`${status} - ${t.name}`);
                 console.log(`  Expected: ${t.expected}, Actual: ${t.actual}`);
             });
             const allPassed = tests.every(t => t.pass);
-            console.log(`\nOverall: ${allPassed ? '✓ ALL TESTS PASSED' : '✗ SOME TESTS FAILED'}`);
+            console.log(`\nOverall: ${allPassed ? 'âœ“ ALL TESTS PASSED' : 'âœ— SOME TESTS FAILED'}`);
 
             return tests;
         }
@@ -3227,7 +3221,7 @@
 
             for (let t = 0; t <= maxYears; t += 0.25) {
                 years.push(t);
-                // Blue curve: Technical feasibility - Risk_tech(t) = 1 - exp(-∫ lambdaAI(u) du)
+                // Blue curve: Technical feasibility - Risk_tech(t) = 1 - exp(-âˆ« lambdaAI(u) du)
                 technicalFeasibility.push(calculateDisplacementProbability(t));
                 // Green curve: Actual job loss - Risk_actual(t) = Risk_tech(max(t - delay, 0))
                 // FIXED: Clamps to 0 to prevent sampling negative time
@@ -3392,7 +3386,7 @@
         document.getElementById('ai-doubling')?.addEventListener('input', function() {
             const value = parseFloat(this.value);
             document.getElementById('ai-doubling-value').textContent = value + ' mo';
-            console.log('[Slider] AI Doubling:', value, 'months → expect', value < 7 ? 'FASTER' : 'SLOWER', 'automation');
+            console.log('[Slider] AI Doubling:', value, 'months â†’ expect', value < 7 ? 'FASTER' : 'SLOWER', 'automation');
             updateChart();
         });
 
@@ -3400,7 +3394,7 @@
             const computeValue = parseFloat(this.value);
             document.getElementById('compute-scaling-value').textContent = computeValue.toFixed(1) + 'x';
             console.log('[Slider] Compute Scaling:', computeValue.toFixed(1) + 'x',
-                       '→ expect', computeValue > 3.4 ? 'FASTER' : 'SLOWER', 'automation');
+                       'â†’ expect', computeValue > 3.4 ? 'FASTER' : 'SLOWER', 'automation');
             updateChart();
         });
 
@@ -3408,7 +3402,7 @@
             const frictionValue = parseFloat(this.value);
             document.getElementById('industry-pace-value').textContent = frictionValue.toFixed(1) + 'x';
             console.log('[Slider] Industry Friction:', frictionValue.toFixed(1) + 'x',
-                       '→ expect', frictionValue > 1.0 ? 'SLOWER' : 'FASTER', 'automation');
+                       'â†’ expect', frictionValue > 1.0 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
         });
 
@@ -3416,7 +3410,7 @@
             const reliabilityValue = parseInt(this.value);
             document.getElementById('ai-reliability-value').textContent = reliabilityValue + '%';
             console.log('[Slider] AI Reliability:', reliabilityValue + '%',
-                       '→ expect', reliabilityValue > 95 ? 'SLOWER' : 'FASTER', 'automation');
+                       'â†’ expect', reliabilityValue > 95 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
         });
 
