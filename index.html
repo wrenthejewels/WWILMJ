@@ -1982,6 +1982,12 @@
                 <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
                 <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
                 <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
+
+                <div class="task-breakdown" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #495057;">Your Task Duration Profile</h4>
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: #6c757d;">Based on your role's seniority, task structure, standardization, and context dependency:</p>
+                    <div id="task-weight-display" style="font-family: monospace; font-size: 12px; line-height: 1.8;"></div>
+                </div>
             </div>
             <section class="ai-equation">
                 <div class="section-intro">
@@ -2145,13 +2151,65 @@
         ];
 
         // Get task weights for a given seniority level (1-5)
-        function getTaskWeightsForSeniority(level) {
-            const baseWeights = METR_DEFAULTS.taskBuckets.map(b => b.w);
-            const idx = Math.max(0, Math.min(SENIORITY_TASK_SHIFTS.length - 1, level - 1));
-            const shift = SENIORITY_TASK_SHIFTS[idx];
-            const adjusted = baseWeights.map((w, i) => w + shift[i]);
-            const sum = adjusted.reduce((a, b) => a + b, 0);
-            return adjusted.map(w => w / sum);  // Normalize
+        // UPDATED: Now uses smart inference from Q5, Q6, Q7 + seniority to personalize task duration distribution
+        function getTaskWeightsForSeniority(level, answers = null) {
+            // Baseline weights: [<5min, 5-15min, 15-60min, 1-3hr, >3hr]
+            let weights = [0.25, 0.35, 0.25, 0.10, 0.05];
+
+            // 1. SENIORITY SHIFT: Entry → more short tasks; Executive → more long tasks
+            // Reasoning: Junior roles do more tactical execution (quick tasks)
+            //            Senior roles do more strategy & integration (long tasks)
+            const seniorityShift = (level - 1) / 4;  // 0.0 (entry) to 1.0 (exec)
+            weights[0] -= 0.15 * seniorityShift;  // Reduce <5min
+            weights[1] -= 0.15 * seniorityShift;  // Reduce 5-15min
+            weights[2] += 0.05 * seniorityShift;  // Slight increase 15-60min
+            weights[3] += 0.15 * seniorityShift;  // Increase 1-3hr
+            weights[4] += 0.10 * seniorityShift;  // Increase >3hr
+
+            // If no answers provided, return seniority-only adjustment
+            if (!answers) {
+                weights = weights.map(w => Math.max(0.01, w));
+                const sum = weights.reduce((a, b) => a + b, 0);
+                return weights.map(w => w / sum);
+            }
+
+            // 2. TASK DECOMPOSABILITY (Q5): Structured → more short; Complex → more long
+            // Q5: 1=Very Complex (integrated work) → 5=Highly Structured (discrete tasks)
+            // Reasoning: Structured work breaks into many short tasks
+            //            Complex work requires longer integrated effort
+            const q5 = answers.Q5 || 3;
+            const structureShift = (q5 - 3) / 2;  // -1.0 to +1.0
+            weights[0] += 0.10 * structureShift;   // Structured → more <5min
+            weights[1] += 0.08 * structureShift;   // Structured → more 5-15min
+            weights[3] -= 0.10 * structureShift;   // Complex → more 1-3hr
+            weights[4] -= 0.08 * structureShift;   // Complex → more >3hr
+
+            // 3. TASK STANDARDIZATION (Q6): Affects distribution shape
+            // Q6: 1=Highly Variable → 5=Highly Standardized
+            // Reasoning: Standardized → tasks have similar durations (concentrate in middle)
+            //            Variable → wide range of durations (spread out)
+            const q6 = answers.Q6 || 3;
+            const stdShift = (q6 - 3) / 2;  // -1.0 to +1.0
+            weights[1] += 0.08 * stdShift;   // Standardized → more short tasks
+            weights[2] += 0.06 * stdShift;   // Standardized → more medium tasks
+            weights[0] -= 0.08 * stdShift;   // Variable → more variety in quick
+            weights[4] -= 0.06 * stdShift;   // Variable → less very long
+
+            // 4. CONTEXT DEPENDENCY (Q7): High context → longer integrated tasks
+            // Q7: 1=Minimal → 5=Critical
+            // Reasoning: High-context work requires understanding complex situations
+            //            Takes longer per task (fewer quick wins)
+            const q7 = answers.Q7 || 3;
+            const contextShift = (q7 - 3) / 2;  // -1.0 to +1.0
+            weights[0] -= 0.08 * contextShift;  // High context → fewer <5min
+            weights[1] -= 0.06 * contextShift;  // High context → fewer 5-15min
+            weights[3] += 0.08 * contextShift;  // High context → more 1-3hr
+            weights[4] += 0.06 * contextShift;  // High context → more >3hr
+
+            // Ensure all weights are positive and normalize to sum to 1.0
+            weights = weights.map(w => Math.max(0.01, w));
+            const sum = weights.reduce((a, b) => a + b, 0);
+            return weights.map(w => w / sum);
         }
 
         // Get softness parameter for a given seniority level
@@ -2361,14 +2419,17 @@
 
         // AI Readiness: A(t) = Σ w_i * G(H_r(t), L_i, s)
         // Returns value in [0, 1] representing fraction of job tasks AI can perform
-        // UPDATED: Now uses seniority-based task weights and softness
+        // UPDATED: Now uses smart inference from Q5, Q6, Q7 + seniority to personalize task weights
         function A_job(tYears) {
             const H = H_r(tYears);
             const buckets = METR_DEFAULTS.taskBuckets;
 
-            // Get seniority level from currentParams (default to entry level)
+            // Get seniority level and answers from currentParams
             const seniorityLevel = (currentParams && currentParams.seniority) || 1;
-            const weights = getTaskWeightsForSeniority(seniorityLevel);
+            const answers = currentParams && currentParams.answers ? currentParams.answers : null;
+
+            // Get personalized task weights based on role characteristics
+            const weights = getTaskWeightsForSeniority(seniorityLevel, answers);
             const s = getSoftnessForSeniority(seniorityLevel);
 
             let readiness = 0;
@@ -3174,6 +3235,33 @@
             return tests;
         }
 
+        function displayTaskWeights() {
+            const displayEl = document.getElementById('task-weight-display');
+            if (!displayEl) return;
+
+            const seniorityLevel = (currentParams && currentParams.seniority) || 1;
+            const answers = currentParams && currentParams.answers ? currentParams.answers : null;
+            const weights = getTaskWeightsForSeniority(seniorityLevel, answers);
+
+            const bucketLabels = [
+                'Quick tasks (<5 min):     ',
+                'Short tasks (5-15 min):   ',
+                'Medium tasks (15-60 min): ',
+                'Long tasks (1-3 hr):      ',
+                'Very long tasks (>3 hr):  '
+            ];
+
+            let html = '';
+            weights.forEach((w, i) => {
+                const pct = Math.round(w * 100);
+                const barLength = Math.round(pct / 2);  // Scale to ~50 char max
+                const bar = '█'.repeat(barLength);
+                html += `<div style="margin-bottom: 4px;">${bucketLabels[i]} <span style="color: #0066cc;">${pct}%</span> ${bar}</div>`;
+            });
+
+            displayEl.innerHTML = html;
+        }
+
         function calculateDisplacementProbability(t) {
             const n = 100;
             const dt = t / n;
@@ -3364,6 +3452,9 @@
             document.getElementById('insight-friction').textContent = describeFriction(currentParams.lambda);
             document.getElementById('insight-alignment').textContent =
                 describeAlignment(currentParams.domainAlignment, currentParams.domainPenalty);
+
+            // Display task weight breakdown
+            displayTaskWeights();
 
             // Update personal timeline table
             updatePersonalTimeline();
