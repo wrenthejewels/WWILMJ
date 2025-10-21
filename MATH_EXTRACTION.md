@@ -44,9 +44,10 @@ Decelerators: Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q11: -0.15
 
 θ (Coverage Threshold):
 ```
-θ = θ_base + thetaLift + alignmentShift + explicitnessShift
+θ = θ_base + thetaLift + alignmentShift + explicitnessShift - feasibilityBonus
 alignmentShift = 0.12 × (0.5 - domainAlignment)
 explicitnessShift = 0.10 × (0.5 - s_e)
+feasibilityBonus = 0.05×(norm(Q2)-0.5) + 0.04×(norm(Q6)-0.5) + 0.03×(norm(Q8)-0.5)
 θ = clamp(θ, 0.35, 0.72)
 
 Where:
@@ -54,6 +55,9 @@ Where:
 - thetaLift from seniority profile (see section 8)
 - domainAlignment ∈ [0, 1] from domain mismatch calculation
 - s_e = explicitness score from questions
+- feasibilityBonus: Data-rich (Q2), standardized (Q6), fast-feedback (Q8) jobs
+  can be automated at LOWER AI capability (lower θ means easier to automate)
+- Negative bonus (subtracts from θ) = easier automation at lower capability
 ```
 
 ---
@@ -97,13 +101,16 @@ Lower p_domain (closer to 0.5) means AI is highly capable for this domain (less 
 
 **Effective Doubling Time:**
 ```
-D_eff = D_base × computeFriction × industryFriction
+D_eff = D_base × domainFriction
 ```
 
 Where:
-- **computeFriction** = resolvedComputeMultiplier() (slider value, default 1.0)
-- **industryFriction** = resolvedDomainPace() (slider value, default 1.0)
-- Higher friction → longer doubling time → slower automation
+- **D_base** = 7 months (METR baseline - observed frontier capability growth)
+- **domainFriction** ∈ [1.0, 2.0] (domain-specific barriers)
+  - Floor at 1.0: Cannot be faster than METR's observed frontier
+  - Ceiling at 2.0: Maximum 2× slower for highly mismatched domains
+- **domainFriction** = inferredDomainFriction(Q7, Q9, Q10, Q11) × slider
+- Higher friction → longer doubling time → slower capability transfer to this domain
 
 **Reliability Factor (Logistic Calibration):**
 ```
@@ -156,17 +163,67 @@ A(t) = Σ w_i · G(H_r(t), L_i, s)
 
 Subject to: Σ w_i = 1.0
 
-**Default Task Buckets:**
+**Task Bucket Thresholds (Fixed):**
 
-| Bucket | L_i (min) | w_i (weight) | Task Type |
-|--------|-----------|--------------|-----------|
-| 1 | 2.5 | 0.25 | <5 min (quick tasks) |
-| 2 | 10.0 | 0.35 | 5-15 min (short tasks) |
-| 3 | 37.5 | 0.25 | 15-60 min (medium tasks) |
-| 4 | 120.0 | 0.10 | 1-3 hr (long tasks) |
-| 5 | 360.0 | 0.05 | >3 hr (very long tasks) |
+| Bucket | L_i (min) | Task Type |
+|--------|-----------|-----------|
+| 1 | 2.5 | <5 min (quick tasks) |
+| 2 | 10.0 | 5-15 min (short tasks) |
+| 3 | 37.5 | 15-60 min (medium tasks) |
+| 4 | 120.0 | 1-3 hr (long tasks) |
+| 5 | 360.0 | >3 hr (very long tasks) |
 
-**Key Property:** A(t) ∈ [0, 1] represents fraction of job tasks AI can perform
+**Personalized Task Weights (w_i):**
+
+The weights are **dynamically calculated** based on seniority and answers to Q5, Q6, Q7:
+
+```
+Baseline weights: [0.25, 0.35, 0.25, 0.10, 0.05]
+
+1. Seniority shift (entry → exec):
+   seniorityShift = (level - 1) / 4
+   w[0] -= 0.15 × seniorityShift  (reduce <5min)
+   w[1] -= 0.15 × seniorityShift  (reduce 5-15min)
+   w[2] += 0.05 × seniorityShift  (increase 15-60min)
+   w[3] += 0.15 × seniorityShift  (increase 1-3hr)
+   w[4] += 0.10 × seniorityShift  (increase >3hr)
+
+2. Task Decomposability (Q5: 1=complex → 5=structured):
+   structureShift = (Q5 - 3) / 2
+   w[0] += 0.10 × structureShift  (structured → more quick)
+   w[1] += 0.08 × structureShift  (structured → more short)
+   w[3] -= 0.10 × structureShift  (complex → more long)
+   w[4] -= 0.08 × structureShift  (complex → more very long)
+
+3. Task Standardization (Q6: 1=variable → 5=standardized):
+   stdShift = (Q6 - 3) / 2
+   w[1] += 0.08 × stdShift   (standardized → more short)
+   w[2] += 0.06 × stdShift   (standardized → more medium)
+   w[0] -= 0.08 × stdShift   (variable → more quick)
+   w[4] -= 0.06 × stdShift   (variable → less very long)
+
+4. Context Dependency (Q7: 1=minimal → 5=critical):
+   contextShift = (Q7 - 3) / 2
+   w[0] -= 0.08 × contextShift  (high context → fewer quick)
+   w[1] -= 0.06 × contextShift  (high context → fewer short)
+   w[3] += 0.08 × contextShift  (high context → more long)
+   w[4] += 0.06 × contextShift  (high context → more very long)
+
+5. Normalize:
+   w_i = max(0.01, w_i)  (ensure positive)
+   w_i = w_i / Σw_i      (ensure sum to 1.0)
+```
+
+**Examples:**
+- **Entry-level customer service** (seniority=1, Q5=5, Q6=5, Q7=1):
+  - Weights: [0.40, 0.35, 0.20, 0.04, 0.01]
+  - Most work is quick/short tasks → automates faster
+
+- **Senior software architect** (seniority=4, Q5=2, Q6=2, Q7=4):
+  - Weights: [0.12, 0.24, 0.28, 0.24, 0.12]
+  - More medium/long tasks → automates slower
+
+**Key Property:** A(t) ∈ [0, 1] represents fraction of job tasks AI can perform. Jobs with more long-duration tasks require higher H_r(t) before A(t) crosses automation threshold θ.
 
 ---
 

@@ -1913,21 +1913,11 @@
                         <span class="value-display" id="ai-doubling-value">7 mo</span>
                     </div>
                 </div>
-                
                 <div class="control-group">
-                    <h3>Compute Scaling</h3>
-                    <p>Annual compute growth</p>
+                    <h3>Domain Friction</h3>
+                    <p>Industry-specific barriers that slow AI capability transfer (≥1.0× METR baseline)</p>
                     <div class="slider-container">
-                        <input type="range" id="compute-scaling" min="1.5" max="5" step="0.1" value="3.4">
-                        <span class="value-display" id="compute-scaling-value">3.4x</span>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <h3>Industry Friction</h3>
-                    <p>More friction → slower adoption → later automation</p>
-                    <div class="slider-container">
-                        <input type="range" id="industry-pace" min="0.5" max="2" step="0.1" value="1">
+                        <input type="range" id="industry-pace" min="1" max="2" step="0.1" value="1">
                         <span class="value-display" id="industry-pace-value">1.0x</span>
                     </div>
                 </div>
@@ -2138,7 +2128,6 @@
 
         const baseDoublingMonths = 7;
         const deltaTacit = 0.07;
-        const computeSliderBaseline = 3.4;
         const domainPaceSliderBaseline = 1.0;
 
         // METR-based capability model parameters
@@ -2297,64 +2286,43 @@
             return clamp(lam, 0.005, 0.05);
         }
 
-        function inferredPace(answers) {
-            // Map questionnaire responses into a METR pace multiplier.
+        function inferredDomainFriction(answers) {
+            // Calculate domain-specific friction that slows AI capability transfer
+            // Only adds friction (≥1.0) - cannot make automation faster than METR baseline
             const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
             const normDiff = (key) => norm(get(key)) - 0.5;
 
-            let pace = 1.0;
+            let friction = 1.0;  // Start at METR baseline (no friction)
 
-            const acceleratorWeights = {
-                Q2: 0.20,   // Data availability accelerates when high
-                Q6: 0.10,   // Standardized workflows accelerate automation
-                Q8: 0.10,   // Fast feedback loops accelerate iteration
-                Q12: 0.15,  // Company adoption culture accelerates
-                Q15: 0.15   // Strong IT infrastructure accelerates
-            };
-
+            // ONLY friction factors - these slow down capability transfer to specific domains
             const frictionWeights = {
-                Q7: 0.18,   // Context dependence slows automation when high
-                Q9: 0.20,   // Tacit knowledge slows transfer
-                Q10: 0.24,  // Relationship-heavy work slows automation
-                Q11: 0.28   // Physical presence needs slow automation
+                Q7: 0.18,   // Context dependence - harder to transfer capability
+                Q9: 0.20,   // Tacit knowledge - harder to codify and automate
+                Q10: 0.24,  // Relationship-heavy work - requires human interaction
+                Q11: 0.28   // Physical presence - requires robotics advancement
             };
 
-            for (const [key, weight] of Object.entries(acceleratorWeights)) {
-                pace -= weight * normDiff(key);
-            }
-
+            // Only ADD friction (never subtract)
             for (const [key, weight] of Object.entries(frictionWeights)) {
-                pace += weight * normDiff(key);
+                friction += weight * normDiff(key);
             }
 
-            return clamp(pace, 0.5, 2.0);
-        }
-
-        function resolvedComputeMultiplier() {
-            const slider = document.getElementById('compute-scaling');
-            // Slider represents annual compute growth (1.5 to 5, default 3.4)
-            // Higher value = faster compute growth = faster AI progress
-            const sliderValue = slider ? parseFloat(slider.value) : computeSliderBaseline;
-            // Invert: higher compute growth should DIVIDE doubling time (faster progress)
-            // Formula: baseline / sliderValue ensures default (3.4) returns 1.0
-            const inverted = computeSliderBaseline / sliderValue;
-            const base = currentParams && typeof currentParams.computeMultiplier === 'number'
-                ? currentParams.computeMultiplier
-                : 1.0;
-            return base * inverted;
+            // Floor at 1.0 (METR baseline), ceiling at 2.0 (2× slower)
+            return clamp(friction, 1.0, 2.0);
         }
 
         function resolvedDomainPace() {
             const slider = document.getElementById('industry-pace');
-            // Slider now represents friction (0.5 to 2.0, default 1.0)
-            // Higher friction = slower automation
+            // Slider represents domain friction (1.0 to 2.0, default 1.0)
+            // Higher friction = slower capability transfer to this domain
             const frictionValue = slider ? parseFloat(slider.value) : domainPaceSliderBaseline;
             const normalized = frictionValue / domainPaceSliderBaseline;
             const base = currentParams && typeof currentParams.domainPace === 'number'
                 ? currentParams.domainPace
                 : 1.0;
             const combined = base * normalized;
-            return clamp(combined, 0.4, 3.0);
+            // Floor at 1.0 (METR baseline) - cannot go faster than frontier
+            return clamp(combined, 1.0, 2.0);
         }
 
         function resolvedReliabilityTarget() {
@@ -2404,17 +2372,17 @@
         // Lower reliability requirement → smaller f(r) → higher H → can automate longer tasks
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = null) {
             const D_months = resolvedBaseDoublingMonths();
-            const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
-            const industryFriction = resolvedDomainPace();  // Now represents friction
+            const domainFriction = resolvedDomainPace();  // Domain-specific friction (≥1.0)
             const reliability = r !== null ? r : resolvedReliabilityTarget(); // Use slider if r not provided
 
-            // Effective doubling time: MULTIPLY by frictions (higher friction → longer doubling → slower automation)
-            const D_eff = D_months * computeFriction * industryFriction;
+            // Effective doubling time: D_eff = METR baseline × domain friction
+            // Domain friction ≥ 1.0 always (cannot be faster than METR's observed frontier)
+            const D_eff = D_months * domainFriction;
 
             // Debug logging (only log occasionally to avoid spam)
             if (tYears === 0 && Math.random() < 0.1) {
-                console.log('[H_r] D_months:', D_months, 'computeFriction:', computeFriction.toFixed(2),
-                           'industryFriction:', industryFriction.toFixed(2), '→ D_eff:', D_eff.toFixed(2), 'months',
+                console.log('[H_r] D_months:', D_months, 'domainFriction:', domainFriction.toFixed(2),
+                           '→ D_eff:', D_eff.toFixed(2), 'months',
                            'reliability:', (reliability * 100).toFixed(0) + '%');
             }
 
@@ -2699,7 +2667,7 @@
                     h0: 0.015, theta: 0.50, gamma: 1.2, kappa: 0.3, friction: 3.0,
                     seniority: 1, seniorityProfile: SENIORITY_PROFILES[0],
                     s_e: inferredExplicitness(answers), lambda: inferredFrictionDecay(answers),
-                    domainPace: inferredPace(answers), computeMultiplier: 1.0,
+                    domainPace: inferredDomainFriction(answers),
                     doublingMonths: baseDoublingMonths, ampMult: ampMult, fricMult: fricMult,
                     domainPenalty: mismatch.penalty, domainAlignment: mismatch.alignment,
                     answers: answers, implementationDelay: 0
@@ -2949,7 +2917,7 @@
 
             const s_e = inferredExplicitness(answers);
             const lambda = inferredFrictionDecay(answers);
-            const domainPace = inferredPace(answers);
+            const domainPace = inferredDomainFriction(answers);
             const { penalty: domainPenalty, alignment: domainAlignment } = computeDomainMismatch(answers);
             const doublingMonths = parseFloat(document.getElementById('ai-doubling').value) || baseDoublingMonths;
 
@@ -2957,7 +2925,16 @@
             const thetaProfileBase = thetaBase + (seniorityProfile.thetaLift || 0);
             const alignmentShift = 0.12 * (0.5 - domainAlignment);
             const explicitnessShift = 0.10 * (0.5 - s_e);
-            const thetaCandidate = thetaProfileBase + alignmentShift + explicitnessShift;
+
+            // Feasibility adjustment: data-rich, standardized, fast-feedback jobs can be automated
+            // at lower AI capability levels (lower theta = easier to automate)
+            const get = (key) => (answers && typeof answers[key] === 'number') ? answers[key] : 3;
+            const feasibilityBonus =
+                0.05 * (norm(get('Q2')) - 0.5) +   // Data availability - more data = clearer automation path
+                0.04 * (norm(get('Q6')) - 0.5) +   // Standardization - clearer success criteria
+                0.03 * (norm(get('Q8')) - 0.5);    // Fast feedback - easier to validate AI performance
+
+            const thetaCandidate = thetaProfileBase + alignmentShift + explicitnessShift - feasibilityBonus;
             const thetaEffective = clamp(thetaCandidate, 0.35, 0.72);
 
             // Apply optional timing shift (capability gate steepness adjustment)
@@ -2982,7 +2959,6 @@
                 domainPace: domainPace,
                 domainPenalty: domainPenalty,
                 domainAlignment: domainAlignment,
-                computeMultiplier: 1.0,
                 doublingMonths: Math.max(2, Math.min(24, doublingMonths)),
                 aiReadiness: aiReadiness,
                 taskAdapt: taskAdapt,
@@ -3196,8 +3172,7 @@
                     seniority: 1,
                     s_e: inferredExplicitness(answers),
                     lambda: inferredFrictionDecay(answers),
-                    domainPace: inferredPace(answers),
-                    computeMultiplier: 1.0,
+                    domainPace: inferredDomainFriction(answers),
                     doublingMonths: baseDoublingMonths,
                     ampMult: ampMult,
                     fricMult: fricMult,
@@ -3399,16 +3374,19 @@
 
         function describePace(pace) {
             if (typeof pace !== 'number' || !Number.isFinite(pace)) return '-';
+
+            // Pace should always be ≥ 1.0 (METR is the floor - frontier capability growth)
+            if (pace < 1.0) {
+                console.warn('[describePace] Unexpected pace < 1.0:', pace, '(METR baseline is the minimum)');
+            }
+
             const multiplier = pace.toFixed(2);
             const effectiveMonths = (7 * pace).toFixed(1);
 
             if (pace > 1.05) {
-                return `${effectiveMonths} months (${multiplier}× METR baseline) - slower progress due to industry/domain friction.`;
+                return `${effectiveMonths} months (${multiplier}× METR baseline) - domain friction slows capability transfer.`;
             }
-            if (pace < 0.95) {
-                return `${effectiveMonths} months (${multiplier}× METR baseline) - faster progress than baseline.`;
-            }
-            return `${effectiveMonths} months (${multiplier}× METR baseline) - close to baseline.`;
+            return `${effectiveMonths} months - at METR baseline (minimal domain friction).`;
         }
 
         function describeFriction(lambda) {
@@ -3496,14 +3474,6 @@
             const value = parseFloat(this.value);
             document.getElementById('ai-doubling-value').textContent = value + ' mo';
             console.log('[Slider] AI Doubling:', value, 'months → expect', value < 7 ? 'FASTER' : 'SLOWER', 'automation');
-            updateChart();
-        });
-
-        document.getElementById('compute-scaling')?.addEventListener('input', function() {
-            const computeValue = parseFloat(this.value);
-            document.getElementById('compute-scaling-value').textContent = computeValue.toFixed(1) + 'x';
-            console.log('[Slider] Compute Scaling:', computeValue.toFixed(1) + 'x',
-                       '→ expect', computeValue > 3.4 ? 'FASTER' : 'SLOWER', 'automation');
             updateChart();
         });
 
