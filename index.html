@@ -1905,26 +1905,8 @@
             
             <div class="controls-grid">
                 <div class="control-group">
-                    <h3>AI Progress Speed</h3>
-                    <p>Capability doubling time (METR trendline: 7 months)</p>
-                    <div class="slider-container">
-                        <input type="range" id="ai-doubling" min="2" max="24" step="1" value="7">
-                        <span class="value-display" id="ai-doubling-value">7 mo</span>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <h3>Compute Scaling</h3>
-                    <p>Annual compute growth</p>
-                    <div class="slider-container">
-                        <input type="range" id="compute-scaling" min="1.5" max="5" step="0.1" value="3.4">
-                        <span class="value-display" id="compute-scaling-value">3.4x</span>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <h3>Industry Friction</h3>
-                    <p>More friction → slower adoption → later automation</p>
+                    <h3>Industry-Specific Friction</h3>
+                    <p>Capability penalty for this industry (does NOT affect METR doubling)</p>
                     <div class="slider-container">
                         <input type="range" id="industry-pace" min="0.5" max="2" step="0.1" value="1">
                         <span class="value-display" id="industry-pace-value">1.0x</span>
@@ -1978,7 +1960,6 @@
             <div class="model-insights">
                 <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
                 <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
-                <p><strong>Pace vs METR:</strong> <span id="insight-pace">-</span></p>
                 <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
                 <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
             </div>
@@ -2103,7 +2084,6 @@
 
         const baseDoublingMonths = 7;
         const deltaTacit = 0.07;
-        const computeSliderBaseline = 3.4;
         const domainPaceSliderBaseline = 1.0;
 
         // METR-based capability model parameters
@@ -2315,20 +2295,6 @@
             return clamp(pace, 0.5, 2.0);
         }
 
-        function resolvedComputeMultiplier() {
-            const slider = document.getElementById('compute-scaling');
-            // Slider represents annual compute growth (1.5 to 5, default 3.4)
-            // Higher value = faster compute growth = faster AI progress
-            const sliderValue = slider ? parseFloat(slider.value) : computeSliderBaseline;
-            // Invert: higher compute growth should DIVIDE doubling time (faster progress)
-            // Formula: baseline / sliderValue ensures default (3.4) returns 1.0
-            const inverted = computeSliderBaseline / sliderValue;
-            const base = currentParams && typeof currentParams.computeMultiplier === 'number'
-                ? currentParams.computeMultiplier
-                : 1.0;
-            return base * inverted;
-        }
-
         function resolvedDomainPace() {
             const slider = document.getElementById('industry-pace');
             // Slider now represents friction (0.5 to 2.0, default 1.0)
@@ -2352,17 +2318,8 @@
         }
 
         function resolvedBaseDoublingMonths() {
-            const slider = document.getElementById('ai-doubling');
-            if (slider) {
-                const raw = parseFloat(slider.value);
-                if (!Number.isNaN(raw)) {
-                    return raw;
-                }
-            }
-            if (currentParams && typeof currentParams.doublingMonths === 'number') {
-                return currentParams.doublingMonths;
-            }
-            return baseDoublingMonths;
+            // METR doubling is FIXED at 7 months - never modified by sliders or questions
+            return METR_DEFAULTS.D_months;
         }
 
         // METR-based capability functions
@@ -2388,31 +2345,23 @@
         // Higher reliability requirement → larger f(r) → lower H → can only automate shorter tasks
         // Lower reliability requirement → smaller f(r) → higher H → can automate longer tasks
         function H_r(tYears, H50_0 = METR_DEFAULTS.H50_0, r = null) {
-            const D_months = resolvedBaseDoublingMonths();
-            const computeFriction = resolvedComputeMultiplier();  // Now represents friction/barriers
-            const industryFriction = resolvedDomainPace();  // Now represents friction
-            const reliability = r !== null ? r : resolvedReliabilityTarget(); // Use slider if r not provided
-
-            // Effective doubling time: MULTIPLY by frictions (higher friction → longer doubling → slower automation)
-            const D_eff = D_months * computeFriction * industryFriction;
-
-            // Debug logging (only log occasionally to avoid spam)
-            if (tYears === 0 && Math.random() < 0.1) {
-                console.log('[H_r] D_months:', D_months, 'computeFriction:', computeFriction.toFixed(2),
-                           'industryFriction:', industryFriction.toFixed(2), '→ D_eff:', D_eff.toFixed(2), 'months',
-                           'reliability:', (reliability * 100).toFixed(0) + '%');
-            }
+            // METR doubling time is FIXED - never modified
+            const D_months = METR_DEFAULTS.D_months;  // Always 7 months
+            const reliability = r !== null ? r : resolvedReliabilityTarget();
 
             const monthsElapsed = tYears * 12;
-            const progress = Math.pow(2, monthsElapsed / D_eff);
+            const progress = Math.pow(2, monthsElapsed / D_months);
             const f_r = reliabilityFactor(reliability);
 
-            // Note: Higher H means better AI (can handle longer human-equivalent tasks)
-            // Domain penalty > 1 decreases H (makes AI relatively worse for domain-mismatched roles)
-            const domainPenalty = currentParams && typeof currentParams.domainPenalty === 'number'
+            // Industry friction affects CAPABILITY (via domainPenalty), NOT doubling time
+            // domainPenalty > 1 decreases H (makes AI relatively worse for domain-mismatched roles)
+            // industryFriction from slider multiplies the penalty
+            const industryFriction = resolvedDomainPace();  // From slider
+            const rolePenalty = currentParams && typeof currentParams.domainPenalty === 'number'
                 ? currentParams.domainPenalty
                 : 1.0;
-            const baselineMinutes = H50_0 / domainPenalty;  // Domain mismatch reduces effective capability
+            const totalPenalty = rolePenalty * industryFriction;  // Both layers multiply
+            const baselineMinutes = H50_0 / totalPenalty;  // Friction reduces effective capability
 
             // FIXED: Multiply by progress, divide by f_r
             // - progress increases H over time (AI tackles harder tasks)
@@ -2681,8 +2630,8 @@
                     h0: 0.015, theta: 0.50, gamma: 1.2, kappa: 0.3, friction: 3.0,
                     seniority: 1, seniorityProfile: SENIORITY_PROFILES[0],
                     s_e: inferredExplicitness(answers), lambda: inferredFrictionDecay(answers),
-                    domainPace: inferredPace(answers), computeMultiplier: 1.0,
-                    doublingMonths: baseDoublingMonths, ampMult: ampMult, fricMult: fricMult,
+                    domainPace: inferredPace(answers),
+                    ampMult: ampMult, fricMult: fricMult,
                     domainPenalty: mismatch.penalty, domainAlignment: mismatch.alignment,
                     answers: answers, implementationDelay: 0
                 };
@@ -2933,7 +2882,6 @@
             const lambda = inferredFrictionDecay(answers);
             const domainPace = inferredPace(answers);
             const { penalty: domainPenalty, alignment: domainAlignment } = computeDomainMismatch(answers);
-            const doublingMonths = parseFloat(document.getElementById('ai-doubling').value) || baseDoublingMonths;
 
             const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
             const thetaProfileBase = thetaBase + (seniorityProfile.thetaLift || 0);
@@ -2964,8 +2912,6 @@
                 domainPace: domainPace,
                 domainPenalty: domainPenalty,
                 domainAlignment: domainAlignment,
-                computeMultiplier: 1.0,
-                doublingMonths: Math.max(2, Math.min(24, doublingMonths)),
                 aiReadiness: aiReadiness,
                 taskAdapt: taskAdapt,
                 friction_score: friction,
@@ -3179,8 +3125,6 @@
                     s_e: inferredExplicitness(answers),
                     lambda: inferredFrictionDecay(answers),
                     domainPace: inferredPace(answers),
-                    computeMultiplier: 1.0,
-                    doublingMonths: baseDoublingMonths,
                     ampMult: ampMult,
                     fricMult: fricMult,
                     domainPenalty: mismatch.penalty,
@@ -3437,8 +3381,6 @@
 
             document.getElementById('insight-explicitness').textContent = describeExplicitness(currentParams.s_e);
             document.getElementById('insight-theta').textContent = describeTheta(currentParams.theta, currentParams.seniority);
-            const paceForDisplay = resolvedDomainPace();
-            document.getElementById('insight-pace').textContent = describePace(paceForDisplay);
             document.getElementById('insight-friction').textContent = describeFriction(currentParams.lambda);
             document.getElementById('insight-alignment').textContent =
                 describeAlignment(currentParams.domainAlignment, currentParams.domainPenalty);
