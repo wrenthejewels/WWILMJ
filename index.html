@@ -1960,7 +1960,13 @@
                     </h4>
                     <div id="task-bucket-editor" class="additional-questions" style="margin-top:10px;">
                         <div style="background:#fff; border:1px solid #e6e0d4; border-radius:12px; padding:16px;">
-                            <p style="margin-bottom:10px; color:#495057; font-size:0.9rem;">Adjust your job’s baseline time split across task duration buckets. Values are percentages and will be normalized.</p>
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;">
+                                <p style="margin:0; color:#495057; font-size:0.9rem;">Adjust your job’s baseline time split across task duration buckets. Values are percentages and will be normalized.</p>
+                                <label style="display:flex; align-items:center; gap:8px; color:#495057; font-size:0.9rem;">
+                                    <input type="checkbox" id="tb-auto" checked>
+                                    <span>Follow model (auto)</span>
+                                </label>
+                            </div>
                             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
                                 <label style="display:flex; flex-direction:column; gap:6px;">
                                     <span style="font-weight:600; color:#2a5298;">Under 5 min (L=2.5)</span>
@@ -2793,6 +2799,8 @@
 
                 updateSlidersFromPreset();
                 analyzeRole();
+                // Refresh bucket editor for new role context
+                try { initTaskBucketEditor(); } catch (e) {}
             });
         });
 
@@ -2804,6 +2812,7 @@
                     updateSlidersFromPreset();
                 }
                 analyzeRole();
+                try { initTaskBucketEditor(); } catch (e) {}
             });
         });
 
@@ -3606,12 +3615,11 @@
             const sumEl = document.getElementById('tb-sum');
             const resetBtn = document.getElementById('tb-reset');
             const applyBtn = document.getElementById('tb-apply');
+            const autoChk = document.getElementById('tb-auto');
 
             // Prefill from current base weights
-            const base = getBaseTaskWeights();
             const toPct = (x) => Math.max(0, Math.min(100, Math.round(x * 100)));
-            inputs.forEach((inp, i) => { inp.value = toPct(base[i] || 0); });
-            updateSum();
+            function setInputsFromArray(arr){ inputs.forEach((inp, i) => { inp.value = toPct(arr[i] || 0); }); }
 
             function updateSum() {
                 const total = inputs.reduce((s, inp) => s + (parseFloat(inp.value) || 0), 0);
@@ -3623,11 +3631,12 @@
 
             btn.onclick = () => {
                 panel.classList.toggle('expanded');
+                refreshTaskBucketEditor();
             };
 
             resetBtn && (resetBtn.onclick = () => {
                 const defaults = METR_DEFAULTS.taskBuckets.map(b => b.w);
-                inputs.forEach((inp, i) => inp.value = toPct(defaults[i] || 0));
+                setInputsFromArray(defaults);
                 updateSum();
             });
 
@@ -3644,6 +3653,34 @@
                 console.log('[TaskBuckets] Applied user base weights:', normalized.map(v=>v.toFixed(3)));
                 updateChart();
             });
+
+            function refreshTaskBucketEditor(){
+                if (!currentParams) return;
+                const mode = currentParams.taskBucketMode === 'custom' ? 'custom' : 'auto';
+                if (autoChk) autoChk.checked = (mode === 'auto');
+                const disable = (mode === 'auto');
+                inputs.forEach(inp => inp.disabled = disable);
+                resetBtn && (resetBtn.disabled = disable);
+                applyBtn && (applyBtn.disabled = disable);
+                if (mode === 'auto') {
+                    const eff = getTaskWeightsForSeniority(currentParams.seniority || 1, currentParams.answers || null);
+                    setInputsFromArray(eff);
+                    updateSum();
+                } else {
+                    const base = getBaseTaskWeights();
+                    setInputsFromArray(base);
+                    updateSum();
+                }
+            }
+
+            autoChk && (autoChk.onchange = () => {
+                if (!currentParams) return;
+                currentParams.taskBucketMode = autoChk.checked ? 'auto' : 'custom';
+                refreshTaskBucketEditor();
+                // If switching to auto, no need to update chart; if switching to custom and values differ, Apply controls chart on click
+            });
+
+            refreshTaskBucketEditor();
         }
 
         // Auto-initialize: load benchmark data, then select custom role and trigger analysis on page load
