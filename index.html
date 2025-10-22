@@ -2063,7 +2063,8 @@
                 <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Model Defaults</h4>
 
                 <ul class="factor-grid factor-grid--compact">
-                    <li><strong>H<sub>50,0</sub>:</strong> 137 minutes (baseline task time, GPT-5, August 2025)</li>
+                    <li><strong>H<sub>50,0</sub>:</strong> Loaded from <code>benchmark_results.yaml</code> (latest SOTA model)</li>
+                    <li><strong>Baseline:</strong> SOTA model release date → current date = time elapsed</li>
                     <li><strong>D:</strong> 7 months (METR doubling period)</li>
                     <li><strong>r:</strong> 0.95 (95% reliability target)</li>
                     <li><strong>Task buckets:</strong> &lt;5m: 25%, 5-15m: 35%, 15-60m: 25%, 1-3h: 10%, &gt;3h: 5%</li>
@@ -2094,6 +2095,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
     <script>
         let selectedRole = null;
         let currentParams = null;
@@ -2124,6 +2126,78 @@
         const LOGIT_80 = Math.log(0.8 / 0.2);
         const METR_SIGMA = Math.log(METR_DEFAULTS.H80_0 / METR_DEFAULTS.H50_0) / LOGIT_80;
         const RELIABILITY_GUARD = 1e-6;
+
+        // Dynamic baseline date calculation
+        let BASELINE_DATE = null;  // Will be set from SOTA model release date
+        let BASELINE_YEAR_DECIMAL = null;  // Decimal year for calculations
+
+        // Current date for calculations (user's access time)
+        function getCurrentYearDecimal() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const start = new Date(year, 0, 1);
+            const diff = now - start;
+            const oneYear = 365.25 * 24 * 60 * 60 * 1000;
+            return year + (diff / oneYear);
+        }
+
+        // Load SOTA model from benchmark_results.yaml
+        async function loadBenchmarkData() {
+            try {
+                const response = await fetch('benchmark_results.yaml');
+                const yamlText = await response.text();
+                const data = jsyaml.load(yamlText);
+
+                // Find the SOTA model (GPT-5 or latest)
+                let sotaModel = null;
+                let sotaDate = null;
+
+                for (const [modelName, modelData] of Object.entries(data.results)) {
+                    if (modelData.release_date) {
+                        const releaseDate = new Date(modelData.release_date);
+                        if (!sotaDate || releaseDate > sotaDate) {
+                            // Check if this model has SOTA flag
+                            const agentData = Object.values(modelData.agents)[0];
+                            if (agentData && agentData.is_sota) {
+                                sotaModel = { name: modelName, ...modelData };
+                                sotaDate = releaseDate;
+                            }
+                        }
+                    }
+                }
+
+                if (sotaModel) {
+                    // Update METR_DEFAULTS with SOTA model data
+                    const agentData = Object.values(sotaModel.agents)[0];
+                    METR_DEFAULTS.H50_0 = agentData.p50_horizon_length.estimate;
+                    METR_DEFAULTS.H80_0 = agentData.p80_horizon_length.estimate;
+
+                    // Set baseline date
+                    BASELINE_DATE = sotaDate;
+                    const year = sotaDate.getFullYear();
+                    const start = new Date(year, 0, 1);
+                    const diff = sotaDate - start;
+                    const oneYear = 365.25 * 24 * 60 * 60 * 1000;
+                    BASELINE_YEAR_DECIMAL = year + (diff / oneYear);
+
+                    console.log(`[Benchmark] Loaded SOTA model: ${sotaModel.name}`);
+                    console.log(`[Benchmark] Release date: ${BASELINE_DATE.toISOString().split('T')[0]} (${BASELINE_YEAR_DECIMAL.toFixed(2)})`);
+                    console.log(`[Benchmark] H50: ${METR_DEFAULTS.H50_0.toFixed(2)} min, H80: ${METR_DEFAULTS.H80_0.toFixed(2)} min`);
+
+                    // Recalculate METR_SIGMA with new values
+                    const newSigma = Math.log(METR_DEFAULTS.H80_0 / METR_DEFAULTS.H50_0) / LOGIT_80;
+                    Object.defineProperty(window, 'METR_SIGMA', { value: newSigma, writable: false });
+                    console.log(`[Benchmark] METR_SIGMA: ${newSigma.toFixed(4)}`);
+                }
+
+                return true;
+            } catch (error) {
+                console.error('[Benchmark] Failed to load benchmark data:', error);
+                // Fall back to hardcoded values
+                BASELINE_YEAR_DECIMAL = 2025.60;  // ~August 2025
+                return false;
+            }
+        }
 
         const SENIORITY_PROFILES = [
             { label: 'Entry',          thetaLift: -0.02, hazardShield: 0.00, delayShift: -0.4, reemploymentBoost: 1.00 },
@@ -3329,8 +3403,13 @@
             // Actual job loss timeline (add delay)
             const medianActual = medianTech + delay;
             const highActual = highTech + delay;
-            const risk2030 = calculateDisplacementProbability(5.35 - delay);
-            const risk2031 = calculateDisplacementProbability(6.35 - delay);
+
+            // Calculate years from now to 2030 and 2031
+            const currentYear = getCurrentYearDecimal();
+            const yearsTo2030 = 2030.0 - currentYear;
+            const yearsTo2031 = 2031.0 - currentYear;
+            const risk2030 = yearsTo2030 > 0 ? calculateDisplacementProbability(yearsTo2030 - delay) : 1.0;
+            const risk2031 = yearsTo2031 > 0 ? calculateDisplacementProbability(yearsTo2031 - delay) : 1.0;
 
             document.getElementById('median-year').textContent =
                 medianActual < 50 ? `${medianActual.toFixed(1)} years` : 'Beyond 2050';
@@ -3399,8 +3478,16 @@
             updateChart();
         });
 
-        // Auto-initialize: select custom role and trigger analysis on page load
-        window.addEventListener('DOMContentLoaded', function() {
+        // Auto-initialize: load benchmark data, then select custom role and trigger analysis on page load
+        window.addEventListener('DOMContentLoaded', async function() {
+            // Load benchmark data first
+            await loadBenchmarkData();
+
+            const currentYear = getCurrentYearDecimal();
+            console.log(`[System] Current date: ${new Date().toISOString().split('T')[0]} (${currentYear.toFixed(2)})`);
+            console.log(`[System] Years since baseline: ${(currentYear - BASELINE_YEAR_DECIMAL).toFixed(2)}`);
+            console.log(`[System] Years to 2030: ${(2030.0 - currentYear).toFixed(2)}`);
+
             const customBtn = document.querySelector('.preset-btn[data-role="custom"]');
             if (customBtn) {
                 customBtn.click();
