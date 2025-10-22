@@ -1963,111 +1963,6 @@
                 <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
                 <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
             </div>
-            <section class="ai-equation">
-                <div class="section-intro">
-                    <span class="eyebrow">How this works</span>
-                    <h3>METR-powered stacked hazard model</h3>
-                    <p>This calculator uses METR's empirical 7-month AI capability doubling benchmark inside a stacked hazard framework. Each channel (AI progress, macro shocks, firm execution, role design, personal leverage) stays in the template so new evidence can switch it on without rewriting the model.</p>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-                    <div class="equation-callout">
-                        <span class="callout-label">Survival relationship</span>
-                        <div class="equation-display">$$P_{\text{loss}}(t) = 1 - S(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s) \, ds\right)$$</div>
-                    </div>
-                    <div class="equation-callout">
-                        <span class="callout-label">Total hazard (stacked framework)</span>
-                        <div class="equation-display">$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
-                    </div>
-                </div>
-
-
-                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">METR Capability → Readiness</h4>
-
-                <div class="equation-callout">
-                    <span class="callout-label">AI capability (task completion time)</span>
-                    <div class="equation-display">$$H_r(t) = \frac{H_{50,0}}{p_{\text{total}}} \cdot \frac{2^{(t \cdot 12)/D}}{f(r)}$$</div>
-                    <p style="font-size: 0.9em; margin-top: 8px; color: #666;">
-                        where $p_{\text{total}} = p_{\text{role}} \times p_{\text{industry}}$ (both friction layers multiply),
-                        $D = 7$ months (METR doubling, fixed),
-                        $f(r) = \exp(-\sigma \cdot \operatorname{logit}(r))$ with $\sigma \approx -1.19$
-                    </p>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
-                    <div class="equation-callout">
-                        <span class="callout-label">Task bucket logistic gate</span>
-                        <div class="equation-display">$$G(H, L_i, s) = \frac{1}{1 + \exp\left(-\frac{\ln(H) - \ln(L_i)}{s}\right)}$$</div>
-                    </div>
-
-                    <div class="equation-callout">
-                        <span class="callout-label">Coverage threshold (readiness gate)</span>
-                        <div class="equation-display">$$\theta = \theta_0 + \theta_{\text{seniority}} + \Delta_{\text{align}} + \Delta_{s_e}$$</div>
-                    </div>
-                </div>
-
-                <div class="equation-callout" style="margin: 15px 0 20px 0;">
-                    <span class="callout-label">AI Readiness (bounded [0,1])</span>
-                    <div class="equation-display">$$A(t) = \sum_{i} w_i \cdot G(H_r(t), L_i, s), \quad \sum_{i} w_i = 1$$</div>
-                </div>
-
-                <p><strong>How it works:</strong> METR defines how AI capability grows exponentially (H<sub>r</sub> increases as AI gets more capable, doubling every 7 months - fixed, never modified). Task bucket mapping translates raw capability into job-specific readiness A(t), bounded between 0 (can't do any tasks) and 1 (can do all tasks). Reliability r (e.g., 95%) requires extra capability margin, delaying milestones. Industry and role-specific friction penalties divide H<sub>50,0</sub>, reducing effective capability for domain-mismatched work.</p>
-
-                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">AI Hazard Core</h4>
-
-                <div class="equation-callout">
-                    <span class="callout-label">Logistic hazard gate</span>
-                    <div class="equation-display">$$\lambda_{\text{AI}}(t) = \frac{h_{\text{AI}}}{1 + \exp(-\gamma \cdot (A(t) - \theta_0))} \times \text{userMult}$$</div>
-                </div>
-
-                <ul class="factor-grid factor-grid--compact">
-                    <li><strong>t:</strong> Time (years from present)</li>
-                    <li><strong>H<sub>r</sub>(t):</strong> AI capability (max task length in minutes; higher = more capable)</li>
-                    <li><strong>A(t):</strong> AI Readiness ∈ [0,1] (fraction of job tasks AI can perform)</li>
-                    <li><strong>D:</strong> Doubling period (7 months, fixed from METR - never modified by questions or sliders)</li>
-                    <li><strong>f(r):</strong> Reliability adjustment (r=0.95 default, requires 33× capability margin)</li>
-                    <li><strong>L<sub>i</sub>:</strong> Task duration thresholds (e.g., 2.5, 10, 37.5, 120, 360 minutes)</li>
-                    <li><strong>w<sub>i</sub>:</strong> Task bucket weights (sum to 1.0, e.g., 25%, 35%, 25%, 10%, 5%)</li>
-                    <li><strong>s:</strong> Logistic softness (0.45 default, controls gate steepness)</li>
-                    <li><strong>h<sub>AI</sub>:</strong> Max base annual hazard (0.40 = 40% per year at full automation)</li>
-                    <li><strong>γ:</strong> Hazard steepness (8.0 default, controls S-curve sharpness)</li>
-                    <li><strong>θ<sub>0</sub>:</strong> Readiness threshold (0.50 = automation kicks in at 50% task coverage)</li>
-                    <li><strong>userMult:</strong> Question-based multiplier (bounded 0.33× to 3.0×)</li>
-                </ul>
-
-                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Risk Curves: Blue vs Green</h4>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-                    <div class="equation-callout">
-                        <span class="callout-label">Blue Curve (Technical Feasibility)</span>
-                        <div class="equation-display">$$P_{\text{tech}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{AI}}(u) \, du\right)$$</div>
-                    </div>
-
-                    <div class="equation-callout">
-                        <span class="callout-label">Green Curve (Actual Job Loss)</span>
-                        <div class="equation-display">$$P_{\text{actual}}(t) = P_{\text{tech}}(t - \Delta), \quad \Delta = \text{implementation delay}$$</div>
-                    </div>
-                </div>
-
-                <p><strong>Key insight:</strong> The Green curve is <em>not</em> a separate hazard-it's the Blue curve shifted right by implementation delay (Δ). Blue represents when AI <em>can</em> technically do the job; Green represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
-
-                <h4 style="color: #2a5298; margin: 30px 0 15px 0; font-size: 1.1em;">Model Defaults</h4>
-
-                <ul class="factor-grid factor-grid--compact">
-                    <li><strong>H<sub>50,0</sub>:</strong> Task horizon at 50% success rate, loaded from latest METR SOTA model (currently GPT-5 @ 137 min, October 2025)</li>
-                    <li><strong>Baseline:</strong> SOTA model release date → current date = time elapsed for capability growth</li>
-                    <li><strong>D:</strong> 7 months (METR doubling period, fixed - never modified)</li>
-                    <li><strong>r:</strong> 0.95 (95% reliability target for production automation)</li>
-                    <li><strong>Task buckets:</strong> &lt;5m: 25%, 5-15m: 35%, 15-60m: 25%, 1-3h: 10%, &gt;3h: 5%</li>
-                    <li><strong>s:</strong> 0.45 (logistic softness for task gates)</li>
-                    <li><strong>θ<sub>0</sub>:</strong> 0.50 (coverage threshold - AI must handle 50% of job before hazard activates)</li>
-                    <li><strong>γ:</strong> 8.0 (hazard gate steepness)</li>
-                    <li><strong>h<sub>AI</sub>:</strong> 0.40 yr<sup>-1</sup> (max base annual hazard at full automation)</li>
-                    <li><strong>userMult range:</strong> 0.33× (max protection) to 3.0× (max acceleration)</li>
-                </ul>
-
-                <p><strong>Question effects:</strong> Q1-Q11 affect technical feasibility via ampMult/fricMult (blue curve hazard multipliers) and domainPenalty (capability reduction). Q2-Q9 also shift θ<sub>0</sub> via explicitness (s<sub>e</sub>) and domain alignment - data-rich, standardized roles get lower θ (automation starts at lower capability), while context-heavy, tacit roles get higher θ. Q12-Q15 affect implementation delay Δ only (green curve shift), not technical capability. Q16-Q18 affect re-employment probability. Seniority adjusts task bucket weights (w<sub>i</sub>), θ baseline, and implementation delay.</p>
-            </section>
                 </div>
             </div>
         </div>
@@ -2104,12 +1999,13 @@
             r_target: 0.95,         // Reliability target (95%)
             softness: 0.45,         // Logistic softness parameter [0.35, 0.6]
             // Task duration buckets (minutes) and weights (sum to 1.0)
+            // Calibrated for corporate production work (longer than METR's research environment)
             taskBuckets: [
-                { L: 2.5, w: 0.25 },    // <5min tasks
-                { L: 10, w: 0.35 },     // 5-15min tasks
-                { L: 37.5, w: 0.25 },   // 15-60min tasks
-                { L: 120, w: 0.10 },    // 1-3hr tasks
-                { L: 360, w: 0.05 }     // >3hr tasks
+                { L: 2.5,  w: 0.25 },   // <5min tasks (center ~2.5m)
+                { L: 15,   w: 0.35 },   // 5-15min tasks (upper-midpoint for 95% reliability)
+                { L: 60,   w: 0.25 },   // 15-60min tasks (conservative center for production)
+                { L: 180,  w: 0.10 },   // 1-3hr tasks (higher threshold for corporate work)
+                { L: 540,  w: 0.05 }    // >9hr tasks (highest threshold for complex work)
             ]
         };
 
