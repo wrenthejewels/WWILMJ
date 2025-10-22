@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang='en'>
 
 <head>
@@ -336,10 +336,11 @@
         }
 
         .detail-list li strong {
-            display: block;
+            display: inline;
             font-family: 'Sora', sans-serif;
             font-size: 0.95rem;
-            margin-bottom: 4px;
+            margin: 0;
+            margin-right: 6px;
         }
 
         .insight-callout {
@@ -493,17 +494,17 @@
 
                             <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task horizon has doubled roughly every seven months since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
 
-                            <p>The calculator uses METR's observed 7-month doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's 50th percentile performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx -1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than the 50th percentile), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
+                            <p>The calculator uses METR's doubling trend to project AI capability growth over time. We start with a baseline task horizon of 137 minutes (GPT-5's 50th percentile performance as of August 2025) and METR's 80% success horizon of 26.37 minutes. We fit a logistic success curve through those quantiles so the reliability adjustment becomes $f(r) = \exp(-\sigma\,\operatorname{logit}(r))$ with $\sigma \approx -1.19$. At the default 95% production bar the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than the 50th percentile), and a 99% requirement would shrink it to about 0.58 minutes (~235&times; shorter).</p>
 
                             <ul class="detail-list">
 
-                                <li><strong>Doubling trend:</strong> METR's empirical 7-month doubling time drives how fast AI capability improves. Every 7 months, AI can handle 2Ã— longer tasks at the same success rate.</li>
+                                <li><strong>Doubling trend:</strong> METR's doubling time drives how fast AI capability improves. Every 7 months, AI can handle 2Ã— longer tasks at the same success rate.</li>
 
                                 <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. Technical capability requires a high bar to outperform human error, though the calculator allows a custom reliability gate if tasks can feasibly be automated at a lower success rate.</li>
 
                                 <li><strong>Task mapping:</strong> Your job gets decomposed into task duration buckets (2.5, 15, 60, 180, 540 minutes). Once AI can reliably complete enough of these buckets, the hazard channel opens.</li>
 
-                                <li><strong>Scenario levers:</strong> Industry-specific friction and required reliability, plus your questionnaire responses, adjust capability but never overwrite the METR trend — the 7‑month doubling stays fixed. Friction multiplies the horizon penalty (p_domain); reliability tightens the success bar.</li>
+                                <li><strong>Scenario levers:</strong> Industry-specific friction and required reliability, plus your questionnaire responses, adjust capability but never overwrite the METR's doubling stays fixed. Friction multiplies the horizon penalty (p_domain); reliability tightens the success bar.</li>
 
                             </ul>
 
@@ -513,7 +514,7 @@
 
                             <img src="images/metr-length-of-tasks-linear.png" alt="METR linear task horizon trend">
 
-                            <figcaption>Linear horizon chart reproduced from <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR</a>. The calculator uses their 7-month doubling trend with a 95% reliability requirement for production-ready automation.</figcaption>
+                            <figcaption>Linear horizon chart reproduced from <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR's doubling trend with a 95% reliability requirement for production-ready automation.</figcaption>
 
                         </figure>
 
@@ -534,6 +535,25 @@
                             <li><strong>Adaptability delay:</strong> Firm and personal answers shift the AI hazard forward in time to produce the green curve.</li>
                             <li><strong>Re-employment likelihood:</strong> Adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
                         </ul>
+
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Model Defaults</h3>
+                        <ul class='detail-list'>
+                            <li><strong>H<sub>50,0</sub>:</strong> 137 minutes (baseline 50% success horizon)</li>
+                            <li><strong>Doubling period D:</strong> 7 months (METR baseline; fixed)</li>
+                            <li><strong>Reliability r:</strong> 0.95 default production bar; role presets recommend r by role and seniority</li>
+                            <li><strong>Task buckets L<sub>i</sub>:</strong> 2.5, 15, 60, 180, 540 minutes</li>
+                            <li><strong>Baseline weights w<sub>i</sub>:</strong> 25%, 35%, 25%, 10%, 5% (personalized by Q5, Q6, Q7 and seniority)</li>
+                            <li><strong>Softness s:</strong> 0.45 (controls bucket gate steepness)</li>
+                            <li><strong>Hazard max h<sub>max</sub>:</strong> 0.40 (40%/yr at full automation)</li>
+                            <li><strong>Logistic steepness gamma:</strong> 8.0</li>
+                            <li><strong>Coverage threshold theta0:</strong> 0.50 (shifts with structure/feedback/standardization)</li>
+                        </ul>
+
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
+                        <ul class='detail-list'>
+                            <li><strong>Domain friction:</strong> Role presets set a conservative friction multiplier by role (software -> lower; legal/engineering -> higher). This multiplies the horizon penalty p<sub>domain</sub> without changing METR's doubling.</li>
+                            <li><strong>Recommended reliability:</strong> Presets also suggest a reliability starting point per role, with seniority adjustments (entry slightly lower, exec slightly higher). You can override both in the UI.</li>
+                        </ul>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
                             <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>
@@ -546,8 +566,8 @@
                         </ol>
                         <p>This structure means automation doesn't happen all at once. AI steadily masters more of your tasks (task gates opening), but job displacement risk only spikes once AI can handle enough of your role to justify replacement (job gate opening). Jobs with more long-duration tasks take longer to reach this threshold.</p>
                         <ul class='detail-list'>
-                            <li><strong>Task horizon $H_r(t)$:</strong> $$H_r(t) = \frac{H_{50,0} \cdot 2^{(t \cdot 12)/D_{\text{METR}}}}{p_{\text{domain}} \cdot f(r)}$$ METR's doubling period is fixed at 7 months. Industry-specific friction $\in [1.0, 2.0]$ multiplies the horizon penalty $p_{\text{domain}}$ (it does not change the doubling time). $f(r)$ is the reliability factor (higher reliability divides H, reducing AI's effective max task length), and $p_{\text{domain}} \in [0.5, 3.0]$ damps capability for tacit or physical work.</li>
-                            <li><strong>Task buckets:</strong> We mirror METR’s five duration categories — <em>&lt;5 min</em>, <em>5–15 min</em>, <em>15–60 min</em>, <em>1–3 hr</em>, and <em>&gt;3 hr</em> — but calibrate representative thresholds for corporate, production‑grade work at <code>[2.5, 15, 60, 180, 540] min</code>. Each bucket uses a logistic gate $$G_i(H) = \frac{1}{1 + \exp\!\left(-\frac{\ln H - \ln L_i}{s}\right)}$$ where $H$ is AI's current capability (maximum task length it can handle) and $L_i$ is the bucket threshold. When $H \gg L_i$, the gate is fully open (AI masters these tasks); when $H \ll L_i$, the gate is closed (AI can't handle them yet). As METR's doubling trend pushes $H$ higher over time, more gates open.</li>
+                            <li><strong>Task horizon $H_r(t)$:</strong> $$H_r(t) = \frac{H_{50,0} \cdot 2^{(t \cdot 12)/D_{\text{METR's doubling period is fixed at 7 months. Industry-specific friction $\in [1.0, 2.0]$ multiplies the horizon penalty $p_{\text{domain}}$ (it does not change the doubling time). $f(r)$ is the reliability factor (higher reliability divides H, reducing AI's effective max task length), and $p_{\text{domain}} \in [0.5, 3.0]$ damps capability for tacit or physical work.</li>
+                            <li><strong>Task buckets:</strong> We mirror METR's doubling trend pushes $H$ higher over time, more gates open.</li>
                             <li><strong>Personalized task weights $w_i$:</strong> Your answers to Q5 (task decomposability), Q6 (task standardization), Q7 (context dependency), and your seniority level determine how your job breaks down across the five buckets. Entry-level roles skew toward shorter tasks (quick emails, simple coding); executive roles skew toward longer tasks (strategic planning, integration work). Highly structured jobs (Q5=5) concentrate weight in the short buckets; complex jobs (Q5=1) shift weight to longer buckets. High-context work (Q7=5) means fewer quick wins and more integrated effort, so the model assigns more weight to the 1–3 hr and &gt;3 hr buckets. The weights always sum to 1.0 and determine what fraction of your job falls into each duration category.</li>
                             <li><strong>Readiness $A_{\text{job}}(t)$:</strong> $$A_{\text{job}}(t) = \sum_i w_i G_i(H_r(t))$$ This weighted sum tells us what fraction of your job AI can perform at time $t$. If you're an entry-level role with 40% of tasks under 5 minutes and AI's capability $H_r(t)$ has reached 10 minutes, the &lt;5 min gate is fully open ($G_1 \approx 1.0$), contributing $0.40 \times 1.0 = 0.40$ to readiness. Jobs with more long-duration tasks need higher $H_r$ before their readiness $A(t)$ crosses the coverage threshold $\theta$, delaying automation.</li>
                             <li><strong>Coverage bar $\theta$:</strong> Baseline $0.50$ shifts based on multiple factors. Data-rich jobs (Q2), standardized workflows (Q6), and fast feedback loops (Q8) <strong>lower</strong> $\theta$ because automation becomes viable at lower AI capability levels (easier to specify, validate, and deploy). Conversely, tacit knowledge, high context, and compliance-heavy roles push $\theta$ up toward ~$0.68$ before hazard activates. Range: $[0.35, 0.72]$. This gate controls how much of the job must be automatable before displacement risk activates.</li>
@@ -594,7 +614,7 @@
                             <li><strong>Personal timeline:</strong> We surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
                             <li><strong>Re-employment label:</strong> The probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
                         </ul>
-                        <p>Use the controls to stress-test assumptions. METR’s 7‑month doubling is fixed. Higher <em>industry-specific friction</em> increases the horizon penalty $p_{\text{domain}}$ (not the doubling time), and stricter <em>reliability</em> requirements reduce the effective task horizon. Answers that raise role explicitness $s_e$ or ease the coverage bar $\theta$ pivot curves left, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out. High scores on Q7–Q12 increase $p_{\text{domain}}$, so even at the METR trend, capability must cover more ground before matching software baselines.</p>
+                        <p>Use the controls to stress-test assumptions. METR's doubling is fixed. Higher <em>industry-specific friction</em> increases the horizon penalty $p_{\text{domain}}$ (not the doubling time), and stricter <em>reliability</em> requirements reduce the effective task horizon. Answers that raise role explicitness $s_e$ or ease the coverage bar $\theta$ pivot curves left, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out. High scores on Q7–Q12 increase $p_{\text{domain}}$, so even at the METR trend, capability must cover more ground before matching software baselines.</p>
                     </section>
 
                     <section>
