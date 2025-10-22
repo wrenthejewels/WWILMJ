@@ -294,8 +294,8 @@
         }
 
         .equation-callout {
-            margin: 24px 0;
-            padding: 20px 24px;
+            margin: 28px 0;
+            padding: 24px 28px;
             border-left: 4px solid #d2c7b8;
             background: #fefbf5;
             border-radius: 18px;
@@ -321,7 +321,7 @@
         .detail-list {
             list-style: none;
             padding: 0;
-            margin: 0 0 24px;
+            margin: 24px 0;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -347,7 +347,8 @@
             border-left: 4px solid #d2c7b8;
             background: #fdf7ed;
             border-radius: 18px;
-            padding: 18px 22px;
+            padding: 20px 24px;
+            margin: 28px 0;
             color: #3f392f;
             font-size: 0.95rem;
         }
@@ -359,33 +360,38 @@
         /* Compact bubble table for defaults */
         .bubble-table {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            margin: 8px 0 20px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 16px 0 24px;
         }
         .bubble-item {
             background: #fefbf5;
             border: 1px solid #eadfce;
             border-radius: 16px;
-            padding: 12px 14px;
+            padding: 14px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 12px;
         }
         .bubble-key {
             font-family: 'Sora', sans-serif;
             font-weight: 600;
             color: #3b3326;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
         .bubble-val {
             color: #3f392f;
+            text-align: right;
+            word-wrap: break-word;
         }
 
         ol.action-list {
             counter-reset: step;
             list-style: none;
             padding: 0;
-            margin: 0 0 24px;
+            margin: 24px 0;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -564,7 +570,7 @@
                             <li><strong>Re-employment likelihood:</strong> Adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
                         </ul>
 
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Model Defaults</h3>
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'><em>Model Defaults</em></h3>
                         <div class='bubble-table'>
                             <div class='bubble-item'><span class='bubble-key'>H_50,0</span><span class='bubble-val'>137 min (GPT-5 SOTA)</span></div>
                             <div class='bubble-item'><span class='bubble-key'>D (doubling)</span><span class='bubble-val'>7 months (fixed)</span></div>
@@ -584,10 +590,7 @@
                             <div class='bubble-item'><span class='bubble-key'>Task buckets</span><span class='bubble-val'>&lt;5, 5&ndash;15, 15&ndash;60, 1&ndash;3, &gt;9 hr (recalibrated)</span></div>
                         </div>
 
-                        
-    
-
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Friction Decay Parameter</h3>
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'><em>Friction Decay Parameter</em></h3>
                         <p>The model includes an inferred friction decay rate (&lambda;) that captures how quickly organizational and role-specific barriers erode over time. This parameter is calculated from your questionnaire responses about company adoption readiness, infrastructure, labor market dynamics, and role characteristics:</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Friction decay rate</span>
@@ -602,13 +605,13 @@
                             <li><strong>Q11 (Physical presence):</strong> -0.01 weight &mdash; physical requirements slow organizational change</li>
                             <li><strong>Q10 (Human judgment):</strong> -0.01 weight &mdash; relationship-intensive work resists automation longer</li>
                         </ul>
-                        <p>This parameter influences how quickly implementation barriers diminish as AI capability continues to grow. The model implements dynamic friction decay where the implementation delay decreases exponentially over time: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) is calculated as the technical feasibility at the earlier time $t - \Delta(t)$. Higher &lambda; means organizational friction erodes faster (barriers collapse quickly once AI crosses initial thresholds); lower Î» means barriers persist longer even as technical capability advances. This captures how, for example, regulatory frameworks and organizational inertia may initially delay adoption by several years, but these delays shrink as AI becomes more capable and widespread adoption creates network effects.</p>
+                        <p>This parameter influences how quickly implementation barriers diminish as AI capability continues to grow. The model implements dynamic friction decay where the implementation delay decreases exponentially over time: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) is calculated as the technical feasibility at the earlier time $t - \Delta(t)$. Higher $\lambda$ means organizational friction erodes faster (barriers collapse quickly once AI crosses initial thresholds); lower $\lambda$ means barriers persist longer even as technical capability advances. This captures how, for example, regulatory frameworks and organizational inertia may initially delay adoption by several years, but these delays shrink as AI becomes more capable and widespread adoption creates network effects.</p>
 
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
-                        <p>Different roles face different automation barriers. Software engineering maps most directly to AI''s training data and requires less physical presence, so it gets lower friction (1.05x). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45&ndash;1.50x). These conservative priors reflect how far capability must stretch beyond METR''s software-centric benchmarks to reach production readiness in each domain.</p>
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'><em>Role Presets</em></h3>
+                        <p>Different roles face different automation barriers. Software engineering maps most directly to AI's training data and requires less physical presence, so it gets lower friction (1.05x). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45&ndash;1.50x). These conservative priors reflect how far capability must stretch beyond METR's software-centric benchmarks to reach production readiness in each domain.</p>
                         <p><strong>Two-layer friction system:</strong> The model applies friction at both industry and role levels. The <em>industry-specific friction slider</em> affects all roles in a sector (e.g., finance 1.35x applies to analysts, controllers, and auditors). Your <em>questionnaire responses</em> then add role-specific friction based on tacit knowledge (Q9), physical presence (Q11), and context dependencies (Q7). Both layers multiply together in the calculation, so a high-context legal role in a regulated industry faces compounded barriers.</p>
                         <ul class='detail-list'>
-                            <li><strong>Domain friction (preset baseline):</strong> Role presets set an initial friction multiplier (software ~1.05x, admin/data ~1.10x, finance/consulting ~1.35x, legal ~1.45x, engineering ~1.50x). This serves as the starting point for the role''s automation difficulty before individual job characteristics are considered.</li>
+                            <li><strong>Domain friction (preset baseline):</strong> Role presets set an initial friction multiplier (software ~1.05x, admin/data ~1.10x, finance/consulting ~1.35x, legal ~1.45x, engineering ~1.50x). This serves as the starting point for the role's automation difficulty before individual job characteristics are considered.</li>
                             <li><strong>Recommended reliability:</strong> Presets suggest a reliability starting point per role based on typical error tolerance and stakes (finance/legal 97&ndash;98%, software/data 92&ndash;93%, creative/customer service 88&ndash;90%). Seniority adjusts these baselines: entry-level roles tolerate slightly lower reliability (&minus;0.05), while executive decisions demand higher confidence (+0.05). Higher reliability requirements contract the effective task horizon significantly &mdash; 95% reliability shrinks capability by ~33&times;, while 98% shrinks it by ~95&times;. You can override both friction and reliability in the UI to test different scenarios.</li>
                         </ul>
                         <p>In addition to the preset baseline, the calculator derives a role-specific <em>domain alignment</em> penalty from your answers. Digitized, decomposable, and standardized work (Q4/Q5/Q6 high) reduces the penalty; context dependence, tacit knowledge, judgment/relationship load, and physical presence (Q7/Q9/Q10/Q11 high) increase it. Internally, we form a signed weighted sum and map it to a penalty multiplier via an exponential, clamped to a reasonable range. This penalty multiplies with the sector slider, so misalignment compounds friction.</p>
@@ -648,10 +651,13 @@
                             <li><strong>Firm and personal context (Q12-Q18):</strong> Company levers shape implementation delay. Job performance (Q18) delays displacement for top performers while also helping re-employment. Adaptability (Q17) and transferability (Q16) drive re-employment probability.</li>
                         </ul>
                         <p><strong>Role explicitness ($s_e$) mechanism:</strong> Questions Q1, Q2, Q3, Q4, Q5, Q6, and Q8 (positive factors) are averaged together, while Q7 and Q9 (context dependency and tacit knowledge &mdash; protective factors) are averaged separately. The formula $s_e = 0.65 \times \text{norm}(s_{\text{pos}}) - 0.35 \times \text{norm}(s_{\text{neg}}) + 0.10$ produces a score between 0 and 1. Higher $s_e$ (more explicit roles) reduces $\theta$ via the shift $\Delta_{s_e} = 0.10 \times (0.5 - s_e)$, meaning AI needs less total job coverage before automation becomes economically viable.</p>
+
                         <div class='insight-callout'>
                             <p><strong>Example:</strong> An entry-level customer service rep (seniority=1, Q5=5 structured, Q6=5 standardized, Q7=1 low context) gets task weights roughly <code>[40%, 35%, 20%, 4%, 1%]</code> &mdash; most work is quick tasks. A senior software architect (seniority=4, Q5=2 complex, Q6=2 variable, Q7=4 high context) gets <code>[12%, 24%, 28%, 24%, 12%]</code> &mdash; heavily weighted toward medium and long tasks. Even if AI capability $H_r(t)$ is identical for both, the architect's readiness $A(t)$ stays lower longer because their job has fewer automatable short tasks. This personalization ensures the model reflects real differences in how jobs are structured.</p>
                         </div>
+
                         <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
+
                         <div class='insight-callout'>
                             <p><strong>Calibration:</strong> The model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q7, Q9, Q11 high) suppresses the hazard by about $50\%$, delays implementation by $\geq 0.7$ years, and pushes the domain penalty above $~2\times$ so readiness clears METR later.</p>
                         </div>
