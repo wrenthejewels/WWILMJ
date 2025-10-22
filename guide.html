@@ -169,7 +169,7 @@
         }
 
         .article-body {
-            width: min(1200px, 95%);
+            width: min(1300px, 98%);
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -360,7 +360,7 @@
         /* Compact bubble table for defaults */
         .bubble-table {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 16px;
             margin: 16px 0 24px;
         }
@@ -372,25 +372,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 14px;
-            overflow: hidden;
+            gap: 12px;
+            overflow: visible;
         }
         .bubble-key {
             font-family: 'Sora', sans-serif;
             font-weight: 600;
             color: #3b3326;
             flex: 0 1 auto;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             min-width: 0;
-            font-size: 0.88rem;
-            word-break: break-word;
-            hyphens: auto;
         }
         .bubble-val {
             color: #3f392f;
             text-align: right;
             flex-shrink: 0;
-            font-size: 0.88rem;
-            word-break: break-word;
+            font-size: 0.84rem;
+            white-space: nowrap;
         }
 
         ol.action-list {
@@ -477,15 +478,25 @@
 
             .bubble-item {
                 padding: 12px 14px;
-                gap: 10px;
+                gap: 8px;
+                flex-wrap: wrap;
+                align-items: flex-start;
             }
 
             .bubble-key {
-                font-size: 0.82rem;
+                font-size: 0.80rem;
+                flex: 1 1 100%;
+                text-align: left;
+                overflow: visible;
+                white-space: normal;
             }
 
             .bubble-val {
-                font-size: 0.82rem;
+                font-size: 0.79rem;
+                flex: 1 1 100%;
+                text-align: left;
+                padding-left: 8px;
+                color: #5c564f;
             }
 
             ol.action-list li {
