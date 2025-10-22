@@ -382,8 +382,8 @@
             flex: 0 1 auto;
             min-width: 0;
             font-size: 0.88rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            word-break: break-word;
+            hyphens: auto;
         }
         .bubble-val {
             color: #3f392f;
@@ -610,7 +610,7 @@
                             <div class='bubble-item'><span class='bubble-key'>$A_{\text{job}}$</span><span class='bubble-val'>Readiness &isin; [0,1]</span></div>
                             <div class='bubble-item'><span class='bubble-key'>$f(r)$</span><span class='bubble-val'>Reliability factor</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Task horizon</span><span class='bubble-val'>7&ndash;mo doubling; friction/reliability reduce</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Task buckets</span><span class='bubble-val'>&lt;5, 5&ndash;15, 15&ndash;60, 1&ndash;3, &gt;9 hr (recalibrated)</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Task buckets</span><span class='bubble-val'>&lt;5, 5&ndash;15, 15&ndash;60, 1&ndash;3, &gt;9 hr</span></div>
                         </div>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Friction Decay Parameter</h3>
