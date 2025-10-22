@@ -2149,7 +2149,22 @@
 
         // Get task weights for a given seniority level (1-5) and questionnaire answers
         function getTaskWeightsForSeniority(level, answers = null) {
+            // Check if user has set custom weights and is in custom mode
+            const isCustomMode = (currentParams && currentParams.taskBucketMode === 'custom');
             const userBase = (currentParams && Array.isArray(currentParams.userBaseWeights)) ? currentParams.userBaseWeights : null;
+
+            // If in custom mode with valid user weights, return them exactly as-is (no shifts)
+            if (isCustomMode && userBase && userBase.length === METR_DEFAULTS.taskBuckets.length) {
+                // Normalize to ensure sum = 1.0 (in case user entered non-normalized values)
+                const sum = userBase.reduce((a, b) => a + b, 0);
+                if (sum > 0) {
+                    const normalized = userBase.map(w => w / sum);
+                    console.log('[TaskWeights] Custom mode: using exact user weights (no shifts):', normalized.map(v => v.toFixed(3)));
+                    return normalized;
+                }
+            }
+
+            // Auto mode: start with base weights (either user's or METR defaults)
             const baseWeights = (userBase && userBase.length === METR_DEFAULTS.taskBuckets.length)
                 ? userBase
                 : METR_DEFAULTS.taskBuckets.map(b => b.w);
