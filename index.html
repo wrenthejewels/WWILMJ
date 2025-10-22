@@ -1908,7 +1908,7 @@
                     <h3>Industry Friction</h3>
                     <p>How much harder is your industry to automate compared to software? (Higher = more barriers)</p>
                     <div class="slider-container">
-                        <input type="range" id="industry-pace" min="0.5" max="2" step="0.1" value="1">
+                        <input type="range" id="industry-pace" min="1.0" max="2.0" step="0.05" value="1.0">
                         <span class="value-display" id="industry-pace-value">1.0x</span>
                     </div>
                 </div>
@@ -1982,6 +1982,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+    <script src="presets.js"></script>
     <script>
         let selectedRole = null;
         let currentParams = null;
@@ -2203,15 +2204,15 @@
 
         function resolvedDomainPace() {
             const slider = document.getElementById('industry-pace');
-            // Slider now represents friction (0.5 to 2.0, default 1.0)
-            // Higher friction = slower automation
+            // Slider now represents friction (1.0 to 2.0, default 1.0)
+            // Higher friction = slower automation (software = 1.0, nothing is easier)
             const frictionValue = slider ? parseFloat(slider.value) : domainPaceSliderBaseline;
             const normalized = frictionValue / domainPaceSliderBaseline;
             const base = currentParams && typeof currentParams.domainPace === 'number'
                 ? currentParams.domainPace
                 : 1.0;
             const combined = base * normalized;
-            return clamp(combined, 0.4, 3.0);
+            return clamp(combined, 1.0, 3.0);
         }
 
         function resolvedReliabilityTarget() {
@@ -2563,23 +2564,36 @@
 
         // Helper: Update sliders based on role preset and seniority
         function updateSlidersFromPreset() {
-            if (!selectedRole) return;
+            if (!selectedRole) {
+                console.log('[updateSlidersFromPreset] No role selected');
+                return;
+            }
 
             const presets = window.WWILMJ_PRESETS;
-            if (!presets) return;
+            if (!presets) {
+                console.error('[updateSlidersFromPreset] WWILMJ_PRESETS not loaded!');
+                return;
+            }
 
             const rolePreset = presets.ROLE_PRESETS[selectedRole];
-            if (!rolePreset) return;
+            if (!rolePreset) {
+                console.warn('[updateSlidersFromPreset] No preset for role:', selectedRole);
+                return;
+            }
 
             // Get current seniority level
             const seniorityChecked = document.querySelector('input[name="seniority"]:checked');
             const seniorityLevel = seniorityChecked ? parseInt(seniorityChecked.value) : 1;
 
+            console.log('[updateSlidersFromPreset] Role:', selectedRole, 'Seniority:', seniorityLevel,
+                        'Preset:', rolePreset);
+
             // Update industry friction slider
             const frictionSlider = document.getElementById('industry-pace');
             if (frictionSlider && rolePreset.friction) {
                 frictionSlider.value = rolePreset.friction;
-                document.getElementById('industry-pace-value').textContent = rolePreset.friction.toFixed(1) + 'x';
+                document.getElementById('industry-pace-value').textContent = rolePreset.friction.toFixed(2) + 'x';
+                console.log('[updateSlidersFromPreset] Updated friction to', rolePreset.friction);
             }
 
             // Update reliability slider (includes seniority adjustment)
@@ -2589,6 +2603,9 @@
                 const percentValue = Math.round(recommendedR * 100);
                 reliabilitySlider.value = percentValue;
                 document.getElementById('ai-reliability-value').textContent = percentValue + '%';
+                console.log('[updateSlidersFromPreset] Updated reliability to', percentValue + '%',
+                           '(base:', rolePreset.reliabilityBase, 'seniority adj:',
+                           presets.SENIORITY_R_DELTAS[seniorityLevel - 1] || 0, ')');
             }
         }
 
