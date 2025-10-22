@@ -1988,8 +1988,6 @@
         let currentParams = null;
         let chart = null;
 
-        const baseDoublingMonths = 7;
-        const deltaTacit = 0.07;
         const domainPaceSliderBaseline = 1.0;
 
         // METR-based capability model parameters
@@ -2095,29 +2093,82 @@
         ];
 
         // Seniority-based task weight shifts (shift toward longer tasks for higher levels)
-        // DISABLED: All zeroed to ensure seniority only affects green curve (implementation delay)
+        // Base shifts: Entry-level roles have more short tasks, senior roles have more long tasks
         const SENIORITY_TASK_SHIFTS = [
-            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Entry
-            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Mid
-            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Senior
-            [ 0.00,  0.00,  0.00, +0.00, +0.00],  // Lead
-            [ 0.00,  0.00,  0.00, +0.00, +0.00]   // Exec
+            [+0.12, +0.08, -0.05, -0.08, -0.07],  // Entry: shift toward short tasks
+            [+0.05, +0.03, -0.02, -0.03, -0.03],  // Mid: slight shift toward short tasks
+            [ 0.00,  0.00,  0.00,  0.00,  0.00],  // Senior: neutral baseline
+            [-0.06, -0.04, +0.03, +0.04, +0.03],  // Lead: shift toward longer tasks
+            [-0.12, -0.09, +0.06, +0.08, +0.07]   // Exec: shift toward long tasks
         ];
 
-        // Get task weights for a given seniority level (1-5)
-        function getTaskWeightsForSeniority(level) {
+        // Get task weights for a given seniority level (1-5) and questionnaire answers
+        function getTaskWeightsForSeniority(level, answers = null) {
             const baseWeights = METR_DEFAULTS.taskBuckets.map(b => b.w);
             const idx = Math.max(0, Math.min(SENIORITY_TASK_SHIFTS.length - 1, level - 1));
-            const shift = SENIORITY_TASK_SHIFTS[idx];
-            const adjusted = baseWeights.map((w, i) => w + shift[i]);
+            const seniorityShift = SENIORITY_TASK_SHIFTS[idx];
+
+            // Start with seniority-based shift
+            let adjusted = baseWeights.map((w, i) => w + seniorityShift[i]);
+
+            // Apply questionnaire-based adjustments if answers provided
+            if (answers) {
+                const q5 = typeof answers.Q5 === 'number' ? answers.Q5 : 3;  // Task decomposability
+                const q6 = typeof answers.Q6 === 'number' ? answers.Q6 : 3;  // Standardization
+                const q7 = typeof answers.Q7 === 'number' ? answers.Q7 : 3;  // Context dependency
+
+                // Q5: Decomposability (1=complex/holistic, 5=highly decomposable)
+                // High decomposability → more short tasks
+                const q5Shift = (norm(q5) - 0.5) * 0.20;  // -0.10 to +0.10
+                adjusted[0] += q5Shift;      // <5min
+                adjusted[1] += q5Shift * 0.5;
+                adjusted[3] -= q5Shift * 0.5;
+                adjusted[4] -= q5Shift;      // >9hr
+
+                // Q6: Standardization (1=bespoke, 5=standardized)
+                // High standardization → more short tasks
+                const q6Shift = (norm(q6) - 0.5) * 0.15;  // -0.075 to +0.075
+                adjusted[0] += q6Shift;
+                adjusted[1] += q6Shift * 0.5;
+                adjusted[3] -= q6Shift * 0.5;
+                adjusted[4] -= q6Shift;
+
+                // Q7: Context dependency (1=low context, 5=high context)
+                // High context → more long tasks (harder to automate in pieces)
+                const q7Shift = (norm(q7) - 0.5) * 0.18;  // -0.09 to +0.09
+                adjusted[0] -= q7Shift;      // <5min
+                adjusted[1] -= q7Shift * 0.6;
+                adjusted[2] += q7Shift * 0.3;
+                adjusted[3] += q7Shift * 0.6;
+                adjusted[4] += q7Shift;      // >9hr
+            }
+
+            // Ensure all weights are non-negative
+            adjusted = adjusted.map(w => Math.max(0.01, w));
+
+            // Normalize to sum to 1.0
             const sum = adjusted.reduce((a, b) => a + b, 0);
-            return adjusted.map(w => w / sum);  // Normalize
+            return adjusted.map(w => w / sum);
         }
 
-        // Get softness parameter for a given seniority level
-        // FIXED: Now constant across all levels to ensure seniority only affects green curve
-        function getSoftnessForSeniority(level) {
-            return 0.45;  // Constant for all seniority levels
+        // Get softness parameter for a given seniority level and answers
+        // Higher seniority and complex tasks → smoother transitions (higher softness)
+        function getSoftnessForSeniority(level, answers = null) {
+            const baseSoftness = 0.45;
+
+            // Seniority effect: entry-level sharper gates, senior smoother gates
+            const seniorityAdjust = (level - 3) * 0.03;  // Range: -0.06 (entry) to +0.06 (exec)
+
+            let questionAdjust = 0;
+            if (answers) {
+                const q5 = typeof answers.Q5 === 'number' ? answers.Q5 : 3;
+                const q6 = typeof answers.Q6 === 'number' ? answers.Q6 : 3;
+
+                // Complex, bespoke tasks → smoother gates (less sharp transitions)
+                questionAdjust = (0.5 - norm(q5)) * 0.08 + (0.5 - norm(q6)) * 0.05;
+            }
+
+            return clamp(baseSoftness + seniorityAdjust + questionAdjust, 0.25, 0.65);
         }
 
         const THETA_BASE_ENTRY = 0.50;
@@ -2224,10 +2275,7 @@
             return METR_DEFAULTS.r_target; // Default 0.95
         }
 
-        function resolvedBaseDoublingMonths() {
-            // METR doubling is FIXED at 7 months - never modified by sliders or questions
-            return METR_DEFAULTS.D_months;
-        }
+        
 
         // METR-based capability functions
 
@@ -2295,10 +2343,11 @@
             const H = H_r(tYears);
             const buckets = METR_DEFAULTS.taskBuckets;
 
-            // Get seniority level from currentParams (default to entry level)
+            // Get seniority level and answers from currentParams (default to entry level)
             const seniorityLevel = (currentParams && currentParams.seniority) || 1;
-            const weights = getTaskWeightsForSeniority(seniorityLevel);
-            const s = getSoftnessForSeniority(seniorityLevel);
+            const answers = (currentParams && currentParams.answers) || null;
+            const weights = getTaskWeightsForSeniority(seniorityLevel, answers);
+            const s = getSoftnessForSeniority(seniorityLevel, answers);
 
             let readiness = 0;
             for (let i = 0; i < buckets.length; i++) {
@@ -2371,6 +2420,8 @@
             console.log('  Green curve at t=T should equal Blue curve at t=(T-delay)');
             console.log('  This is enforced by updateChart() implementation ✓\n');
 
+            console.log('  Note: implementation now uses dynamic delay(t) = delay0 * exp(-lambda * t)');
+            console.log('  Green(t) computed as Blue(max(t - delay(t), 0))');
             // Test 5: Key diagnostic values
             console.log('DIAGNOSTIC VALUES:');
             console.log(`  H_r(0) = ${H_r(0).toFixed(2)} minutes (baseline capability)`);
@@ -2398,9 +2449,11 @@
             console.log(`  taskGate(H=100, L=10) = ${gateSlow.toFixed(4)}`);
             console.log(`  RESULT: ${gatePass ? 'PASS ✓' : 'FAIL ✗'} (faster AI must have higher readiness)`);
             if (!gatePass) allPassed = false;
+            console.log('  Note: taskGate increases with higher H at fixed L (direction check)');
 
             // Test 2: Reliability factor - r=0.95 should be ~13.5×, r=0.99 should be ~69-72×
             console.log('\nTEST 2: Reliability factor');
+            console.log('  Expected scale: f(0.95) ~33x, f(0.99) ~235x');
             const f95 = reliabilityFactor(0.95);
             const f99 = reliabilityFactor(0.99);
             const reliabilityPass = (f95 > 25 && f95 < 45) && (f99 > 180 && f99 < 320);
@@ -2559,6 +2612,86 @@
             if (!q1SwingPass) allPassed = false;
 
             console.log(`\n=== PATCH TESTS: ${allPassed ? 'ALL PASSED ✓' : 'SOME FAILED ✗'} ===\n`);
+            return allPassed;
+        }
+
+        // Test new features: task weight personalization and lambda friction decay
+        function runFeatureImplementationTests() {
+            console.log('\n=== FEATURE IMPLEMENTATION TESTS ===\n');
+
+            let allPassed = true;
+
+            // Helper: Create neutral answers (all 3s)
+            const neutralAnswers = {};
+            for (let i = 1; i <= 19; i++) neutralAnswers[`Q${i}`] = 3;
+
+            // Test 1: Q5/Q6/Q7 affect task weights
+            console.log('TEST 1: Q5/Q6/Q7 affect task weights');
+            const structuredAnswers = { ...neutralAnswers, Q5: 5, Q6: 5, Q7: 1 };  // Structured, standardized, low context
+            const complexAnswers = { ...neutralAnswers, Q5: 1, Q6: 1, Q7: 5 };     // Complex, bespoke, high context
+
+            const weightsStructured = getTaskWeightsForSeniority(1, structuredAnswers);
+            const weightsComplex = getTaskWeightsForSeniority(1, complexAnswers);
+
+            // Structured should have more weight in short tasks (buckets 0,1), less in long tasks (buckets 3,4)
+            const shortTasksStructured = weightsStructured[0] + weightsStructured[1];
+            const shortTasksComplex = weightsComplex[0] + weightsComplex[1];
+            const longTasksStructured = weightsStructured[3] + weightsStructured[4];
+            const longTasksComplex = weightsComplex[3] + weightsComplex[4];
+
+            const test1Pass = shortTasksStructured > shortTasksComplex && longTasksStructured < longTasksComplex;
+            console.log(`  Structured (Q5=5,Q6=5,Q7=1): short=${(shortTasksStructured*100).toFixed(1)}%, long=${(longTasksStructured*100).toFixed(1)}%`);
+            console.log(`  Complex (Q5=1,Q6=1,Q7=5): short=${(shortTasksComplex*100).toFixed(1)}%, long=${(longTasksComplex*100).toFixed(1)}%`);
+            console.log(`  RESULT: ${test1Pass ? 'PASS ✓' : 'FAIL ✗'} (structured should have more short tasks)`);
+            if (!test1Pass) allPassed = false;
+
+            // Test 2: Seniority affects task weights (Executive vs Entry)
+            console.log('\nTEST 2: Seniority affects task weights');
+            const weightsEntry = getTaskWeightsForSeniority(1, neutralAnswers);    // Entry
+            const weightsExec = getTaskWeightsForSeniority(5, neutralAnswers);     // Executive
+
+            const shortTasksEntry = weightsEntry[0] + weightsEntry[1];
+            const shortTasksExec = weightsExec[0] + weightsExec[1];
+            const longTasksEntry = weightsEntry[3] + weightsEntry[4];
+            const longTasksExec = weightsExec[3] + weightsExec[4];
+
+            const test2Pass = shortTasksEntry > shortTasksExec && longTasksEntry < longTasksExec;
+            console.log(`  Entry (seniority=1): short=${(shortTasksEntry*100).toFixed(1)}%, long=${(longTasksEntry*100).toFixed(1)}%`);
+            console.log(`  Executive (seniority=5): short=${(shortTasksExec*100).toFixed(1)}%, long=${(longTasksExec*100).toFixed(1)}%`);
+            console.log(`  RESULT: ${test2Pass ? 'PASS ✓' : 'FAIL ✗'} (entry should have more short tasks)`);
+            if (!test2Pass) allPassed = false;
+
+            // Test 3: Lambda affects dynamic delay
+            console.log('\nTEST 3: Lambda affects dynamic implementation delay');
+            const lowLambdaAnswers = { ...neutralAnswers, Q10: 5, Q11: 5, Q12: 1, Q15: 1 };  // Low friction decay
+            const highLambdaAnswers = { ...neutralAnswers, Q10: 1, Q11: 1, Q12: 5, Q15: 5 }; // High friction decay
+
+            const lambdaLow = inferredFrictionDecay(lowLambdaAnswers);
+            const lambdaHigh = inferredFrictionDecay(highLambdaAnswers);
+
+            // Test how lambda affects delay at t=5 years
+            const baseDelay = 2.0;
+            const dynamicDelayLow = baseDelay * Math.exp(-lambdaLow * 5);
+            const dynamicDelayHigh = baseDelay * Math.exp(-lambdaHigh * 5);
+
+            const test3Pass = lambdaHigh > lambdaLow && dynamicDelayHigh < dynamicDelayLow;
+            console.log(`  Low friction decay (λ=${lambdaLow.toFixed(3)}): delay at t=5 is ${dynamicDelayLow.toFixed(2)}y`);
+            console.log(`  High friction decay (λ=${lambdaHigh.toFixed(3)}): delay at t=5 is ${dynamicDelayHigh.toFixed(2)}y`);
+            console.log(`  RESULT: ${test3Pass ? 'PASS ✓' : 'FAIL ✗'} (higher λ should reduce delay faster)`);
+            if (!test3Pass) allPassed = false;
+
+            // Test 4: Softness varies by seniority and task complexity
+            console.log('\nTEST 4: Softness varies by seniority and task complexity');
+            const softnessEntryStructured = getSoftnessForSeniority(1, structuredAnswers);
+            const softnessExecComplex = getSoftnessForSeniority(5, complexAnswers);
+
+            const test4Pass = softnessExecComplex > softnessEntryStructured;
+            console.log(`  Entry + Structured: softness=${softnessEntryStructured.toFixed(3)} (sharper gates)`);
+            console.log(`  Executive + Complex: softness=${softnessExecComplex.toFixed(3)} (smoother gates)`);
+            console.log(`  RESULT: ${test4Pass ? 'PASS ✓' : 'FAIL ✗'} (exec+complex should have smoother gates)`);
+            if (!test4Pass) allPassed = false;
+
+            console.log(`\n=== FEATURE TESTS: ${allPassed ? 'ALL PASSED ✓' : 'SOME FAILED ✗'} ===\n`);
             return allPassed;
         }
 
@@ -3185,9 +3318,14 @@
                 years.push(t);
                 // Blue curve: Technical feasibility - Risk_tech(t) = 1 - exp(-∫ lambdaAI(u) du)
                 technicalFeasibility.push(calculateDisplacementProbability(t));
-                // Green curve: Actual job loss - Risk_actual(t) = Risk_tech(max(t - delay, 0))
-                // FIXED: Clamps to 0 to prevent sampling negative time
-                actualJobLoss.push(t >= delay ? calculateDisplacementProbability(t - delay) : 0);
+
+                // Green curve: Actual job loss with dynamic friction decay
+                // Implementation delay decreases exponentially as capability grows: delay(t) = delay_0 * exp(-lambda * t)
+                // This models how organizational barriers diminish as AI capability increases
+                const lambda = currentParams.lambda || 0.02;
+                const dynamicDelay = delay * Math.exp(-lambda * t);
+                const effectiveTime = Math.max(t - dynamicDelay, 0);
+                actualJobLoss.push(effectiveTime > 0 ? calculateDisplacementProbability(effectiveTime) : 0);
             }
 
             chart.data.labels = years;
@@ -3206,18 +3344,40 @@
             let low = 0;
             let high = 50;
             let mid;
-            
+
             while (high - low > 0.1) {
                 mid = (low + high) / 2;
                 const prob = calculateDisplacementProbability(mid);
-                
+
                 if (prob < targetProb) {
                     low = mid;
                 } else {
                     high = mid;
                 }
             }
-            
+
+            return mid;
+        }
+
+        function findYearForProbabilityWithDynamicDelay(targetProb, delay, lambda) {
+            let low = 0;
+            let high = 50;
+            let mid;
+
+            while (high - low > 0.1) {
+                mid = (low + high) / 2;
+                // Calculate probability with dynamic delay: delay(t) = delay_0 * exp(-lambda * t)
+                const dynamicDelay = delay * Math.exp(-lambda * mid);
+                const effectiveTime = Math.max(mid - dynamicDelay, 0);
+                const prob = effectiveTime > 0 ? calculateDisplacementProbability(effectiveTime) : 0;
+
+                if (prob < targetProb) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+
             return mid;
         }
 
@@ -3298,21 +3458,26 @@
 
         function updateResults() {
             const delay = currentParams.implementationDelay || 0;
+            const lambda = currentParams.lambda || 0.02;
 
             // Technical feasibility timeline
             const medianTech = findYearForProbability(0.5);
             const highTech = findYearForProbability(0.9);
 
-            // Actual job loss timeline (add delay)
-            const medianActual = medianTech + delay;
-            const highActual = highTech + delay;
+            // Actual job loss timeline with dynamic friction decay
+            const medianActual = findYearForProbabilityWithDynamicDelay(0.5, delay, lambda);
+            const highActual = findYearForProbabilityWithDynamicDelay(0.9, delay, lambda);
 
-            // Calculate years from now to 2030 and 2031
+            // Calculate years from now to 2030 and 2031 with dynamic delay
             const currentYear = getCurrentYearDecimal();
             const yearsTo2030 = 2030.0 - currentYear;
             const yearsTo2031 = 2031.0 - currentYear;
-            const risk2030 = yearsTo2030 > 0 ? calculateDisplacementProbability(yearsTo2030 - delay) : 1.0;
-            const risk2031 = yearsTo2031 > 0 ? calculateDisplacementProbability(yearsTo2031 - delay) : 1.0;
+            const dynamicDelay2030 = delay * Math.exp(-lambda * yearsTo2030);
+            const dynamicDelay2031 = delay * Math.exp(-lambda * yearsTo2031);
+            const effectiveTime2030 = Math.max(yearsTo2030 - dynamicDelay2030, 0);
+            const effectiveTime2031 = Math.max(yearsTo2031 - dynamicDelay2031, 0);
+            const risk2030 = yearsTo2030 > 0 && effectiveTime2030 > 0 ? calculateDisplacementProbability(effectiveTime2030) : (yearsTo2030 <= 0 ? 1.0 : 0);
+            const risk2031 = yearsTo2031 > 0 && effectiveTime2031 > 0 ? calculateDisplacementProbability(effectiveTime2031) : (yearsTo2031 <= 0 ? 1.0 : 0);
 
             document.getElementById('median-year').textContent =
                 medianActual < 50 ? `${medianActual.toFixed(1)} years` : 'Beyond 2050';
@@ -3348,14 +3513,14 @@
             updatePersonalTimeline();
         }
 
-        document.getElementById('ai-doubling')?.addEventListener('input', function() {
+        if (false) document.getElementById('ai-doubling')?.addEventListener('input', function() {
             const value = parseFloat(this.value);
             document.getElementById('ai-doubling-value').textContent = value + ' mo';
             console.log('[Slider] AI Doubling:', value, 'months → expect', value < 7 ? 'FASTER' : 'SLOWER', 'automation');
             updateChart();
         });
 
-        document.getElementById('compute-scaling')?.addEventListener('input', function() {
+        if (false) document.getElementById('compute-scaling')?.addEventListener('input', function() {
             const computeValue = parseFloat(this.value);
             document.getElementById('compute-scaling-value').textContent = computeValue.toFixed(1) + 'x';
             console.log('[Slider] Compute Scaling:', computeValue.toFixed(1) + 'x',
@@ -3399,6 +3564,7 @@
                 runMETRAcceptanceTests();
                 runRegressionTests();
                 runPatchRegressionTests();
+                runFeatureImplementationTests();
                 runCalibrationTests();
             }, 500);
         });
