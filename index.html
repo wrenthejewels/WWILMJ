@@ -1950,12 +1950,51 @@
                 </div>
             </div>
 
-            <div class="parameter-breakdown">
-                <div class="profile-timeline">
-                    <h4 class="section-title">Your Automation Timeline</h4>
+        <div class="parameter-breakdown">
+            <div class="profile-timeline">
+                    <h4 class="section-title" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                        <span>Your Automation Timeline</span>
+                        <button id="edit-task-buckets" class="header-btn" style="padding:8px 16px; font-size:0.85rem; letter-spacing:0.05em;">
+                            Edit task buckets (optional)
+                        </button>
+                    </h4>
+                    <div id="task-bucket-editor" class="additional-questions" style="margin-top:10px;">
+                        <div style="background:#fff; border:1px solid #e6e0d4; border-radius:12px; padding:16px;">
+                            <p style="margin-bottom:10px; color:#495057; font-size:0.9rem;">Adjust your job’s baseline time split across task duration buckets. Values are percentages and will be normalized.</p>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+                                <label style="display:flex; flex-direction:column; gap:6px;">
+                                    <span style="font-weight:600; color:#2a5298;">Under 5 min (L=2.5)</span>
+                                    <input type="number" min="0" max="100" step="1" id="tb-bucket-0" value="25" style="padding:10px; border:1px solid #e0e0e0; border-radius:6px;">
+                                </label>
+                                <label style="display:flex; flex-direction:column; gap:6px;">
+                                    <span style="font-weight:600; color:#2a5298;">5–15 min (L=15)</span>
+                                    <input type="number" min="0" max="100" step="1" id="tb-bucket-1" value="35" style="padding:10px; border:1px solid #e0e0e0; border-radius:6px;">
+                                </label>
+                                <label style="display:flex; flex-direction:column; gap:6px;">
+                                    <span style="font-weight:600; color:#2a5298;">15–60 min (L=60)</span>
+                                    <input type="number" min="0" max="100" step="1" id="tb-bucket-2" value="25" style="padding:10px; border:1px solid #e0e0e0; border-radius:6px;">
+                                </label>
+                                <label style="display:flex; flex-direction:column; gap:6px;">
+                                    <span style="font-weight:600; color:#2a5298;">1–3 hr (L=180)</span>
+                                    <input type="number" min="0" max="100" step="1" id="tb-bucket-3" value="10" style="padding:10px; border:1px solid #e0e0e0; border-radius:6px;">
+                                </label>
+                                <label style="display:flex; flex-direction:column; gap:6px;">
+                                    <span style="font-weight:600; color:#2a5298;">Over 9 hr (L=540)</span>
+                                    <input type="number" min="0" max="100" step="1" id="tb-bucket-4" value="5" style="padding:10px; border:1px solid #e0e0e0; border-radius:6px;">
+                                </label>
+                            </div>
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:12px;">
+                                <span id="tb-sum" style="color:#666; font-size:0.9rem;">Sum: 100%</span>
+                                <div style="display:flex; gap:8px;">
+                                    <button id="tb-reset" class="header-btn" style="padding:8px 14px; font-size:0.85rem; background:#fdf8f0;">Reset</button>
+                                    <button id="tb-apply" class="header-btn" style="padding:8px 14px; font-size:0.85rem;">Apply Changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div id="personal-timeline"></div>
-                </div>
             </div>
+        </div>
 
             <div class="model-insights">
                 <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
@@ -2104,7 +2143,10 @@
 
         // Get task weights for a given seniority level (1-5) and questionnaire answers
         function getTaskWeightsForSeniority(level, answers = null) {
-            const baseWeights = METR_DEFAULTS.taskBuckets.map(b => b.w);
+            const userBase = (currentParams && Array.isArray(currentParams.userBaseWeights)) ? currentParams.userBaseWeights : null;
+            const baseWeights = (userBase && userBase.length === METR_DEFAULTS.taskBuckets.length)
+                ? userBase
+                : METR_DEFAULTS.taskBuckets.map(b => b.w);
             const idx = Math.max(0, Math.min(SENIORITY_TASK_SHIFTS.length - 1, level - 1));
             const seniorityShift = SENIORITY_TASK_SHIFTS[idx];
 
@@ -2931,6 +2973,7 @@
                 return;
             }
 
+            const prevParams = currentParams;
             const roleName = selectedRole === 'custom' ?
                 'Other/Custom' :
                 document.querySelector(`.preset-btn[data-role="${selectedRole}"]`).textContent.trim();
@@ -3012,12 +3055,14 @@
                 ampMult: ampMult,
                 fricMult: fricMult,
                 answers: answers,
-                implementationDelay: implementationDelay
+                implementationDelay: implementationDelay,
+                userBaseWeights: (prevParams && Array.isArray(prevParams.userBaseWeights)) ? prevParams.userBaseWeights : null
             };
 
             updatePersonalTimeline();
             initChart();
             updateChart();
+            initTaskBucketEditor();
         }
 
         function updatePersonalTimeline() {
@@ -3544,6 +3589,63 @@
             updateChart();
         });
 
+        // Task bucket editor logic
+        function getBaseTaskWeights() {
+            const userBase = (currentParams && Array.isArray(currentParams.userBaseWeights)) ? currentParams.userBaseWeights : null;
+            if (userBase && userBase.length === METR_DEFAULTS.taskBuckets.length) return userBase;
+            return METR_DEFAULTS.taskBuckets.map(b => b.w);
+        }
+
+        function initTaskBucketEditor() {
+            const panel = document.getElementById('task-bucket-editor');
+            const btn = document.getElementById('edit-task-buckets');
+            if (!panel || !btn) return;
+
+            const ids = ['tb-bucket-0','tb-bucket-1','tb-bucket-2','tb-bucket-3','tb-bucket-4'];
+            const inputs = ids.map(id => document.getElementById(id)).filter(Boolean);
+            const sumEl = document.getElementById('tb-sum');
+            const resetBtn = document.getElementById('tb-reset');
+            const applyBtn = document.getElementById('tb-apply');
+
+            // Prefill from current base weights
+            const base = getBaseTaskWeights();
+            const toPct = (x) => Math.max(0, Math.min(100, Math.round(x * 100)));
+            inputs.forEach((inp, i) => { inp.value = toPct(base[i] || 0); });
+            updateSum();
+
+            function updateSum() {
+                const total = inputs.reduce((s, inp) => s + (parseFloat(inp.value) || 0), 0);
+                if (sumEl) sumEl.textContent = `Sum: ${Math.round(total)}%`;
+                return total;
+            }
+
+            inputs.forEach(inp => inp.addEventListener('input', updateSum));
+
+            btn.onclick = () => {
+                panel.classList.toggle('expanded');
+            };
+
+            resetBtn && (resetBtn.onclick = () => {
+                const defaults = METR_DEFAULTS.taskBuckets.map(b => b.w);
+                inputs.forEach((inp, i) => inp.value = toPct(defaults[i] || 0));
+                updateSum();
+            });
+
+            applyBtn && (applyBtn.onclick = () => {
+                let raw = inputs.map(inp => Math.max(0, parseFloat(inp.value) || 0));
+                const total = raw.reduce((a,b)=>a+b,0);
+                if (total <= 0) {
+                    console.warn('[TaskBuckets] Sum is zero; ignoring apply');
+                    return;
+                }
+                const normalized = raw.map(v => v / total);
+                if (!currentParams) return;
+                currentParams.userBaseWeights = normalized;
+                console.log('[TaskBuckets] Applied user base weights:', normalized.map(v=>v.toFixed(3)));
+                updateChart();
+            });
+        }
+
         // Auto-initialize: load benchmark data, then select custom role and trigger analysis on page load
         window.addEventListener('DOMContentLoaded', async function() {
             // Load benchmark data first
@@ -3566,6 +3668,7 @@
                 runPatchRegressionTests();
                 runFeatureImplementationTests();
                 runCalibrationTests();
+                initTaskBucketEditor();
             }, 500);
         });
     </script>
