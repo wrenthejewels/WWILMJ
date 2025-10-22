@@ -360,7 +360,7 @@
         /* Compact bubble table for defaults */
         .bubble-table {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 16px;
             margin: 16px 0 24px;
         }
@@ -368,25 +368,29 @@
             background: #fefbf5;
             border: 1px solid #eadfce;
             border-radius: 16px;
-            padding: 14px 18px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 14px;
+            overflow: hidden;
         }
         .bubble-key {
             font-family: 'Sora', sans-serif;
             font-weight: 600;
             color: #3b3326;
-            flex-shrink: 0;
-            white-space: nowrap;
+            flex: 0 1 auto;
+            min-width: 0;
             font-size: 0.88rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .bubble-val {
             color: #3f392f;
             text-align: right;
-            word-wrap: break-word;
+            flex-shrink: 0;
             font-size: 0.88rem;
+            word-break: break-word;
         }
 
         ol.action-list {
@@ -467,6 +471,23 @@
                 padding: 28px;
             }
 
+            .bubble-table {
+                grid-template-columns: 1fr;
+            }
+
+            .bubble-item {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+
+            .bubble-key {
+                font-size: 0.82rem;
+            }
+
+            .bubble-val {
+                font-size: 0.82rem;
+            }
+
             ol.action-list li {
                 padding: 16px 18px 16px 48px;
             }
@@ -535,7 +556,7 @@
 
                                 <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. Technical capability requires a high bar to outperform human error, though the calculator allows a custom reliability gate if tasks can feasibly be automated at a lower success rate.</li>
 
-                                <li><strong>Task mapping:</strong> Your job gets decomposed into five task duration categories borrowed from METR's framework (&lt;2 min, 2-5 min, 5-15 min, 15-60 min, &gt;60 min), but with gate thresholds recalibrated for corporate production work: [2.5, 15, 60, 180, 540] minutes. These longer thresholds reflect typical workplace task decomposition, which runs longer than METR's research-oriented benchmarks. Once AI can reliably complete enough of these categories, the hazard channel opens.</li>
+                                <li><strong>Task mapping:</strong> Your job gets decomposed into five task duration categories with gate thresholds calibrated for corporate production work: [2.5, 15, 60, 180, 540] minutes. These thresholds reflect typical workplace task decomposition. Once AI can reliably complete enough of these categories, the hazard channel opens.</li>
 
                                 <li><strong>Scenario levers:</strong> Industry-specific friction and required reliability, plus your questionnaire responses, adjust capability but never overwrite METR's doubling - the 7-month doubling stays fixed. Friction multiplies the horizon penalty (p_domain); reliability tightens the success bar.</li>
 
