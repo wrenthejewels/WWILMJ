@@ -2684,7 +2684,10 @@
                 document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 selectedRole = this.dataset.role;
-
+                // Reset overrides on role change so recommendations apply
+                window.__userReliabilityOverride = false;
+                window.__userFrictionOverride = false;
+                applyRecommendedControls();
                 analyzeRole();
             });
         });
@@ -2692,6 +2695,7 @@
         // Add event listeners to all radio buttons to auto-update
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', function() {
+                applyRecommendedControls();
                 analyzeRole();
             });
         });
@@ -2699,6 +2703,34 @@
         function getQuestionValue(questionNum) {
             const checked = document.querySelector(`input[name="q${questionNum}"]:checked`);
             return checked ? parseFloat(checked.value) : 3;
+        }
+
+        // Apply recommended defaults from WWILMJ_PRESETS unless user has overridden
+        function applyRecommendedControls() {
+            if (!window.WWILMJ_PRESETS || !selectedRole) return;
+            const roleKey = selectedRole;
+            const seniorityChecked = document.querySelector('input[name="seniority"]:checked');
+            const seniority = seniorityChecked ? parseFloat(seniorityChecked.value) : 1;
+
+            // Domain friction slider (1.0..2.0)
+            const frictionSlider = document.getElementById('industry-pace');
+            const frictionDisplay = document.getElementById('industry-pace-value');
+            const preset = window.WWILMJ_PRESETS.ROLE_PRESETS[roleKey];
+            if (frictionSlider && preset && !window.__userFrictionOverride) {
+                const v = Math.max(1.0, Math.min(2.0, preset.friction || 1.0));
+                frictionSlider.value = String(v);
+                if (frictionDisplay) frictionDisplay.textContent = v.toFixed(1) + 'x';
+            }
+
+            // Reliability slider (50..99)
+            const relSlider = document.getElementById('ai-reliability');
+            const relDisplay = document.getElementById('ai-reliability-value');
+            if (relSlider && !window.__userReliabilityOverride) {
+                const rec = window.WWILMJ_PRESETS.recommendReliability(roleKey, seniority);
+                const pct = Math.round(rec * 100);
+                relSlider.value = String(Math.max(50, Math.min(99, pct)));
+                if (relDisplay) relDisplay.textContent = pct + '%';
+            }
         }
 
         // Per-question log-hazard multipliers for TECHNICAL FEASIBILITY (Blue Curve)
@@ -3469,6 +3501,7 @@
             console.log('[Slider] Industry Friction:', frictionValue.toFixed(1) + 'x',
                        '→ expect', frictionValue > 1.0 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
+            window.__userFrictionOverride = true;
         });
 
         document.getElementById('ai-reliability')?.addEventListener('input', function() {
@@ -3477,6 +3510,7 @@
             console.log('[Slider] AI Reliability:', reliabilityValue + '%',
                        '→ expect', reliabilityValue > 95 ? 'SLOWER' : 'FASTER', 'automation');
             updateChart();
+            window.__userReliabilityOverride = true;
         });
 
         // Toggle task breakdown visibility
@@ -3515,5 +3549,6 @@
         });
     </script>
     <script src="navigation.js"></script>
+    <script src="presets.js"></script>
 </body>
 </html>
