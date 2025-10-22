@@ -380,11 +380,13 @@
             color: #3b3326;
             flex-shrink: 0;
             white-space: nowrap;
+            font-size: 0.88rem;
         }
         .bubble-val {
             color: #3f392f;
             text-align: right;
             word-wrap: break-word;
+            font-size: 0.88rem;
         }
 
         ol.action-list {
@@ -570,27 +572,27 @@
                             <li><strong>Re-employment likelihood:</strong> Adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
                         </ul>
 
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'><em>Model Defaults</em></h3>
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Model Defaults</h3>
                         <div class='bubble-table'>
-                            <div class='bubble-item'><span class='bubble-key'>H_50,0</span><span class='bubble-val'>137 min (GPT-5 SOTA)</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>D (doubling)</span><span class='bubble-val'>7 months (fixed)</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>r (reliability)</span><span class='bubble-val'>0.95 (default)</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>L_i (gate thresholds)</span><span class='bubble-val'>2.5, 15, 60, 180, 540 min</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>w_i (weights)</span><span class='bubble-val'>25%, 35%, 25%, 10%, 5%</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>s (softness)</span><span class='bubble-val'>0.45</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>h_AI (max hazard)</span><span class='bubble-val'>0.40/yr</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>gamma (steepness)</span><span class='bubble-val'>8.0</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>&theta; (threshold)</span><span class='bubble-val'>0.50</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$H_{50,0}$</span><span class='bubble-val'>137 min (GPT-5 SOTA)</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$D$ (doubling)</span><span class='bubble-val'>7 months (fixed)</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$r$ (reliability)</span><span class='bubble-val'>0.95 (default)</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$L_i$ (gate thresholds)</span><span class='bubble-val'>2.5, 15, 60, 180, 540 min</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$w_i$ (weights)</span><span class='bubble-val'>25%, 35%, 25%, 10%, 5%</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$s$ (softness)</span><span class='bubble-val'>0.45</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$h_{\text{AI}}$ (max hazard)</span><span class='bubble-val'>0.40/yr</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$\gamma$ (steepness)</span><span class='bubble-val'>8.0</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$\theta$ (threshold)</span><span class='bubble-val'>0.50</span></div>
                             <div class='bubble-item'><span class='bubble-key'>userMult range</span><span class='bubble-val'>0.33&times; to 3.0&times;</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>t (timeline)</span><span class='bubble-val'>Years from now</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>H_r(t)</span><span class='bubble-val'>Task horizon at reliability r</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>A_job</span><span class='bubble-val'>Readiness &isin; [0,1]</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>f(r)</span><span class='bubble-val'>Reliability factor</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$t$ (timeline)</span><span class='bubble-val'>Years from now</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$H_r(t)$</span><span class='bubble-val'>Task horizon at reliability $r$</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$A_{\text{job}}$</span><span class='bubble-val'>Readiness &isin; [0,1]</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$f(r)$</span><span class='bubble-val'>Reliability factor</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Task horizon</span><span class='bubble-val'>7&ndash;mo doubling; friction/reliability reduce</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Task buckets</span><span class='bubble-val'>&lt;5, 5&ndash;15, 15&ndash;60, 1&ndash;3, &gt;9 hr (recalibrated)</span></div>
                         </div>
 
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'><em>Friction Decay Parameter</em></h3>
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Friction Decay Parameter</h3>
                         <p>The model includes an inferred friction decay rate (&lambda;) that captures how quickly organizational and role-specific barriers erode over time. This parameter is calculated from your questionnaire responses about company adoption readiness, infrastructure, labor market dynamics, and role characteristics:</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Friction decay rate</span>
@@ -607,7 +609,7 @@
                         </ul>
                         <p>This parameter influences how quickly implementation barriers diminish as AI capability continues to grow. The model implements dynamic friction decay where the implementation delay decreases exponentially over time: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) is calculated as the technical feasibility at the earlier time $t - \Delta(t)$. Higher $\lambda$ means organizational friction erodes faster (barriers collapse quickly once AI crosses initial thresholds); lower $\lambda$ means barriers persist longer even as technical capability advances. This captures how, for example, regulatory frameworks and organizational inertia may initially delay adoption by several years, but these delays shrink as AI becomes more capable and widespread adoption creates network effects.</p>
 
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'><em>Role Presets</em></h3>
+                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
                         <p>Different roles face different automation barriers. Software engineering maps most directly to AI's training data and requires less physical presence, so it gets lower friction (1.05x). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45&ndash;1.50x). These conservative priors reflect how far capability must stretch beyond METR's software-centric benchmarks to reach production readiness in each domain.</p>
                         <p><strong>Two-layer friction system:</strong> The model applies friction at both industry and role levels. The <em>industry-specific friction slider</em> affects all roles in a sector (e.g., finance 1.35x applies to analysts, controllers, and auditors). Your <em>questionnaire responses</em> then add role-specific friction based on tacit knowledge (Q9), physical presence (Q11), and context dependencies (Q7). Both layers multiply together in the calculation, so a high-context legal role in a regulated industry faces compounded barriers.</p>
                         <ul class='detail-list'>
@@ -620,7 +622,7 @@
                             <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>
                         </div>
                         <p>The hazard turns on once METR readiness clears the coverage bar. The model uses a <strong>two-level gating system</strong>: first, task-level gates determine which individual tasks AI can handle; second, a job-level hazard gate opens when enough of your job becomes automatable. Here's how it works:</p>
-                        <ol class='detail-list' style='list-style-type: decimal; padding-left: 2em;'>
+                        <ol class='action-list'>
                             <li><strong>Task-level gates open gradually:</strong> As AI capability $H_r(t)$ grows via METR's doubling trend, each task bucket's gate $G_i(H)$ opens. Short tasks automate first (gates open when $H$ exceeds their threshold $L_i$), then medium tasks, then long tasks. Your personalized weights $w_i$ determine how much each gate contributes to overall readiness.</li>
                             <li><strong>Job readiness accumulates:</strong> $A(t) = \sum w_i G_i(H)$ sums up all the open gates, weighted by your job profile. This gives a number between 0 and 1 representing what fraction of your job AI can perform.</li>
                             <li><strong>Job-level hazard gate activates:</strong> When $A(t)$ crosses the coverage threshold $\theta$ (typically 0.50), the hazard function $\lambda_{\text{AI}}(t)$ rapidly increases via the logistic gate. Before this point, hazard is near zero; after, it approaches the maximum $h_{\max} \times M_{\text{user}}$.</li>
