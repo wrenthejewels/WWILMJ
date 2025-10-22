@@ -3635,8 +3635,11 @@
             };
 
             resetBtn && (resetBtn.onclick = () => {
-                const defaults = METR_DEFAULTS.taskBuckets.map(b => b.w);
-                setInputsFromArray(defaults);
+                // Reset to model-computed values for current seniority/answers
+                const seniorityLevel = (currentParams && currentParams.seniority) || 1;
+                const answers = (currentParams && currentParams.answers) || null;
+                const modelWeights = getTaskWeightsForSeniority(seniorityLevel, answers);
+                setInputsFromArray(modelWeights);
                 updateSum();
             });
 
@@ -3662,22 +3665,45 @@
                 inputs.forEach(inp => inp.disabled = disable);
                 resetBtn && (resetBtn.disabled = disable);
                 applyBtn && (applyBtn.disabled = disable);
+
+                const seniorityLevel = (currentParams && currentParams.seniority) || 1;
+                const answers = (currentParams && currentParams.answers) || null;
+
                 if (mode === 'auto') {
-                    const eff = getTaskWeightsForSeniority(currentParams.seniority || 1, currentParams.answers || null);
-                    setInputsFromArray(eff);
+                    // In auto mode, always show the current model-computed weights
+                    const effectiveWeights = getTaskWeightsForSeniority(seniorityLevel, answers);
+                    setInputsFromArray(effectiveWeights);
                     updateSum();
                 } else {
-                    const base = getBaseTaskWeights();
-                    setInputsFromArray(base);
+                    // In custom mode, show user's custom weights if they exist
+                    // Otherwise show model-computed weights as starting point
+                    if (currentParams.userBaseWeights && currentParams.userBaseWeights.length === METR_DEFAULTS.taskBuckets.length) {
+                        setInputsFromArray(currentParams.userBaseWeights);
+                    } else {
+                        const modelWeights = getTaskWeightsForSeniority(seniorityLevel, answers);
+                        setInputsFromArray(modelWeights);
+                    }
                     updateSum();
                 }
             }
 
             autoChk && (autoChk.onchange = () => {
                 if (!currentParams) return;
+                const wasAuto = (currentParams.taskBucketMode !== 'custom');
                 currentParams.taskBucketMode = autoChk.checked ? 'auto' : 'custom';
+
+                // If switching FROM auto TO custom, populate with current model-computed values
+                // This gives users the current model calculation as their starting point for editing
+                if (wasAuto && !autoChk.checked) {
+                    const seniorityLevel = (currentParams && currentParams.seniority) || 1;
+                    const answers = (currentParams && currentParams.answers) || null;
+                    const modelWeights = getTaskWeightsForSeniority(seniorityLevel, answers);
+                    // Don't set userBaseWeights yet - let them click Apply to commit
+                    setInputsFromArray(modelWeights);
+                    updateSum();
+                }
+
                 refreshTaskBucketEditor();
-                // If switching to auto, no need to update chart; if switching to custom and values differ, Apply controls chart on click
             });
 
             refreshTaskBucketEditor();
