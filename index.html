@@ -1905,8 +1905,8 @@
             
             <div class="controls-grid">
                 <div class="control-group">
-                    <h3>Industry-Specific Friction</h3>
-                    <p>Capability penalty for this industry (does NOT affect METR doubling)</p>
+                    <h3>Industry Friction</h3>
+                    <p>How much harder is your industry to automate compared to software? (Higher = more barriers)</p>
                     <div class="slider-container">
                         <input type="range" id="industry-pace" min="0.5" max="2" step="0.1" value="1">
                         <span class="value-display" id="industry-pace-value">1.0x</span>
@@ -2561,6 +2561,37 @@
             return allPassed;
         }
 
+        // Helper: Update sliders based on role preset and seniority
+        function updateSlidersFromPreset() {
+            if (!selectedRole) return;
+
+            const presets = window.WWILMJ_PRESETS;
+            if (!presets) return;
+
+            const rolePreset = presets.ROLE_PRESETS[selectedRole];
+            if (!rolePreset) return;
+
+            // Get current seniority level
+            const seniorityChecked = document.querySelector('input[name="seniority"]:checked');
+            const seniorityLevel = seniorityChecked ? parseInt(seniorityChecked.value) : 1;
+
+            // Update industry friction slider
+            const frictionSlider = document.getElementById('industry-pace');
+            if (frictionSlider && rolePreset.friction) {
+                frictionSlider.value = rolePreset.friction;
+                document.getElementById('industry-pace-value').textContent = rolePreset.friction.toFixed(1) + 'x';
+            }
+
+            // Update reliability slider (includes seniority adjustment)
+            const reliabilitySlider = document.getElementById('ai-reliability');
+            if (reliabilitySlider) {
+                const recommendedR = presets.recommendReliability(selectedRole, seniorityLevel);
+                const percentValue = Math.round(recommendedR * 100);
+                reliabilitySlider.value = percentValue;
+                document.getElementById('ai-reliability-value').textContent = percentValue + '%';
+            }
+        }
+
         // Tests will be run after DOM is ready (see DOMContentLoaded handler below)
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -2568,6 +2599,7 @@
                 this.classList.add('active');
                 selectedRole = this.dataset.role;
 
+                updateSlidersFromPreset();
                 analyzeRole();
             });
         });
@@ -2575,6 +2607,10 @@
         // Add event listeners to all radio buttons to auto-update
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', function() {
+                // If seniority changed, update sliders (reliability adjusts by seniority)
+                if (this.name === 'seniority') {
+                    updateSlidersFromPreset();
+                }
                 analyzeRole();
             });
         });
