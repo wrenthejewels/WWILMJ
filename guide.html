@@ -527,7 +527,7 @@
 
                                 <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. Technical capability requires a high bar to outperform human error, though the calculator allows a custom reliability gate if tasks can feasibly be automated at a lower success rate.</li>
 
-                                <li><strong>Task mapping:</strong> Your job gets decomposed into task duration buckets (2.5, 15, 60, 180, 540 minutes). Once AI can reliably complete enough of these buckets, the hazard channel opens.</li>
+                                <li><strong>Task mapping:</strong> Your job gets decomposed into five task duration buckets calibrated for corporate production environments (2.5, 15, 60, 180, 540 minute boundaries, using midpoint thresholds 2.5, 10, 37.5, 120, 360 minutes). While METR's categories provide the framework, these specific values reflect typical workplace task lengths. Once AI can reliably complete enough of these buckets, the hazard channel opens.</li>
 
                                 <li><strong>Scenario levers:</strong> Industry-specific friction and required reliability, plus your questionnaire responses, adjust capability but never overwrite METR's doubling - the 7-month doubling stays fixed. Friction multiplies the horizon penalty (p_domain); reliability tightens the success bar.</li>
 
@@ -567,7 +567,7 @@
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Model Defaults</h3>
                         <ul class='detail-list'>
                             <li><strong>Task horizon:</strong> METR's 7-month doubling increases capability over time; domain friction (p_domain) and required reliability (f(r)) reduce the effective horizon.</li>
-                            <li><strong>Task buckets:</strong> We mirror METR's five duration categories (<5 min, 5-15 min, 15-60 min, 1-3 hr, >3 hr) with gate thresholds L_i = [2.5, 10, 37.5, 120, 360] minutes (using category midpoints). Each bucket opens via a logistic gate as capability grows.</li>
+                            <li><strong>Task buckets:</strong> Five duration categories calibrated for corporate production (<5 min, 5-15 min, 15-60 min, 1-3 hr, >3 hr) with gate thresholds L_i = [2.5, 10, 37.5, 120, 360] minutes. While inspired by METR's framework, these specific boundaries (2.5, 15, 60, 180, 540) reflect typical workplace task decomposition. Each bucket opens via a logistic gate as capability grows.</li>
                         </ul>
                         <div class='bubble-table'>
                             <div class='bubble-item'><span class='bubble-key'>Reliability (r)</span><span class='bubble-val'>0.95 default</span></div>
@@ -575,14 +575,15 @@
                             <div class='bubble-item'><span class='bubble-key'>Weights w_i</span><span class='bubble-val'>25%, 35%, 25%, 10%, 5%</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Softness (s)</span><span class='bubble-val'>0.45</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Max hazard</span><span class='bubble-val'>0.40 / yr</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>gamma</span><span class='bubble-val'>8.0</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>theta0</span><span class='bubble-val'>0.50</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>γ</span><span class='bubble-val'>8.0</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>θ₀</span><span class='bubble-val'>0.50</span></div>
                         </div>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
+                        <p>Different roles face different automation barriers. Software engineering maps most directly to AI's training data and requires less physical presence, so it gets lower friction (1.05×). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45-1.50×). These conservative priors reflect how far capability must stretch beyond METR's software-centric benchmarks to reach production readiness in each domain.</p>
                         <ul class='detail-list'>
-                            <li><strong>Domain friction:</strong> Role presets set a conservative friction multiplier by role (software -> lower; legal/engineering -> higher). This multiplies the horizon penalty p<sub>domain</sub> without changing METR's doubling.</li>
-                            <li><strong>Recommended reliability:</strong> Presets also suggest a reliability starting point per role, with seniority adjustments (entry slightly lower, exec slightly higher). You can override both in the UI.</li>
+                            <li><strong>Domain friction:</strong> Role presets set a friction multiplier by role (software 1.05×, admin/data 1.10×, finance/consulting 1.35×, legal 1.45×, engineering 1.50×). This multiplies the horizon penalty p<sub>domain</sub>, requiring AI to handle longer tasks before automation becomes viable in domains with tacit knowledge, compliance burdens, or physical constraints. The doubling time stays fixed at 7 months.</li>
+                            <li><strong>Recommended reliability:</strong> Presets suggest a reliability starting point per role based on typical error tolerance and stakes (finance/legal 97-98%, software/data 92-93%, creative/customer service 88-90%). Seniority adjusts these baselines: entry-level roles tolerate slightly lower reliability (-0.05), while executive decisions demand higher confidence (+0.05). Higher reliability requirements contract the effective task horizon significantly—95% reliability shrinks capability by ~33×, while 98% shrinks it by ~95×. You can override both friction and reliability in the UI to test different scenarios.</li>
                         </ul>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
