@@ -3330,12 +3330,12 @@
             const q11 = answers.Q12 || 3;  // Physical presence
 
             const reallocationScore = (
-                norm(q10) * 0.40 +           // Direct reallocation feasibility
-                norm(q5) * 0.20 +            // Decomposable = easier to split
-                norm(q6) * 0.15 +            // Standardized = others can pick up
-                (1 - norm(q7)) * 0.10 +      // Low context = portable
+                norm(q10) * 0.50 +           // Direct reallocation feasibility (increased weight)
+                norm(q5) * 0.18 +            // Decomposable = easier to split
+                norm(q6) * 0.12 +            // Standardized = others can pick up
+                (1 - norm(q7)) * 0.08 +      // Low context = portable
                 (1 - norm(q9)) * 0.10 +      // Low tacit = teachable
-                (1 - norm(q11)) * 0.05       // Low physical presence = easier remote reallocation
+                (1 - norm(q11)) * 0.02       // Low physical presence = easier remote reallocation
             );
 
             // 2. Senior Productivity Amplification (only for digital work)
@@ -3349,8 +3349,9 @@
             // Amplification ranges from 0 to 2.0 (can double senior productivity)
             const amplificationBoost = digitalFraction * aiCapability * 2.0;
 
-            // 3. Compression Readiness (reallocation × amplification)
-            const compressionReadiness = reallocationScore * (1.0 + amplificationBoost);
+            // 3. Compression Readiness (hybrid: 70% immediate + 30% time-dependent)
+            // This gives Q10 immediate effect while preserving growth as AI improves
+            const compressionReadiness = reallocationScore * (0.7 + 0.3 * (1.0 + amplificationBoost));
 
             // 4. Compression Hazard Gate (lower threshold than automation)
             const h_max_compression = 0.30;  // Lower than automation's 0.40
