@@ -3338,16 +3338,42 @@
                 (1 - norm(q11)) * 0.02       // Low physical presence = easier remote reallocation
             );
 
-            // 2. Senior Productivity Amplification (only for digital work)
+            // 2. Senior Productivity Amplification (only for AI-learnable digital work)
             const q1 = answers.Q1 || 3;    // Current AI performance
-            const q4 = answers.Q4 || 3;    // Digitization
+            const q4 = answers.Q4 || 3;    // Task digitization
+            const q5 = answers.Q5 || 3;    // Task decomposability
+            const q6 = answers.Q6 || 3;    // Task standardization
+            const q7 = answers.Q7 || 3;    // Context dependency
+            const q9 = answers.Q9 || 3;    // Tacit knowledge
 
             const A_current = A_job(tYears); // Current task readiness
-            const digitalFraction = norm(q4);
+
+            // Raw digitization (digital deliverables)
+            const rawDigitalFraction = norm(q4);
+
+            // Learnability discount: factors that make digital work less AI-trainable
+            // High context, high tacit knowledge, low decomposability, and low standardization
+            // all reduce how much AI can learn from observing the digital work
+            const contextPenalty = norm(q7);           // High context = work requires understanding not in the data
+            const tacitPenalty = norm(q9);             // High tacit = work requires experience not codifiable
+            const variabilityPenalty = 1 - norm(q5);   // Low decomposability = work is integrated/holistic
+            const customizationPenalty = 1 - norm(q6); // Low standardization = each instance is unique
+
+            const learnabilityDiscount = 1 - (
+                0.35 * contextPenalty +
+                0.30 * tacitPenalty +
+                0.20 * variabilityPenalty +
+                0.15 * customizationPenalty
+            );
+
+            // Effective digital fraction: only digital work that AI can actually learn from
+            const effectiveDigitalFraction = rawDigitalFraction * Math.max(0.1, learnabilityDiscount);
+
             const aiCapability = norm(q1) * A_current;
 
             // Amplification ranges from 0 to 2.0 (can double senior productivity)
-            const amplificationBoost = digitalFraction * aiCapability * 2.0;
+            // But only applies to work that is both digital AND AI-learnable
+            const amplificationBoost = effectiveDigitalFraction * aiCapability * 2.0;
 
             // 3. Compression Readiness (hybrid: 70% immediate + 30% time-dependent)
             // This gives Q10 immediate effect while preserving growth as AI improves
@@ -3371,7 +3397,9 @@
             if (tYears === 0 && compressionReadiness > 0.2) {
                 console.log('[Compression Debug] t=0:');
                 console.log(`  reallocationScore = ${reallocationScore.toFixed(3)}`);
-                console.log(`  amplificationBoost = ${amplificationBoost.toFixed(3)} (digital=${digitalFraction.toFixed(2)}, AI capability=${aiCapability.toFixed(2)})`);
+                console.log(`  rawDigital = ${rawDigitalFraction.toFixed(2)}, learnabilityDiscount = ${learnabilityDiscount.toFixed(2)}`);
+                console.log(`  effectiveDigital = ${effectiveDigitalFraction.toFixed(2)} (AI-learnable fraction)`);
+                console.log(`  amplificationBoost = ${amplificationBoost.toFixed(3)} (AI capability=${aiCapability.toFixed(2)})`);
                 console.log(`  compressionReadiness = ${compressionReadiness.toFixed(3)}`);
                 console.log(`  hierarchyVuln = ${hierarchyVuln.toFixed(2)} (level ${seniorityLevel})`);
                 console.log(`  compression hazard = ${finalCompressionHazard.toFixed(3)}/year`);
