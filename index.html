@@ -2655,30 +2655,30 @@
             if (!q5Pass) allPassed = false;
 
             // Test 2: Q12 direction - moving from 1→5 should DECREASE hazardMult
-            console.log('\nTEST 2: Q11 direction (physical presence)');
+            console.log('\nTEST 2: Q12 direction (physical presence)');
             const q12Low = { ...neutralAnswers, Q12: 1 };  // None
             const q12High = { ...neutralAnswers, Q12: 5 }; // Essential
-            const { ampMult: ampQ13Low, fricMult: fricQ13Low } = computeHazardMultipliers(q12Low);
-            const { ampMult: ampQ13High, fricMult: fricQ13High } = computeHazardMultipliers(q12High);
-            const multQ13Low = ampQ13Low * fricQ13Low;
-            const multQ13High = ampQ13High * fricQ13High;
-            const q12Pass = multQ13High < multQ13Low;
-            console.log(`  Q11=1 (none): hazardMult = ${multQ12Low.toFixed(3)}`);
-            console.log(`  Q11=5 (essential): hazardMult = ${multQ12High.toFixed(3)}`);
+            const { ampMult: ampQ12Low, fricMult: fricQ12Low } = computeHazardMultipliers(q12Low);
+            const { ampMult: ampQ12High, fricMult: fricQ12High } = computeHazardMultipliers(q12High);
+            const multQ12Low = ampQ12Low * fricQ12Low;
+            const multQ12High = ampQ12High * fricQ12High;
+            const q12Pass = multQ12High < multQ12Low;
+            console.log(`  Q12=1 (none): hazardMult = ${multQ12Low.toFixed(3)}`);
+            console.log(`  Q12=5 (essential): hazardMult = ${multQ12High.toFixed(3)}`);
             console.log(`  RESULT: ${q12Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should decrease hazard)`);
             if (!q12Pass) allPassed = false;
 
             // Test 3: Q15 direction - moving from 1→5 should INCREASE delayYears
-            console.log('\nTEST 3: Q14 direction (labor market tightness)');
-            const q16Easy = { ...neutralAnswers, Q15: 1 };       // Very Easy to hire
-            const q16Difficult = { ...neutralAnswers, Q15: 5 };  // Very Difficult to hire
-            const delayEasy = calculateImplementationDelay(q16Easy, 1);
-            const delayDifficult = calculateImplementationDelay(q16Difficult, 1);
-            const q16Pass = delayDifficult > delayEasy;
-            console.log(`  Q14=1 (easy to hire): delay = ${delayEasy.toFixed(2)} years`);
-            console.log(`  Q14=5 (difficult to hire): delay = ${delayDifficult.toFixed(2)} years`);
-            console.log(`  RESULT: ${q16Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should increase delay)`);
-            if (!q16Pass) allPassed = false;
+            console.log('\nTEST 3: Q15 direction (labor market tightness)');
+            const q15Easy = { ...neutralAnswers, Q15: 1 };       // Very Easy to hire
+            const q15Difficult = { ...neutralAnswers, Q15: 5 };  // Very Difficult to hire
+            const delayEasy = calculateImplementationDelay(q15Easy, 1);
+            const delayDifficult = calculateImplementationDelay(q15Difficult, 1);
+            const q15Pass = delayDifficult > delayEasy;
+            console.log(`  Q15=1 (easy to hire): delay = ${delayEasy.toFixed(2)} years`);
+            console.log(`  Q15=5 (difficult to hire): delay = ${delayDifficult.toFixed(2)} years`);
+            console.log(`  RESULT: ${q15Pass ? 'PASS ✓' : 'FAIL ✗'} (moving 1→5 should increase delay)`);
+            if (!q15Pass) allPassed = false;
 
             // Test 4: Calibration - Max(Q1,Q4,Q6)=5 vs all=3 should yield ≥2.5× hazard
             console.log('\nTEST 4: High-risk amplifier stack (Q1+Q4+Q6 max)');
@@ -2696,7 +2696,7 @@
             if (!calibPass) allPassed = false;
 
             // Test 5: Protective stack - Q7=5, Q9=5, Q12=5, Q14=5 should suppress hazard ≤0.5× AND increase delay ≥0.7y
-            console.log('\nTEST 5: Protective stack (Q7+Q9+Q11 high friction, Q14 high)');
+            console.log('\nTEST 5: Protective stack (Q7+Q9+Q12 high friction, Q14 high)');
             const protectiveAnswers = { ...neutralAnswers, Q7: 5, Q9: 5, Q12: 5, Q14: 5 };
             const { ampMult: protAmp, fricMult: protFric } = computeHazardMultipliers(protectiveAnswers);
             const protMult = protAmp * protFric;
