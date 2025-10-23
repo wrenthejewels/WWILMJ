@@ -441,6 +441,7 @@
         canvas {
             max-width: 100%;
             height: 400px;
+            display: block;
         }
         
         .results {
@@ -634,14 +635,19 @@
             }
 
             .chart-container {
-                padding: 12px;
+                padding: 8px;
                 height: auto;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
             }
 
             canvas {
                 height: auto !important;
                 aspect-ratio: 5 / 4;
                 width: 100%;
+                display: block;
+                margin: 0;
             }
 
             .results {
@@ -2574,11 +2580,11 @@
             // Test 1: Gate direction - faster AI (lower H) should give higher readiness
             console.log('TEST 1: Gate direction');
             const s = 0.45, L = 10;
-            const gateFast = taskGate(1, L, s);
-            const gateSlow = taskGate(100, L, s);
+            const gateSlow = taskGate(1, L, s);    // H=1 is slow/low capability AI
+            const gateFast = taskGate(100, L, s);  // H=100 is fast/high capability AI
             const gatePass = gateFast > gateSlow;
-            console.log(`  taskGate(H=1, L=10) = ${gateFast.toFixed(4)}`);
-            console.log(`  taskGate(H=100, L=10) = ${gateSlow.toFixed(4)}`);
+            console.log(`  taskGate(H=1, L=10) = ${gateSlow.toFixed(4)}`);
+            console.log(`  taskGate(H=100, L=10) = ${gateFast.toFixed(4)}`);
             console.log(`  RESULT: ${gatePass ? 'PASS ✓' : 'FAIL ✗'} (faster AI must have higher readiness)`);
             if (!gatePass) allPassed = false;
             console.log('  Note: taskGate increases with higher H at fixed L (direction check)');
