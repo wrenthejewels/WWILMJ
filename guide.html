@@ -597,10 +597,11 @@
                             <span class='callout-label'>Stacked hazard model</span>
                             <div class='equation-display'>$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
                         </div>
-                        <p>The active AI hazard channel ($\lambda_{\text{AI}}(s)$) generates the blue technical feasibility curve. Your firm and personal questionnaire responses then shift this curve forward in time to create the green implementation curve. The same data also determines your re-employment probability.</p>
+                        <p>The active AI hazard channel ($\lambda_{\text{AI}}(s)$) generates the blue technical feasibility curve. Your firm and personal questionnaire responses then shift this curve forward in time and add a compression hazard channel to create the green implementation curve. The same data also determines your re-employment probability.</p>
                         <ul class='detail-list'>
-                            <li><strong>AI hazard:</strong> METR task-length data map capability progress into the blue curve.</li>
-                            <li><strong>Adaptability delay:</strong> Firm and personal answers shift the AI hazard forward in time to produce the green curve.</li>
+                            <li><strong>AI hazard (blue curve):</strong> METR task-length data map capability progress into technical feasibility.</li>
+                            <li><strong>Compression hazard (green curve only):</strong> Workforce reductions via task reallocation to AI-amplified seniors, activated at lower capability thresholds for vulnerable hierarchy positions.</li>
+                            <li><strong>Implementation delay (green curve):</strong> Firm and personal answers shift the AI automation hazard forward in time.</li>
                             <li><strong>Re-employment likelihood:</strong> Adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
                         </ul>
 
@@ -698,9 +699,38 @@
                     </section>
 
                     <section>
+                        <h2>Workforce compression: job loss before full automation</h2>
+                        <p><strong>Key insight:</strong> Jobs can be eliminated well before AI reaches full automation capability. When AI makes senior workers more productive, companies can reduce headcount by redistributing work upward in the hierarchy. An entry-level software engineer's role might disappear when AI can only handle 35% of their tasks &mdash; not because AI does everything, but because AI-amplified senior engineers can absorb the remaining 65%.</p>
+
+                        <p>The model captures this through a <strong>compression hazard</strong> that activates earlier and at a lower threshold than full automation. This hazard only affects the green curve (actual job loss), not the blue curve (technical feasibility), and depends on three factors:</p>
+
+                        <div class='equation-callout'>
+                            <span class='callout-label'>Compression hazard</span>
+                            <div class='equation-display'>$$\lambda_{\text{compression}}(t) = \frac{h_{\max,c}}{1 + \exp(-\gamma_c (R_c(t) - \theta_c))} \cdot V_{\text{hierarchy}}$$</div>
+                            <span class='callout-label'>Where compression readiness is:</span>
+                            <div class='equation-display'>$$R_c(t) = s_{\text{realloc}} \times (1 + B_{\text{amp}}),\quad B_{\text{amp}} = f_{\text{digital}} \cdot A_{\text{job}}(t) \cdot \text{norm}(Q1) \cdot 2.0$$</div>
+                        </div>
+
+                        <p><strong>How it works:</strong></p>
+                        <ol class='action-list'>
+                            <li><strong>Reallocation feasibility ($s_{\text{realloc}}$):</strong> Combines Q19 (direct reallocation question), task structure (Q5-Q7: decomposable, standardized, low-context work is easier to redistribute), tacit knowledge (Q9), and physical presence requirements (Q11). Higher scores mean your work can be easily absorbed by others.</li>
+                            <li><strong>Senior productivity amplification ($B_{\text{amp}}$):</strong> AI only amplifies productivity for digital work (Q4). The boost ranges from 0 to 2.0× (can double senior output), scaled by current AI performance (Q1) and job readiness. Physical or tacit-heavy roles get minimal amplification even if tasks are reallocatable.</li>
+                            <li><strong>Hierarchy vulnerability ($V_{\text{hierarchy}}$):</strong> Your position in the workflow determines exposure. Level 1 (many layers above) = 100% vulnerable. Level 4-5 (top of domain, no one above can do your work) = protected. A principal engineer who owns a system faces minimal compression risk despite being in a "senior" role title.</li>
+                        </ol>
+
+                        <p><strong>Parameters differ from full automation:</strong> The compression gate opens at $\theta_c = 0.35$ (vs. $\theta = 0.50$ for automation), has gentler slope ($\gamma_c = 6.0$ vs. $\gamma = 8.0$), and lower maximum hazard ($h_{\max,c} = 0.30$/year vs. $h_{\max} = 0.40$/year). Combined with automation hazard, the total is capped at 0.60/year to reflect real-world institutional friction that prevents instant mass layoffs.</p>
+
+                        <p><strong>Example:</strong> An entry-level SWE (Level 1) with highly decomposable digital work (Q4=5, Q5=4, Q6=4, Q19=4) faces compression when AI reaches ~30% capability. At 40% capability, seniors are 1.6× more productive, triggering 15-25%/year compression hazard before automation hazard even activates. The green curve shows significant job loss risk 2-3 years earlier than the blue curve predicts, matching observed workforce reductions in software engineering.</p>
+
+                        <div class='insight-callout'>
+                            <p><strong>Protection mechanisms:</strong> Compression vulnerability is lowest when you combine: (1) high hierarchy position (Level 4-5: you own the domain), (2) low reallocation feasibility (Q19=1-2: unique expertise, hard to transfer), (3) high tacit/context load (Q7/Q9 high: work requires deep specialized knowledge), or (4) low digitization (Q4 low: AI can't amplify seniors in your domain). Physical presence (Q11 high) also protects by making remote redistribution difficult.</p>
+                        </div>
+                    </section>
+
+                    <section>
                         <h2>Implementation delay and the green curve</h2>
-                        <p><strong>Key insight:</strong> The green curve is <em>not</em> a separate hazard &mdash; it's the blue curve shifted right by implementation delay (&Delta;). The blue curve represents when AI <em>can</em> technically do the job; the green curve represents when organizations <em>actually</em> adopt automation, accounting for regulatory friction, labor protections, integration costs, and trust requirements.</p>
-                        <p>The implementation delay derives from company context and individual leverage. Q12 through Q15 examine adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q18 (job performance) helps retain top performers, delaying job loss.</p>
+                        <p><strong>Key insight:</strong> The green curve combines two job loss mechanisms: (1) the blue curve shifted right by implementation delay (delayed automation), and (2) workforce compression hazard (task reallocation to AI-amplified seniors). The blue curve represents pure technical feasibility &mdash; when AI <em>can</em> do the job. The green curve represents actual job loss, accounting for both organizational adoption delays <em>and</em> earlier compression-driven workforce reductions.</p>
+                        <p>The implementation delay derives from company context and individual leverage. Q12 through Q15 examine adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q18 (job performance) helps retain top performers, delaying job loss. Compression hazard (described in the previous section) can cause the green curve to exceed the blue curve in early years for vulnerable roles.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Delay function</span>
                             <div class='equation-display'>$$\text{delay} = \operatorname{clip}(1.75 - 1.25 s_{\text{delay}} + \Delta_{\text{seniority}}, 0.3, 4.0),\quad s_{\text{delay}} \in [-2,2],\; \Delta_{\text{seniority}} \in \{-0.4,-0.1,+0.2,+0.4,+0.6\}$$</div>
