@@ -633,23 +633,23 @@
                             <p style="font-size: 0.9em; margin-top: 8px; color: #666;">where $n_i$ is the normalized answer to question $i$ (Likert 1-5 scaled to 0-1), and $\lambda$ is clamped to $[0.005, 0.05]$</p>
                         </div>
                         <div class='bubble-table'>
-                            <div class='bubble-item'><span class='bubble-key'>Q12 (Company AI adoption)</span><span class='bubble-val'>+0.01 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q15 (IT infrastructure)</span><span class='bubble-val'>+0.01 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q13 (Labor cost pressure)</span><span class='bubble-val'>+0.005 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q14 (Labor market tightness)</span><span class='bubble-val'>+0.005 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q11 (Physical presence)</span><span class='bubble-val'>-0.01 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q10 (Human judgment)</span><span class='bubble-val'>-0.01 weight</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Q13 (Company AI adoption)</span><span class='bubble-val'>+0.01 weight</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Q16 (IT infrastructure)</span><span class='bubble-val'>+0.01 weight</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Q14 (Labor cost pressure)</span><span class='bubble-val'>+0.005 weight</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Q15 (Labor market tightness)</span><span class='bubble-val'>+0.005 weight</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Q12 (Physical presence)</span><span class='bubble-val'>-0.01 weight</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Q11 (Human judgment)</span><span class='bubble-val'>-0.01 weight</span></div>
                         </div>
                         <p>This parameter influences how quickly implementation barriers diminish as AI capability continues to grow. The model implements dynamic friction decay where the implementation delay decreases exponentially over time: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) is calculated as the technical feasibility at the earlier time $t - \Delta(t)$. Higher $\lambda$ means organizational friction erodes faster (barriers collapse quickly once AI crosses initial thresholds); lower $\lambda$ means barriers persist longer even as technical capability advances. This captures how, for example, regulatory frameworks and organizational inertia may initially delay adoption by several years, but these delays shrink as AI becomes more capable and widespread adoption creates network effects.</p>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
                         <p>Different roles face different automation barriers. Software engineering maps most directly to AI's training data and requires less physical presence, so it gets lower friction (1.05x). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45&ndash;1.50x). These conservative priors reflect how far capability must stretch beyond METR's software-centric benchmarks to reach production readiness in each domain.</p>
-                        <p><strong>Two-layer friction system:</strong> The model applies friction at both industry and role levels. The <em>industry-specific friction slider</em> affects all roles in a sector (e.g., finance 1.35x applies to analysts, controllers, and auditors). Your <em>questionnaire responses</em> then add role-specific friction based on tacit knowledge (Q9), physical presence (Q11), and context dependencies (Q7). Both layers multiply together in the calculation, so a high-context legal role in a regulated industry faces compounded barriers.</p>
+                        <p><strong>Two-layer friction system:</strong> The model applies friction at both industry and role levels. The <em>industry-specific friction slider</em> affects all roles in a sector (e.g., finance 1.35x applies to analysts, controllers, and auditors). Your <em>questionnaire responses</em> then add role-specific friction based on tacit knowledge (Q9), physical presence (Q12), and context dependencies (Q7). Both layers multiply together in the calculation, so a high-context legal role in a regulated industry faces compounded barriers.</p>
                         <ul class='detail-list'>
                             <li><strong>Domain friction (preset baseline):</strong> Role presets set an initial friction multiplier (software ~1.05x, admin/data ~1.10x, finance/consulting ~1.35x, legal ~1.45x, engineering ~1.50x). This serves as the starting point for the role's automation difficulty before individual job characteristics are considered.</li>
                             <li><strong>Recommended reliability:</strong> Presets suggest a reliability starting point per role based on typical error tolerance and stakes (finance/legal 97&ndash;98%, software/data 92&ndash;93%, creative/customer service 88&ndash;90%). Seniority adjusts these baselines: entry-level roles tolerate slightly lower reliability (&minus;0.05), while executive decisions demand higher confidence (+0.05). Higher reliability requirements contract the effective task horizon significantly &mdash; 95% reliability shrinks capability by ~33&times;, while 98% shrinks it by ~95&times;. You can override both friction and reliability in the UI to test different scenarios.</li>
                         </ul>
-                        <p>In addition to the preset baseline, the calculator derives a role-specific <em>domain alignment</em> penalty from your answers. Digitized, decomposable, and standardized work (Q4/Q5/Q6 high) reduces the penalty; context dependence, tacit knowledge, judgment/relationship load, and physical presence (Q7/Q9/Q10/Q11 high) increase it. Internally, we form a signed weighted sum and map it to a penalty multiplier via an exponential, clamped to a reasonable range. This penalty multiplies with the sector slider, so misalignment compounds friction.</p>
+                        <p>In addition to the preset baseline, the calculator derives a role-specific <em>domain alignment</em> penalty from your answers. Digitized, decomposable, and standardized work (Q4/Q5/Q6 high) reduces the penalty; context dependence, tacit knowledge, judgment/relationship load, and physical presence (Q7/Q9/Q11/Q12 high) increase it. Internally, we form a signed weighted sum and map it to a penalty multiplier via an exponential, clamped to a reasonable range. This penalty multiplies with the sector slider, so misalignment compounds friction.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
                             <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>
@@ -682,8 +682,8 @@
                         <ul class='detail-list'>
                             <li><strong>AI readiness (Q1-Q4):</strong> High scores strengthen the amplifier channel when you indicate strong capability for AI learning and completing your tasks. Additionally, Q1 (current AI performance), Q2 (data availability), Q3 (benchmark clarity), and Q4 (task digitization) all contribute to role explicitness ($s_e$), which lowers the coverage threshold $\theta$ &mdash; making automation viable at lower overall capability levels.</li>
                             <li><strong>Task structure (Q5&ndash;Q9):</strong> These questions affect the blue curve (technical feasibility) through multiple mechanisms: <strong>(1)</strong> Q5, Q6 shift the task duration profile (structured &rarr; shorter buckets, complex &rarr; longer buckets), <strong>(2)</strong> Q2, Q5, Q6, Q8 contribute to $s_e$ which <strong>lowers $\theta$</strong> (data-rich, decomposable, standardized, fast-feedback jobs become viable at lower capability), and <strong>(3)</strong> Q7, Q9 increase the domain penalty $p_{\text{domain}}$ (high context, tacit knowledge damp capability) &mdash; they do <em>not</em> change the doubling time. Together, these determine when your specific job crosses the automation threshold.</li>
-                            <li><strong>Human moat (Q10-Q11):</strong> Relationship intensity and physical presence both load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
-                            <li><strong>Firm and personal context (Q12-Q18):</strong> Company levers shape implementation delay. Job performance (Q18) delays displacement for top performers while also helping re-employment. Adaptability (Q17) and transferability (Q16) drive re-employment probability.</li>
+                            <li><strong>Human moat (Q11-Q12):</strong> Relationship intensity and physical presence both load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
+                            <li><strong>Firm and personal context (Q13-Q19):</strong> Company levers shape implementation delay. Job performance (Q19) delays displacement for top performers while also helping re-employment. Adaptability (Q18) and transferability (Q17) drive re-employment probability.</li>
                         </ul>
                         <p><strong>Role explicitness ($s_e$) mechanism:</strong> Questions Q1, Q2, Q3, Q4, Q5, Q6, and Q8 (positive factors) are averaged together, while Q7 and Q9 (context dependency and tacit knowledge &mdash; protective factors) are averaged separately. The formula $s_e = 0.65 \times \text{norm}(s_{\text{pos}}) - 0.35 \times \text{norm}(s_{\text{neg}}) + 0.10$ produces a score between 0 and 1. Higher $s_e$ (more explicit roles) reduces $\theta$ via the shift $\Delta_{s_e} = 0.10 \times (0.5 - s_e)$, meaning AI needs less total job coverage before automation becomes economically viable.</p>
 
@@ -691,10 +691,10 @@
     <p><strong>Protection mechanisms (user-actionable):</strong></p>
     <ul>
         <li>Move up hierarchy: reach Level 4–5 (own a domain/system)</li>
-        <li>Increase specialization: lower Q19 (make work harder to transfer)</li>
+        <li>Increase specialization: lower Q10 (make work harder to transfer)</li>
         <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work)</li>
         <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows)</li>
-        <li>Build unique relationships: strengthen Q10/Q11 protective value</li>
+        <li>Build unique relationships: strengthen Q11/Q12 protective value</li>
     </ul>
 </div>
 
@@ -704,19 +704,57 @@
     <p><strong>Protection mechanisms (user-actionable):</strong></p>
     <ul>
         <li>Move up hierarchy: reach Level 4–5 (own a domain/system)</li>
-        <li>Increase specialization: lower Q19 (make work harder to transfer)</li>
+        <li>Increase specialization: lower Q10 (make work harder to transfer)</li>
         <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work)</li>
         <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows)</li>
-        <li>Build unique relationships: strengthen Q10/Q11 protective value</li>
+        <li>Build unique relationships: strengthen Q11/Q12 protective value</li>
     </ul>
 </div>
                     </section>
 
                     <section>
-                        <h2>Workforce compression: job loss before full automation</h2>
+                        <h2>The green curve: Implementation delay and workforce compression</h2>
+
+                        <p><strong>Key insight:</strong> The green curve (actual job loss) differs from the blue curve (technical feasibility) through two distinct mechanisms that combine to determine when your job is actually at risk. The blue curve shows when AI <em>can</em> do the job technically. The green curve shows when job loss <em>actually occurs</em>, accounting for both organizational adoption barriers and earlier compression-driven workforce reductions.</p>
+
+                        <h3 style='margin: 32px 0 16px 0;'>How the green curve is calculated</h3>
+
+                        <p>The model integrates two separate hazard channels to create the green curve:</p>
+
+                        <div class='equation-callout'>
+                            <span class='callout-label'>Green curve total hazard</span>
+                            <div class='equation-display'>$$\lambda_{\text{total}}(t) = \lambda_{\text{AI}}(t - \Delta(t)) + \lambda_{\text{compression}}(t)$$</div>
+                            <span class='callout-label'>Where implementation delay decreases over time</span>
+                            <div class='equation-display'>$$\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$$</div>
+                        </div>
+
+                        <p>This structure captures two different ways jobs disappear:</p>
+
+                        <ul class='detail-list'>
+                            <li><strong>Delayed automation hazard:</strong> The AI automation hazard $\lambda_{\text{AI}}$ is evaluated at an earlier time $(t - \Delta(t))$ due to organizational friction. Early in the timeline, implementation barriers create a significant delay ($\Delta_0$), but this delay shrinks exponentially as AI capability grows and adoption accelerates. The friction decay rate $\lambda$ determines how fast these barriers collapse.</li>
+                            <li><strong>Compression hazard:</strong> A separate hazard channel $\lambda_{\text{compression}}(t)$ that activates when AI makes senior workers productive enough to absorb junior work. This hazard is evaluated at the current time $t$ (no delay) and can cause job loss well before full automation becomes technically feasible. The two hazards are summed and capped at 0.60/year total.</li>
+                        </ul>
+
+                        <h3 style='margin: 32px 0 16px 0;'>Mechanism 1: Implementation delay (shifts automation hazard forward)</h3>
+
+                        <p>Organizational barriers slow the adoption of AI automation. The initial delay $\Delta_0$ derives from company context (Q13-Q16: adoption appetite, labor cost pressure, market tightness, infrastructure) and individual leverage (Q19: job performance protects top performers). This delay starts between 0.3 and 4.0 years depending on your situation.</p>
+
+                        <div class='equation-callout'>
+                            <span class='callout-label'>Initial delay calculation</span>
+                            <div class='equation-display'>$$\Delta_0 = \operatorname{clip}\big(1.75 - 1.25\, s_{\text{delay}} + \Delta^{\text{eff}}_{\text{seniority}},\; 0.3,\; 4.0\big)$$</div>
+                            <div class='equation-display'>$$\Delta^{\text{eff}}_{\text{seniority}} = \Delta_{\text{seniority}} \cdot \Big[1 + 0.5\, (\operatorname{norm}(Q19) - 0.5)\, \operatorname{sign}(\Delta_{\text{seniority}})\Big]$$</div>
+                            <p style="font-size: 0.9em; margin-top: 8px; color: #666;">$s_{\text{delay}} \in [-2,2]$ from Q13-Q16; $\Delta_{\text{seniority}} \in \{-0.25,-0.05,+0.10,+0.20,+0.30\}$ by level</p>
+                        </div>
+
+                        <p><strong>Dynamic friction decay:</strong> The delay doesn't stay constant. As AI capability increases and adoption spreads, organizational barriers erode exponentially: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. The decay rate $\lambda$ (typically 0.02-0.05/year) is inferred from your answers about adoption readiness, infrastructure, and role characteristics. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds; lower $\lambda$ means delays persist even as capability advances.</p>
+
+                        <p><strong>Example delays:</strong> An early-adopting entry-level role (s_delay = +2, $\Delta_{\text{seniority}}$ = -0.25) starts with $\Delta_0 \approx 0.3$ years. A defensive environment with senior leadership (s_delay = -2, $\Delta_{\text{seniority}}$ = +0.30) starts with $\Delta_0 \approx 4.0$ years. Performance (Q19) modulates these: high performers get extended delays; low performers face shortened timelines.</p>
+
+                        <h3 style='margin: 32px 0 16px 0;'>Mechanism 2: Workforce compression (earlier job loss via task reallocation)</h3>
+
                         <p><strong>Key insight:</strong> Jobs can be eliminated well before AI reaches full automation capability. When AI makes senior workers more productive, companies can reduce headcount by redistributing work upward in the hierarchy. An entry-level software engineer's role might disappear when AI can only handle 35% of their tasks &mdash; not because AI does everything, but because AI-amplified senior engineers can absorb the remaining 65%.</p>
 
-                        <p>The model captures this through a <strong>compression hazard</strong> that activates earlier and at a lower threshold than full automation. This hazard only affects the green curve (actual job loss), not the blue curve (technical feasibility), and depends on three factors:</p>
+                        <p>The compression hazard activates earlier and at a lower threshold than full automation. It depends on three factors:</p>
 
                         <div class='equation-callout'>
                             <span class='callout-label'>Compression hazard</span>
@@ -725,45 +763,39 @@
                             <div class='equation-display'>$$R_c(t) = s_{\text{realloc}} \times (1 + B_{\text{amp}}),\quad B_{\text{amp}} = f_{\text{digital}} \cdot A_{\text{job}}(t) \cdot \text{norm}(Q1) \cdot 2.0$$</div>
                         </div>
 
-                        <p><strong>How it works:</strong></p>
                         <ol class='action-list'>
-                            <li><strong>Reallocation feasibility ($s_{\text{realloc}}$):</strong> Combines Q19 (direct reallocation question), task structure (Q5-Q7: decomposable, standardized, low-context work is easier to redistribute), tacit knowledge (Q9), and physical presence requirements (Q11). Higher scores mean your work can be easily absorbed by others.</li>
-                            <li><strong>Senior productivity amplification ($B_{\text{amp}}$):</strong> AI only amplifies productivity for digital work (Q4). The boost ranges from 0 to 2.0 (up to +200% output; up to 3� productivity when used in <code>1 + B_{\text{amp}}</code>), scaled by current AI performance (Q1) and job readiness. Physical or tacit-heavy roles get minimal amplification even if tasks are reallocatable.</li>
-                            <li><strong>Hierarchy vulnerability ($V_{\text{hierarchy}}$):</strong> Your position in the workflow determines exposure. Level 1 (many layers above) = 100% vulnerable. Level 4-5 (top of domain, no one above can do your work) = protected. A principal engineer who owns a system faces minimal compression risk despite being in a "senior" role title.</li>
+                            <li><strong>Reallocation feasibility ($s_{\text{realloc}}$):</strong> Combines Q10 (direct reallocation question: 40% weight), task structure (Q5-Q7: decomposable, standardized, low-context work is easier to redistribute), tacit knowledge (Q9), and physical presence requirements (Q12). Higher scores mean your work can be easily absorbed by others. Range: [0, 1].</li>
+                            <li><strong>Senior productivity amplification ($B_{\text{amp}}$):</strong> AI only amplifies productivity for digital work (Q4). The boost ranges from 0 to 2.0 (up to +200% output; up to 3&times; productivity when used in <code>1 + B_{\text{amp}}</code>), scaled by current AI performance (Q1) and job readiness $A_{\text{job}}(t)$. Physical or tacit-heavy roles get minimal amplification even if tasks are reallocatable.</li>
+                            <li><strong>Hierarchy vulnerability ($V_{\text{hierarchy}}$):</strong> Your position in the workflow determines exposure. Calculated as $(6 - \text{level}) / 5$. Level 1 (many layers above) = 100% vulnerable. Level 4 = 40% vulnerable. Level 5 (top of domain, no one above can do your work) = 20% vulnerable. A principal engineer who owns a system faces minimal compression risk despite being in a "senior" role title.</li>
                         </ol>
 
-                        <p><strong>Parameters differ from full automation:</strong> The compression gate opens at $\theta_c = 0.35$ (vs. $\theta = 0.50$ for automation), has gentler slope ($\gamma_c = 6.0$ vs. $\gamma = 8.0$), and lower maximum hazard ($h_{\max,c} = 0.30$/year vs. $h_{\max} = 0.40$/year). Combined with automation hazard, the total is capped at 0.60/year to reflect real-world institutional friction that prevents instant mass layoffs.</p>
+                        <p><strong>Parameters differ from full automation:</strong> The compression gate opens at $\theta_c = 0.35$ (vs. $\theta \approx 0.50$ for automation), has gentler slope ($\gamma_c = 6.0$ vs. $\gamma = 8.0$), and lower maximum hazard ($h_{\max,c} = 0.30$/year vs. $h_{\max} = 0.40$/year). Combined with automation hazard, the total is capped at 0.60/year to reflect real-world institutional friction that prevents instant mass layoffs.</p>
 
-                        <p><strong>Example:</strong> An entry-level SWE (Level 1) with highly decomposable digital work (Q4=5, Q5=4, Q6=4, Q19=4) faces compression when AI reaches ~30% capability. At 40% capability, seniors are 1.6× more productive, triggering 15-25%/year compression hazard before automation hazard even activates. The green curve shows significant job loss risk 2-3 years earlier than the blue curve predicts, matching observed workforce reductions in software engineering.</p>
+                        <h3 style='margin: 32px 0 16px 0;'>Examples: How the mechanisms interact</h3>
 
-                        <p><strong>Example 2 (protected): Senior engineer who owns system.</strong> Level 4, fully digital (Q4=5), structured/standardized (Q5=4, Q6=3), hard to reallocate (Q19=2), high tacit/context (Q7=5, Q9=5), normal physical presence (Q11=3). With modest current AI performance (Q1=2) and job readiness A_job�0.40: reallocationScore�0.35; amplificationBoost�0.20; compressionReadiness�0.42; base hazard�0.18/year; hierarchy vulnerability (Level 4) = 0.4 ? compression hazard�0.07/year. Outcome: protected by hierarchy � compression risk is low; main risk shifts to later full automation.</p>
+                        <p><strong>Example 1 (high compression risk): Entry-level SWE.</strong> Level 1 with highly decomposable digital work (Q4=5, Q5=4, Q6=4, Q10=4). Reallocation score $\approx$ 0.80. At 40% job readiness with current AI performance Q1=3, amplification boost $\approx$ 0.60 (seniors become 1.6&times; more productive). Compression readiness = 0.80 &times; 1.6 = 1.28. Base compression hazard $\approx$ 0.25/year. Hierarchy vulnerability = 1.0 &rarr; final compression hazard $\approx$ 0.25/year. This activates when AI reaches ~30% capability, causing the green curve to show significant job loss risk 2-3 years earlier than the blue curve predicts, matching observed workforce reductions in software engineering.</p>
 
-                        <p><strong>Example 3 (moderate): Entry-level accountant.</strong> Level 1; mostly digital (Q4=4), moderate structure (Q5=3, Q6=3), reallocation moderate (Q19=3). At A_job�0.40 and Q1=3: digitalFraction=0.75; amplificationBoost�0.30; compressionReadiness�0.65; base hazard�0.26/year; hierarchy vulnerability=1.0 ? compression hazard�0.26/year. Outcome: moderate compression risk, activating a bit later than SWE due to lower digitization (weaker amplification).</p>
+                        <p><strong>Example 2 (protected): Senior engineer who owns system.</strong> Level 4, fully digital (Q4=5), structured/standardized (Q5=4, Q6=3), hard to reallocate (Q10=2), high tacit/context (Q7=5, Q9=5), normal physical presence (Q12=3). Reallocation score $\approx$ 0.35 (low due to Q10=2 and high Q7/Q9). With modest current AI performance (Q1=2) and job readiness $A_{\text{job}} \approx 0.40$: amplification boost $\approx$ 0.20; compression readiness $\approx$ 0.42. Base hazard $\approx$ 0.18/year. Hierarchy vulnerability (Level 4) = 0.4 &rarr; compression hazard $\approx$ 0.07/year. Outcome: protected by hierarchy &mdash; compression risk is low; main risk comes from later full automation shifted by implementation delay.</p>
+
+                        <p><strong>Example 3 (moderate): Entry-level accountant.</strong> Level 1; mostly digital (Q4=4), moderate structure (Q5=3, Q6=3), reallocation moderate (Q10=3). Reallocation score $\approx$ 0.50. At $A_{\text{job}} \approx 0.40$ and Q1=3: digital fraction = 0.75; amplification boost $\approx$ 0.30; compression readiness $\approx$ 0.65. Base hazard $\approx$ 0.26/year. Hierarchy vulnerability = 1.0 &rarr; compression hazard $\approx$ 0.26/year. Outcome: moderate compression risk, activating a bit later than SWE due to lower digitization (weaker amplification), but still appearing before full automation.</p>
+
+                        <h3 style='margin: 32px 0 16px 0;'>Re-employment probability</h3>
+
+                        <p>Re-employment odds derive from adaptability questions. The model starts at 60% baseline, adjusts based on transferable skills (Q17), learning speed (Q18), and job performance (Q19) with a scaling factor of 0.2 per weighted point, subtracts a timing penalty if displacement occurs soon, and then applies the seniority boost from the profile (roughly +0% to +10%). The result is clamped between 10% and 85% &mdash; no one is guaranteed, but no one is written off.</p>
+
+                        <p><strong>Timing penalty (graduated scale):</strong> If the median technical feasibility hazard occurs within a shorter timeframe, re-employment becomes more difficult due to market saturation. The penalty is a probability reduction applied as follows: median &lt; 3 years: $-0.30$; 3-7 years: $-0.15$; 7-12 years: $-0.05$; &gt;12 years: $0$ (no penalty). This reflects the difficulty of finding alternative employment when many similar roles are being automated simultaneously.</p>
 
                         <div class='insight-callout'>
-    <p><strong>Protection mechanisms (user-actionable):</strong></p>
-    <ul>
-        <li>Move up hierarchy: reach Level 4–5 (own a domain/system)</li>
-        <li>Increase specialization: lower Q19 (make work harder to transfer)</li>
-        <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work)</li>
-        <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows)</li>
-        <li>Build unique relationships: strengthen Q10/Q11 protective value</li>
-    </ul>
-</div>
-                    </section>
-
-                    <section>
-                        <h2>Implementation delay and the green curve</h2>
-                        <p><strong>Key insight:</strong> The green curve combines two job loss mechanisms: (1) the blue curve shifted right by implementation delay (delayed automation), and (2) workforce compression hazard (task reallocation to AI-amplified seniors). The blue curve represents pure technical feasibility &mdash; when AI <em>can</em> do the job. The green curve represents actual job loss, accounting for both organizational adoption delays <em>and</em> earlier compression-driven workforce reductions.</p>
-                        <p>The implementation delay derives from company context and individual leverage. Q12 through Q15 examine adoption appetite, labor cost pressure, labor-market tightness, and infrastructure. Q18 (job performance) helps retain top performers, delaying job loss. Compression hazard (described in the previous section) can cause the green curve to exceed the blue curve in early years for vulnerable roles.</p>
-                        <div class='equation-callout'>
-                            <span class='callout-label'>Delay function</span>
-                            <div class='equation-display'>\\text{delay} = \\operatorname{clip}\\big(1.75 - 1.25\\, s_{\\text{delay}} + \\Delta^{\\text{eff}}_{\\text{seniority}},\\; 0.3,\\; 4.0\\big)</div>
-                            <div class='equation-display'>\\Delta^{\\text{eff}}_{\\text{seniority}} = \\Delta_{\\text{seniority}} \\cdot \\Big[1 + 0.5\\, (\\operatorname{norm}(Q18) - 0.5)\\, \\operatorname{sign}(\\Delta_{\\text{seniority}})\\Big],\\quad s_{\\text{delay}} \\in [-2,2],\\; \\Delta_{\\text{seniority}} \\in \\{-0.25,-0.05,+0.10,+0.20,+0.30\\}</div>
-                        <p>Positive scores mean less delay: an early-adopting entry-level role (s_delay = +2, &Delta;_seniority = -0.25) can reduce the delay to as low as 0.3 years, while defensive environments with senior leadership (s_delay = -2, &Delta;_seniority = +0.30) stretch it toward 4.0 years. Performance (Q18) modulates these shifts: high Q18 increases positive shifts and reduces negative shifts; low Q18 does the reverse. The seniority effect is applied inside the clip, keeping delay bounded to [0.3, 4.0] years.</p>
-                        <p>Positive scores mean less delay: an early-adopting entry-level role (s_delay = +2, &Delta;_seniority = -0.4) can reduce the delay to as low as 0.3 years, while defensive environments with senior leadership (s_delay = -2, &Delta;_seniority = +0.6) stretch it to 4.0 years. The seniority shift is applied inside the clip function, so the final delay is always bounded to [0.3, 4.0] years regardless of inputs.</p>
-                        <p>Re-employment odds pull from the adaptability prompts. We start at $60\%$, adjust based on transferable skills (Q16), learning speed (Q17), and job performance (Q18) with a scaling factor of $0.2$ per weighted point, subtract a timing penalty if displacement occurs soon, and then apply the seniority boost from the profile (roughly +0% to +10%). The result is clamped between $10\%$ and $85\%$ &mdash; No one is guaranteed, but no one is written off.</p>
-                        <p><strong>Timing penalty (graduated scale):</strong> If the median technical feasibility hazard occurs within a shorter timeframe, re-employment becomes more difficult due to market saturation. The penalty is a probability reduction applied as follows: median &lt; 3 years: $-0.30$; 3-7 years: $-0.15$; 7-12 years: $-0.05$; &gt;12 years: $0$ (no penalty). This reflects the difficulty of finding alternative employment when many similar roles are being automated simultaneously.</p>
+                            <p><strong>Protection mechanisms (user-actionable):</strong></p>
+                            <ul>
+                                <li>Move up hierarchy: reach Level 4–5 (own a domain/system) to reduce compression vulnerability</li>
+                                <li>Increase specialization: lower Q10 (make work harder to transfer to others)</li>
+                                <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work)</li>
+                                <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows weaken AI amplification)</li>
+                                <li>Build unique relationships: strengthen Q11/Q12 protective value</li>
+                                <li>Strengthen performance: raise Q19 to increase implementation delay and re-employment odds</li>
+                            </ul>
+                        </div>
                     </section>
 
                     <section>
@@ -775,7 +807,7 @@
                             <li><strong>Personal timeline:</strong> We surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
                             <li><strong>Re-employment label:</strong> The probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
                         </ul>
-                        <p>Use the controls to stress-test assumptions. METR's doubling is fixed. Higher <em>industry-specific friction</em> increases the horizon penalty $p_{\text{domain}}$ (not the doubling time), and stricter <em>reliability</em> requirements reduce the effective task horizon. Answers that raise role explicitness $s_e$ or ease the coverage bar $\theta$ pivot curves left, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out. High scores on Q7&ndash;Q12 increase $p_{\text{domain}}$, so even at the METR trend, capability must cover more ground before matching software baselines.</p>
+                        <p>Use the controls to stress-test assumptions. METR's doubling is fixed. Higher <em>industry-specific friction</em> increases the horizon penalty $p_{\text{domain}}$ (not the doubling time), and stricter <em>reliability</em> requirements reduce the effective task horizon. Answers that raise role explicitness $s_e$ or ease the coverage bar $\theta$ pivot curves left, while higher rollout friction $\lambda$ or stubborn implementation drag pushes the green curve out. High scores on Q7&ndash;Q13 increase $p_{\text{domain}}$, so even at the METR trend, capability must cover more ground before matching software baselines.</p>
                     </section>
 
                     <section>
