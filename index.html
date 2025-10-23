@@ -70,13 +70,13 @@
             gap: 16px;
         }
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1000px) and (min-width: 769px) {
             .question-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 768px) and (min-width: 481px) {
             .question-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
@@ -1293,12 +1293,20 @@
             }
 
             .article-hero h1 {
-                font-size: clamp(2.2rem, 7vw, 2.8rem);
+                font-size: clamp(1.8rem, 6vw, 2.4rem);
                 margin-top: 12px;
+                letter-spacing: -0.01em;
+            }
+
+            .hero-section h1 {
+                font-size: clamp(1.8rem, 6vw, 2.4rem);
+                letter-spacing: -0.01em;
             }
 
             .lede {
-                font-size: 1.05rem;
+                font-size: 1.0rem;
+                max-width: 100%;
+                line-height: 1.6;
             }
 
             .model-explanation,
