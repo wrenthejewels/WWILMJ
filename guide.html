@@ -605,6 +605,204 @@
                             <li><strong>Re-employment likelihood:</strong> Adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
                         </ul>
 
+                        <h3 style='margin: 32px 0 16px 0;'>Model Flow: How Your Inputs Become Predictions</h3>
+
+                        <div style="margin: 24px 0; padding: 20px; background: #fdfaf5; border-radius: 12px; border: 1px solid #e6dcc8;">
+                            <svg id="model-flow-diagram" viewBox="0 0 1000 800" style="width: 100%; height: auto; margin: 0 auto; display: block;">
+                                <!-- Define styles -->
+                                <defs>
+                                    <style>
+                                        .flow-box { transition: all 0.3s ease; cursor: pointer; }
+                                        .flow-box:hover rect { fill: #fdf7ed; stroke: #a88860; stroke-width: 2.5; }
+                                        .flow-arrow { transition: all 0.3s ease; }
+                                        .input-box rect { fill: #f5f1ea; stroke: #9b8b6f; }
+                                        .calc-box rect { fill: #fdfaf5; stroke: #d2c7b8; }
+                                        .output-box rect { fill: #f0f7f4; stroke: #7fa89b; }
+                                        .blue-output rect { fill: #e8f1f8; stroke: #5a8db8; }
+                                        .green-output rect { fill: #e8f5ee; stroke: #6ba583; }
+                                    </style>
+                                </defs>
+
+                                <!-- Title -->
+                                <text x="500" y="40" text-anchor="middle" font-family="'Sora', sans-serif" font-size="24" font-weight="600" fill="#2a5298">Your Inputs → Calculations → Results</text>
+
+                                <!-- LEVEL 1: INPUTS -->
+                                <g class="flow-box input-box" data-connects="task-dist,auto-timing,comp-timing">
+                                    <rect x="50" y="90" width="280" height="120" rx="8" stroke-width="1.5"/>
+                                    <text x="190" y="120" text-anchor="middle" font-family="'Sora', sans-serif" font-size="17" font-weight="600" fill="#2a5298">Questionnaire</text>
+                                    <text x="190" y="143" text-anchor="middle" font-size="13" fill="#495057">Your answers to Q1-Q19</text>
+                                    <text x="190" y="163" text-anchor="middle" font-size="11" fill="#868e96">AI capability, task characteristics,</text>
+                                    <text x="190" y="178" text-anchor="middle" font-size="11" fill="#868e96">friction factors, and adaptability</text>
+                                    <text x="190" y="193" text-anchor="middle" font-size="11" fill="#868e96">questions that shape all outputs</text>
+                                </g>
+
+                                <g class="flow-box input-box" data-connects="task-dist,comp-timing">
+                                    <rect x="360" y="90" width="260" height="120" rx="8" stroke-width="1.5"/>
+                                    <text x="490" y="120" text-anchor="middle" font-family="'Sora', sans-serif" font-size="17" font-weight="600" fill="#2a5298">Hierarchy Level</text>
+                                    <text x="490" y="143" text-anchor="middle" font-size="13" fill="#495057">Level 1-5</text>
+                                    <text x="490" y="163" text-anchor="middle" font-size="11" fill="#868e96">Position in organizational ladder.</text>
+                                    <text x="490" y="178" text-anchor="middle" font-size="11" fill="#868e96">Affects compression vulnerability</text>
+                                    <text x="490" y="193" text-anchor="middle" font-size="11" fill="#868e96">and task distribution patterns</text>
+                                </g>
+
+                                <g class="flow-box input-box" data-connects="auto-timing">
+                                    <rect x="650" y="90" width="300" height="120" rx="8" stroke-width="1.5"/>
+                                    <text x="800" y="120" text-anchor="middle" font-family="'Sora', sans-serif" font-size="17" font-weight="600" fill="#2a5298">Sliders</text>
+                                    <text x="800" y="143" text-anchor="middle" font-size="13" fill="#495057">Reliability, Industry Friction, Compute</text>
+                                    <text x="800" y="163" text-anchor="middle" font-size="11" fill="#868e96">Adjusts how strict automation needs</text>
+                                    <text x="800" y="178" text-anchor="middle" font-size="11" fill="#868e96">to be (reliability) and how fast AI</text>
+                                    <text x="800" y="193" text-anchor="middle" font-size="11" fill="#868e96">reaches your industry's requirements</text>
+                                </g>
+
+                                <!-- LEVEL 2: CALCULATIONS -->
+                                <g id="task-dist" class="flow-box calc-box" data-connects="blue-output">
+                                    <rect x="40" y="270" width="280" height="150" rx="8" stroke-width="1.5"/>
+                                    <text x="180" y="300" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Task Distribution</text>
+                                    <text x="180" y="330" text-anchor="middle" font-size="12" fill="#495057">How your job splits across 5 task</text>
+                                    <text x="180" y="348" text-anchor="middle" font-size="12" fill="#495057">duration buckets (short to long)</text>
+                                    <text x="180" y="375" text-anchor="middle" font-size="11" fill="#868e96">Hierarchy level, Q5 (decomposability),</text>
+                                    <text x="180" y="393" text-anchor="middle" font-size="11" fill="#868e96">Q6 (standardization), Q7 (context)</text>
+                                    <text x="180" y="413" text-anchor="middle" font-size="10" font-style="italic" fill="#a88860">Can override manually in calculator</text>
+                                </g>
+
+                                <g id="auto-timing" class="flow-box calc-box" data-connects="blue-output,green-output">
+                                    <rect x="360" y="270" width="280" height="150" rx="8" stroke-width="1.5"/>
+                                    <text x="500" y="300" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Automation Timing</text>
+                                    <text x="500" y="330" text-anchor="middle" font-size="12" fill="#495057">When AI becomes technically capable</text>
+                                    <text x="500" y="348" text-anchor="middle" font-size="12" fill="#495057">of doing your job (blue curve basis)</text>
+                                    <text x="500" y="375" text-anchor="middle" font-size="11" fill="#868e96">Task buckets, reliability slider,</text>
+                                    <text x="500" y="393" text-anchor="middle" font-size="11" fill="#868e96">industry friction, Q2/Q6-Q16</text>
+                                </g>
+
+                                <g id="comp-timing" class="flow-box calc-box" data-connects="green-output">
+                                    <rect x="680" y="270" width="280" height="150" rx="8" stroke-width="1.5"/>
+                                    <text x="820" y="300" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Compression Risk</text>
+                                    <text x="820" y="330" text-anchor="middle" font-size="12" fill="#495057">Job loss from task reallocation to</text>
+                                    <text x="820" y="348" text-anchor="middle" font-size="12" fill="#495057">AI-amplified seniors (green modifier)</text>
+                                    <text x="820" y="375" text-anchor="middle" font-size="11" fill="#868e96">Q10 (reallocation ease), Q4-Q9</text>
+                                    <text x="820" y="393" text-anchor="middle" font-size="11" fill="#868e96">(AI learnability), hierarchy vulnerability</text>
+                                </g>
+
+                                <!-- LEVEL 3: OUTPUTS -->
+                                <g id="blue-output" class="flow-box blue-output">
+                                    <rect x="80" y="490" width="380" height="160" rx="8" stroke-width="1.5"/>
+                                    <text x="270" y="520" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Blue Curve</text>
+                                    <text x="270" y="543" text-anchor="middle" font-size="13" fill="#495057">Timeline estimation of your role's</text>
+                                    <text x="270" y="560" text-anchor="middle" font-size="13" fill="#495057">technical automation feasibility</text>
+                                    <text x="270" y="583" text-anchor="middle" font-size="11" fill="#868e96">When AI becomes capable enough to</text>
+                                    <text x="270" y="598" text-anchor="middle" font-size="11" fill="#868e96">perform your job, based on METR's task</text>
+                                    <text x="270" y="613" text-anchor="middle" font-size="11" fill="#868e96">horizon data, your task distribution, and</text>
+                                    <text x="270" y="628" text-anchor="middle" font-size="11" fill="#868e96">reliability/friction settings</text>
+                                </g>
+
+                                <g id="green-output" class="flow-box green-output">
+                                    <rect x="540" y="490" width="380" height="160" rx="8" stroke-width="1.5"/>
+                                    <text x="730" y="520" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Green Curve</text>
+                                    <text x="730" y="543" text-anchor="middle" font-size="13" fill="#495057">Timeline estimation of your</text>
+                                    <text x="730" y="560" text-anchor="middle" font-size="13" fill="#495057">actual role elimination</text>
+                                    <text x="730" y="583" text-anchor="middle" font-size="11" fill="#868e96">When job loss actually happens in practice.</text>
+                                    <text x="730" y="598" text-anchor="middle" font-size="11" fill="#868e96">Combines blue curve + implementation</text>
+                                    <text x="730" y="613" text-anchor="middle" font-size="11" fill="#868e96">delay + compression hazard. Can arrive</text>
+                                    <text x="730" y="628" text-anchor="middle" font-size="11" fill="#868e96">earlier than blue if compression is high</text>
+                                </g>
+
+                                <!-- ARROWS: Inputs to Calculations -->
+                                <path class="flow-arrow" d="M 190 210 L 180 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                                <path class="flow-arrow" d="M 230 210 L 500 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                                <path class="flow-arrow" d="M 260 210 L 820 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                                <path class="flow-arrow" d="M 490 210 L 220 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                                <path class="flow-arrow" d="M 510 210 L 800 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                                <path class="flow-arrow" d="M 800 210 L 530 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                                <!-- ARROWS: Calculations to Outputs -->
+                                <path class="flow-arrow" d="M 180 420 L 230 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                                <path class="flow-arrow" d="M 500 420 L 320 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                                <path class="flow-arrow" d="M 500 420 L 680 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                                <path class="flow-arrow" d="M 820 420 L 770 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                                <!-- Arrow markers -->
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                        <polygon points="0 0, 10 3, 0 6" fill="#9b8b6f"/>
+                                    </marker>
+                                </defs>
+
+                                <!-- Legend -->
+                                <g transform="translate(60, 690)">
+                                    <text x="0" y="0" font-family="'Sora', sans-serif" font-size="12" font-weight="600" fill="#2a5298">Legend:</text>
+                                    <rect x="0" y="12" width="20" height="20" rx="2" fill="#f5f1ea" stroke="#9b8b6f" stroke-width="1.5"/>
+                                    <text x="26" y="26" font-size="11" fill="#495057">Your inputs</text>
+
+                                    <rect x="140" y="12" width="20" height="20" rx="2" fill="#fdfaf5" stroke="#d2c7b8" stroke-width="1.5"/>
+                                    <text x="166" y="26" font-size="11" fill="#495057">Calculations</text>
+
+                                    <rect x="280" y="12" width="20" height="20" rx="2" fill="#e8f1f8" stroke="#5a8db8" stroke-width="1.5"/>
+                                    <text x="306" y="26" font-size="11" fill="#495057">Blue curve</text>
+
+                                    <rect x="410" y="12" width="20" height="20" rx="2" fill="#e8f5ee" stroke="#6ba583" stroke-width="1.5"/>
+                                    <text x="436" y="26" font-size="11" fill="#495057">Green curve</text>
+
+                                    <text x="560" y="26" font-size="11" fill="#868e96" font-style="italic">Hover over boxes to highlight connections</text>
+                                </g>
+
+                                <!-- Key insights -->
+                                <g transform="translate(60, 760)">
+                                    <text x="0" y="0" font-size="10" fill="#495057">Note: Compression can make green curve happen before blue curve completes</text>
+                                    <text x="0" y="18" font-size="10" fill="#495057">Note: Higher reliability shrinks effective horizon, delaying automation</text>
+                                    <text x="0" y="36" font-size="10" fill="#495057">Note: Task buckets auto-calculate from your answers but can be overridden in the calculator</text>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <script>
+                            // Simple hover interactions for the model flow diagram
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const flowBoxes = document.querySelectorAll('.flow-box');
+
+                                flowBoxes.forEach(box => {
+                                    box.addEventListener('mouseenter', function() {
+                                        const connects = this.getAttribute('data-connects');
+                                        if (connects) {
+                                            connects.split(',').forEach(targetId => {
+                                                const target = document.getElementById(targetId);
+                                                if (target) {
+                                                    target.querySelector('rect').style.fill = '#fdf7ed';
+                                                    target.querySelector('rect').style.stroke = '#a88860';
+                                                    target.querySelector('rect').style.strokeWidth = '2.5';
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                    box.addEventListener('mouseleave', function() {
+                                        const connects = this.getAttribute('data-connects');
+                                        if (connects) {
+                                            connects.split(',').forEach(targetId => {
+                                                const target = document.getElementById(targetId);
+                                                if (target) {
+                                                    // Reset to original colors based on box type
+                                                    const rect = target.querySelector('rect');
+                                                    if (target.classList.contains('calc-box')) {
+                                                        rect.style.fill = '#fdfaf5';
+                                                        rect.style.stroke = '#d2c7b8';
+                                                    } else if (target.classList.contains('blue-output')) {
+                                                        rect.style.fill = '#e8f1f8';
+                                                        rect.style.stroke = '#5a8db8';
+                                                    } else if (target.classList.contains('green-output')) {
+                                                        rect.style.fill = '#e8f5ee';
+                                                        rect.style.stroke = '#6ba583';
+                                                    }
+                                                    rect.style.strokeWidth = '1.5';
+                                                }
+                                            });
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Model Defaults</h3>
                         <div class='bubble-table'>
                             <div class='bubble-item'><span class='bubble-key'>$H_{50,0}$</span><span class='bubble-val'>137 min (GPT-5 SOTA)</span></div>
