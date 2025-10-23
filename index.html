@@ -2157,11 +2157,11 @@
         }
 
         const SENIORITY_PROFILES = [
-            { label: 'Level 1: Many layers above',            thetaLift: -0.02, hazardShield: 0.00, delayShift: -0.4, reemploymentBoost: 1.00 },
-            { label: 'Level 2: Several layers above',         thetaLift: 0.00,  hazardShield: 0.02, delayShift: -0.1, reemploymentBoost: 1.03 },
-            { label: 'Level 3: Few above or mostly peers',    thetaLift: 0.03,  hazardShield: 0.05, delayShift: 0.2,  reemploymentBoost: 1.06 },
-            { label: 'Level 4: Top of domain',                thetaLift: 0.05,  hazardShield: 0.08, delayShift: 0.4,  reemploymentBoost: 1.08 },
-            { label: 'Level 5: Unique/irreplaceable owner',   thetaLift: 0.08,  hazardShield: 0.10, delayShift: 0.6,  reemploymentBoost: 1.10 }
+            { label: 'Level 1: Many layers above',            thetaLift: -0.02, hazardShield: 0.00, delayShift: -0.25, reemploymentBoost: 1.00 },
+            { label: 'Level 2: Several layers above',         thetaLift: 0.00,  hazardShield: 0.02, delayShift: -0.05, reemploymentBoost: 1.03 },
+            { label: 'Level 3: Few above or mostly peers',    thetaLift: 0.03,  hazardShield: 0.05, delayShift:  0.10, reemploymentBoost: 1.06 },
+            { label: 'Level 4: Top of domain',                thetaLift: 0.05,  hazardShield: 0.08, delayShift:  0.20, reemploymentBoost: 1.08 },
+            { label: 'Level 5: Unique/irreplaceable owner',   thetaLift: 0.08,  hazardShield: 0.10, delayShift:  0.30, reemploymentBoost: 1.10 }
         ];
 
         // Seniority-based task weight shifts (shift toward longer tasks for higher levels)
@@ -2918,7 +2918,7 @@
             Q14: -0.35,  // Labor market tightness: 5=Very Difficult (more delay), 1=Very Easy (less delay)
             Q15: +0.35,  // IT infrastructure: 1=Very Outdated (more delay), 5=Cutting Edge (less delay)
             // Job Retention Factor (Q18)
-            Q18: -0.35,  // Job performance: 5=Top 10% (more delay), 1=Below Average (less delay) - top performers retained longer
+            Q18: -0.20,  // Job performance: 5=Top 10% (more delay), 1=Below Average (less delay) - reduced weight; also modulates seniority shift
         };
 
         // Re-employment probability weights (Q16, Q17, Q18) - affects ability to find new job
@@ -2964,9 +2964,14 @@
             delayScore = clamp(delayScore, -2.0, +2.0);
             let delay = 1.75 - 1.25 * delayScore;
             delay = clamp(delay, 0.5, 3.0);
-            if (seniorityProfile) {
-                delay += seniorityProfile.delayShift;
-            }
+            // Performance-modulated seniority shift (sign-aware)
+            const q18Raw = (answers && typeof answers.Q18 === 'number') ? answers.Q18 : 3;
+            const q18Norm = (q18Raw - 1) / 4; // in [0,1]
+            const baseShift = seniorityProfile ? (seniorityProfile.delayShift || 0) : 0;
+            const s = Math.sign(baseShift) || 1;
+            const perfAdj = 1 + 0.5 * (q18Norm - 0.5) * s; // factor in [0.75, 1.25]
+            const effectiveShift = baseShift * perfAdj;
+            delay += effectiveShift;
             return clamp(delay, 0.3, 4.0);
         }
 
