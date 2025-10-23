@@ -3377,7 +3377,7 @@
             const compressionReadiness = reallocationScore * (0.7 + 0.3 * (1.0 + amplificationBoost));
 
             // 4. Compression Hazard Gate (lower threshold than automation)
-            const h_max_compression = 0.30;  // Lower than automation's 0.40
+            const h_max_compression = 0.40;  // Equal to automation's 0.40 - AI-driven compression is equally serious
             const gamma_compression = 6.0;   // Gentler slope than automation's 8.0
             const theta_compression = 0.35;  // Lower threshold than automation's ~0.50
 
