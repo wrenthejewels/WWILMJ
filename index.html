@@ -1350,29 +1350,29 @@
             </div>
 
             <div class="setup-section">
-                <h3>Step 2: Your Seniority Level</h3>
+                <h3>Step 2: Your Hierarchy Position</h3>
                 <div class="question-group">
-                    <p>Higher seniority levels involve more strategic decision-making and are typically harder to automate</p>
+                    <p>Select based on how many people <strong>above you in your specific workflow</strong> could absorb your responsibilities if your role were eliminated. A senior engineer who owns a system has no one above (Level 4-5), while a VP with C-suite above might be Level 2-3.</p>
                     <div class="radio-group">
                         <div class="radio-option">
                             <input type="radio" id="seniority-1" name="seniority" value="1" checked>
-                            <label for="seniority-1">Entry Level</label>
+                            <label for="seniority-1">Level 1: Many layers above me (4+ people who do similar work)</label>
                         </div>
                         <div class="radio-option">
                             <input type="radio" id="seniority-2" name="seniority" value="2">
-                            <label for="seniority-2">Mid-Level</label>
+                            <label for="seniority-2">Level 2: Several layers above (2-3 people/levels)</label>
                         </div>
                         <div class="radio-option">
                             <input type="radio" id="seniority-3" name="seniority" value="3">
-                            <label for="seniority-3">Senior</label>
+                            <label for="seniority-3">Level 3: Few above (1-2 people) or mostly peers</label>
                         </div>
                         <div class="radio-option">
                             <input type="radio" id="seniority-4" name="seniority" value="4">
-                            <label for="seniority-4">Lead/Principal</label>
+                            <label for="seniority-4">Level 4: Top of my domain (no one above can do my work)</label>
                         </div>
                         <div class="radio-option">
                             <input type="radio" id="seniority-5" name="seniority" value="5">
-                            <label for="seniority-5">Executive</label>
+                            <label for="seniority-5">Level 5: Unique/irreplaceable (own entire function/system)</label>
                         </div>
                     </div>
                 </div>
@@ -1891,6 +1891,33 @@
                             <div class="radio-option">
                                 <input type="radio" id="q18-5" name="q18" value="5">
                                 <label for="q18-5">Top Performer</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-group">
+                        <h5>19. Task Reallocation Risk</h5>
+                        <p>If your position were eliminated, how easily could your responsibilities be redistributed to existing team members?</p>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="q19-1" name="q19" value="1">
+                                <label for="q19-1">Nearly impossible - unique expertise/relationships</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="q19-2" name="q19" value="2">
+                                <label for="q19-2">Very difficult - would take 3-6 months to transfer</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="q19-3" name="q19" value="3" checked>
+                                <label for="q19-3">Moderately difficult - requires 1-2 months training</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="q19-4" name="q19" value="4">
+                                <label for="q19-4">Fairly easily - needs 1-2 weeks knowledge transfer</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="q19-5" name="q19" value="5">
+                                <label for="q19-5">Very easily - others already do similar work</label>
                             </div>
                         </div>
                     </div>
@@ -3269,6 +3296,84 @@
             return Math.min(0.95, hazard);
         }
 
+        // Workforce Compression Hazard - job loss via task reallocation to amplified seniors
+        // This hazard activates EARLIER than full automation (lower threshold)
+        // Only affects GREEN curve (actual job loss), not BLUE curve (technical feasibility)
+        function compressionHazard(tYears) {
+            if (!currentParams) return 0;
+
+            const seniorityLevel = currentParams.seniority || 1;
+
+            // Level 4-5 are protected from compression (top of hierarchy)
+            if (seniorityLevel >= 4) return 0;
+
+            const answers = currentParams.answers || {};
+
+            // Helper function to normalize answers
+            const norm = (val) => {
+                if (typeof val !== 'number') return 0.5;
+                return (val - 1) / 4;  // 1→0, 3→0.5, 5→1
+            };
+
+            // 1. Task Reallocation Feasibility Score
+            // Higher score = easier for others to absorb your work
+            const q19 = answers.Q19 || 3;  // New reallocation question
+            const q5 = answers.Q5 || 3;    // Decomposability
+            const q6 = answers.Q6 || 3;    // Standardization
+            const q7 = answers.Q7 || 3;    // Context dependency
+            const q9 = answers.Q9 || 3;    // Tacit knowledge
+            const q11 = answers.Q11 || 3;  // Physical presence
+
+            const reallocationScore = (
+                norm(q19) * 0.40 +           // Direct reallocation feasibility
+                norm(q5) * 0.20 +            // Decomposable = easier to split
+                norm(q6) * 0.15 +            // Standardized = others can pick up
+                (1 - norm(q7)) * 0.10 +      // Low context = portable
+                (1 - norm(q9)) * 0.10 +      // Low tacit = teachable
+                (1 - norm(q11)) * 0.05       // Low physical presence = easier remote reallocation
+            );
+
+            // 2. Senior Productivity Amplification (only for digital work)
+            const q1 = answers.Q1 || 3;    // Current AI performance
+            const q4 = answers.Q4 || 3;    // Digitization
+
+            const A_current = A_job(tYears); // Current task readiness
+            const digitalFraction = norm(q4);
+            const aiCapability = norm(q1) * A_current;
+
+            // Amplification ranges from 0 to 2.0 (can double senior productivity)
+            const amplificationBoost = digitalFraction * aiCapability * 2.0;
+
+            // 3. Compression Readiness (reallocation × amplification)
+            const compressionReadiness = reallocationScore * (1.0 + amplificationBoost);
+
+            // 4. Compression Hazard Gate (lower threshold than automation)
+            const h_max_compression = 0.30;  // Lower than automation's 0.40
+            const gamma_compression = 6.0;   // Gentler slope than automation's 8.0
+            const theta_compression = 0.35;  // Lower threshold than automation's ~0.50
+
+            const logisticArg = -gamma_compression * (compressionReadiness - theta_compression);
+            const baseCompressionHazard = h_max_compression / (1.0 + Math.exp(logisticArg));
+
+            // 5. Scale by Hierarchy Vulnerability
+            // Level 1 = 1.0 (fully vulnerable), Level 5 = 0.2 (protected)
+            const hierarchyVuln = (6 - seniorityLevel) / 5;
+
+            const finalCompressionHazard = baseCompressionHazard * hierarchyVuln;
+
+            // Diagnostic logging at t=0
+            if (tYears === 0 && compressionReadiness > 0.2) {
+                console.log('[Compression Debug] t=0:');
+                console.log(`  reallocationScore = ${reallocationScore.toFixed(3)}`);
+                console.log(`  amplificationBoost = ${amplificationBoost.toFixed(3)} (digital=${digitalFraction.toFixed(2)}, AI capability=${aiCapability.toFixed(2)})`);
+                console.log(`  compressionReadiness = ${compressionReadiness.toFixed(3)}`);
+                console.log(`  hierarchyVuln = ${hierarchyVuln.toFixed(2)} (level ${seniorityLevel})`);
+                console.log(`  compression hazard = ${finalCompressionHazard.toFixed(3)}/year`);
+            }
+
+            return finalCompressionHazard;
+        }
+
         // Cumulative risk from hazard series using survival function
         function cumulativeRiskFromHazard(hSeries, dtYears) {
             let cum = 0;
@@ -3363,6 +3468,7 @@
             return tests;
         }
 
+        // BLUE CURVE: Technical feasibility only (pure AI automation hazard)
         function calculateDisplacementProbability(t) {
             const n = 100;
             const dt = t / n;
@@ -3385,6 +3491,33 @@
             return 1 - Math.exp(-integral);
         }
 
+        // GREEN CURVE: Actual job loss (automation + compression)
+        function calculateActualJobLossProbability(t) {
+            const n = 100;
+            const dt = t / n;
+            let integral = 0;
+
+            for (let i = 0; i <= n; i++) {
+                const s = i * dt;
+                const automationRate = hazardAI(s);
+                const compressionRate = compressionHazard(s);
+
+                // Combined hazard (capped at 0.60/year)
+                const totalRate = Math.min(automationRate + compressionRate, 0.60);
+
+                if (i === 0 || i === n) {
+                    integral += totalRate;
+                } else if (i % 2 === 1) {
+                    integral += 4 * totalRate;
+                } else {
+                    integral += 2 * totalRate;
+                }
+            }
+
+            integral = integral * dt / 3;
+            return 1 - Math.exp(-integral);
+        }
+
         function updateChart() {
             if (!currentParams || !chart) return;
 
@@ -3399,13 +3532,14 @@
                 // Blue curve: Technical feasibility - Risk_tech(t) = 1 - exp(-∫ lambdaAI(u) du)
                 technicalFeasibility.push(calculateDisplacementProbability(t));
 
-                // Green curve: Actual job loss with dynamic friction decay
+                // Green curve: Actual job loss with dynamic friction decay + compression hazard
                 // Implementation delay decreases exponentially as capability grows: delay(t) = delay_0 * exp(-lambda * t)
                 // This models how organizational barriers diminish as AI capability increases
+                // PLUS workforce compression hazard (task reallocation to AI-amplified seniors)
                 const lambda = currentParams.lambda || 0.02;
                 const dynamicDelay = delay * Math.exp(-lambda * t);
                 const effectiveTime = Math.max(t - dynamicDelay, 0);
-                actualJobLoss.push(effectiveTime > 0 ? calculateDisplacementProbability(effectiveTime) : 0);
+                actualJobLoss.push(effectiveTime > 0 ? calculateActualJobLossProbability(effectiveTime) : 0);
             }
 
             chart.data.labels = years;
@@ -3446,10 +3580,10 @@
 
             while (high - low > 0.1) {
                 mid = (low + high) / 2;
-                // Calculate probability with dynamic delay: delay(t) = delay_0 * exp(-lambda * t)
+                // Calculate probability with dynamic delay + compression: delay(t) = delay_0 * exp(-lambda * t)
                 const dynamicDelay = delay * Math.exp(-lambda * mid);
                 const effectiveTime = Math.max(mid - dynamicDelay, 0);
-                const prob = effectiveTime > 0 ? calculateDisplacementProbability(effectiveTime) : 0;
+                const prob = effectiveTime > 0 ? calculateActualJobLossProbability(effectiveTime) : 0;
 
                 if (prob < targetProb) {
                     low = mid;
@@ -3556,8 +3690,8 @@
             const dynamicDelay2031 = delay * Math.exp(-lambda * yearsTo2031);
             const effectiveTime2030 = Math.max(yearsTo2030 - dynamicDelay2030, 0);
             const effectiveTime2031 = Math.max(yearsTo2031 - dynamicDelay2031, 0);
-            const risk2030 = yearsTo2030 > 0 && effectiveTime2030 > 0 ? calculateDisplacementProbability(effectiveTime2030) : (yearsTo2030 <= 0 ? 1.0 : 0);
-            const risk2031 = yearsTo2031 > 0 && effectiveTime2031 > 0 ? calculateDisplacementProbability(effectiveTime2031) : (yearsTo2031 <= 0 ? 1.0 : 0);
+            const risk2030 = yearsTo2030 > 0 && effectiveTime2030 > 0 ? calculateActualJobLossProbability(effectiveTime2030) : (yearsTo2030 <= 0 ? 1.0 : 0);
+            const risk2031 = yearsTo2031 > 0 && effectiveTime2031 > 0 ? calculateActualJobLossProbability(effectiveTime2031) : (yearsTo2031 <= 0 ? 1.0 : 0);
 
             document.getElementById('median-year').textContent =
                 medianActual < 50 ? `${medianActual.toFixed(1)} years` : 'Beyond 2050';
