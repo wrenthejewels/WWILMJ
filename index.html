@@ -2020,7 +2020,6 @@
                             <div style="display:flex; align-items:center; justify-content:space-between; margin-top:12px;">
                                 <span id="tb-sum" style="color:#666; font-size:0.9rem;">Sum: 100%</span>
                                 <div style="display:flex; gap:8px;">
-                                    <button id="tb-reset" class="header-btn" style="padding:8px 14px; font-size:0.85rem; background:#fdf8f0;">Reset</button>
                                     <button id="tb-apply" class="header-btn" style="padding:8px 14px; font-size:0.85rem;">Apply Changes</button>
                                 </div>
                             </div>
@@ -3804,7 +3803,6 @@
             const ids = ['tb-bucket-0','tb-bucket-1','tb-bucket-2','tb-bucket-3','tb-bucket-4'];
             const inputs = ids.map(id => document.getElementById(id)).filter(Boolean);
             const sumEl = document.getElementById('tb-sum');
-            const resetBtn = document.getElementById('tb-reset');
             const applyBtn = document.getElementById('tb-apply');
             const autoChk = document.getElementById('tb-auto');
 
@@ -3824,21 +3822,6 @@
                 panel.classList.toggle('expanded');
                 refreshTaskBucketEditor();
             };
-
-            resetBtn && (resetBtn.onclick = () => {
-                // Reset to model-computed values for current seniority/answers
-                const seniorityLevel = (currentParams && currentParams.seniority) || 1;
-                const answers = (currentParams && currentParams.answers) || null;
-                const modelWeights = getTaskWeightsForSeniority(seniorityLevel, answers);
-                setInputsFromArray(modelWeights);
-                updateSum();
-                // Apply the reset values immediately
-                if (currentParams) {
-                    currentParams.userBaseWeights = modelWeights;
-                    console.log('[TaskBuckets] Reset to model weights:', modelWeights.map(v=>v.toFixed(3)));
-                    updateChart();
-                }
-            });
 
             applyBtn && (applyBtn.onclick = () => {
                 let raw = inputs.map(inp => Math.max(0, parseFloat(inp.value) || 0));
@@ -3860,7 +3843,6 @@
                 if (autoChk) autoChk.checked = (mode === 'auto');
                 const disable = (mode === 'auto');
                 inputs.forEach(inp => inp.disabled = disable);
-                resetBtn && (resetBtn.disabled = disable);
                 applyBtn && (applyBtn.disabled = disable);
 
                 const seniorityLevel = (currentParams && currentParams.seniority) || 1;
@@ -3888,6 +3870,19 @@
                 if (!currentParams) return;
                 const wasAuto = (currentParams.taskBucketMode !== 'custom');
                 currentParams.taskBucketMode = autoChk.checked ? 'auto' : 'custom';
+
+                // If switching FROM custom TO auto, reset to model values and update chart
+                if (!wasAuto && autoChk.checked) {
+                    const seniorityLevel = (currentParams && currentParams.seniority) || 1;
+                    const answers = (currentParams && currentParams.answers) || null;
+                    const modelWeights = getTaskWeightsForSeniority(seniorityLevel, answers);
+                    // Clear user overrides and recalculate from model
+                    currentParams.userBaseWeights = null;
+                    setInputsFromArray(modelWeights);
+                    updateSum();
+                    console.log('[TaskBuckets] Switched to auto mode, reset to model weights:', modelWeights.map(v=>v.toFixed(3)));
+                    updateChart();
+                }
 
                 // If switching FROM auto TO custom, populate with current model-computed values
                 // This gives users the current model calculation as their starting point for editing
