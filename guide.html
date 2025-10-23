@@ -43,6 +43,20 @@
             background: transparent;
         }
 
+        @media (max-width: 768px) {
+            .container {
+                width: 96%;
+                padding: 0 0 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 98%;
+                padding: 0 0 60px;
+            }
+        }
+
         .content-wrapper {
             width: 100%;
             margin: 0 auto;
@@ -360,9 +374,15 @@
         /* Compact bubble table for defaults */
         .bubble-table {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 16px;
             margin: 16px 0 24px;
+        }
+
+        @media (max-width: 480px) {
+            .bubble-table {
+                grid-template-columns: 1fr;
+            }
         }
         .bubble-item {
             background: #fefbf5;
@@ -460,8 +480,13 @@
                 flex: 1;
             }
 
+            .article-hero {
+                padding: 56px 0 32px;
+            }
+
             .article-hero h1 {
                 font-size: clamp(2.2rem, 7vw, 2.8rem);
+                margin-top: 12px;
             }
 
             .lede {
@@ -469,7 +494,11 @@
             }
 
             .article-body section {
-                padding: 28px;
+                padding: 20px 16px;
+            }
+
+            #model-flow-diagram {
+                min-width: 550px;
             }
 
             .bubble-table {
@@ -607,8 +636,8 @@
 
                         <h3 style='margin: 32px 0 16px 0;'>Model Flow: How Your Inputs Become Predictions</h3>
 
-                        <div style="margin: 24px 0; padding: 20px; background: #fdfaf5; border-radius: 12px; border: 1px solid #e6dcc8;">
-                            <svg id="model-flow-diagram" viewBox="0 0 1000 800" style="width: 100%; height: auto; margin: 0 auto; display: block;">
+                        <div style="margin: 24px 0; padding: 20px; background: #fdfaf5; border-radius: 12px; border: 1px solid #e6dcc8; overflow-x: auto;">
+                            <svg id="model-flow-diagram" viewBox="0 0 1000 800" style="width: 100%; min-width: 600px; height: auto; margin: 0 auto; display: block;">
                                 <!-- Define styles -->
                                 <defs>
                                     <style>
