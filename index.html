@@ -3764,14 +3764,6 @@
             updateChart();
         });
 
-        if (false) document.getElementById('compute-scaling')?.addEventListener('input', function() {
-            const computeValue = parseFloat(this.value);
-            document.getElementById('compute-scaling-value').textContent = computeValue.toFixed(1) + 'x';
-            console.log('[Slider] Compute Scaling:', computeValue.toFixed(1) + 'x',
-                       '→ expect', computeValue > 3.4 ? 'FASTER' : 'SLOWER', 'automation');
-            updateChart();
-        });
-
         document.getElementById('industry-pace')?.addEventListener('input', function() {
             const frictionValue = parseFloat(this.value);
             document.getElementById('industry-pace-value').textContent = frictionValue.toFixed(1) + 'x';
