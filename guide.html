@@ -688,14 +688,28 @@
                         <p><strong>Role explicitness ($s_e$) mechanism:</strong> Questions Q1, Q2, Q3, Q4, Q5, Q6, and Q8 (positive factors) are averaged together, while Q7 and Q9 (context dependency and tacit knowledge &mdash; protective factors) are averaged separately. The formula $s_e = 0.65 \times \text{norm}(s_{\text{pos}}) - 0.35 \times \text{norm}(s_{\text{neg}}) + 0.10$ produces a score between 0 and 1. Higher $s_e$ (more explicit roles) reduces $\theta$ via the shift $\Delta_{s_e} = 0.10 \times (0.5 - s_e)$, meaning AI needs less total job coverage before automation becomes economically viable.</p>
 
                         <div class='insight-callout'>
-                            <p><strong>Example:</strong> An entry-level customer service rep (seniority=1, Q5=5 structured, Q6=5 standardized, Q7=1 low context) gets task weights roughly <code>[40%, 35%, 20%, 4%, 1%]</code> &mdash; most work is quick tasks. A senior software architect (seniority=4, Q5=2 complex, Q6=2 variable, Q7=4 high context) gets <code>[12%, 24%, 28%, 24%, 12%]</code> &mdash; heavily weighted toward medium and long tasks. Even if AI capability $H_r(t)$ is identical for both, the architect's readiness $A(t)$ stays lower longer because their job has fewer automatable short tasks. This personalization ensures the model reflects real differences in how jobs are structured.</p>
-                        </div>
+    <p><strong>Protection mechanisms (user-actionable):</strong></p>
+    <ul>
+        <li>Move up hierarchy: reach Level 4–5 (own a domain/system)</li>
+        <li>Increase specialization: lower Q19 (make work harder to transfer)</li>
+        <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work)</li>
+        <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows)</li>
+        <li>Build unique relationships: strengthen Q10/Q11 protective value</li>
+    </ul>
+</div>
 
                         <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
 
                         <div class='insight-callout'>
-                            <p><strong>Calibration:</strong> The model is validated on each page load. Setting Q1, Q4, and Q6 to five yields roughly a $2.5\times$ hazard boost versus neutral answers, while stacking protective responses (Q7, Q9, Q11 high) suppresses the hazard by about $50\%$, delays implementation by $\geq 0.7$ years, and pushes the domain penalty above $~2\times$ so readiness clears METR later.</p>
-                        </div>
+    <p><strong>Protection mechanisms (user-actionable):</strong></p>
+    <ul>
+        <li>Move up hierarchy: reach Level 4–5 (own a domain/system)</li>
+        <li>Increase specialization: lower Q19 (make work harder to transfer)</li>
+        <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work)</li>
+        <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows)</li>
+        <li>Build unique relationships: strengthen Q10/Q11 protective value</li>
+    </ul>
+</div>
                     </section>
 
                     <section>
@@ -714,7 +728,7 @@
                         <p><strong>How it works:</strong></p>
                         <ol class='action-list'>
                             <li><strong>Reallocation feasibility ($s_{\text{realloc}}$):</strong> Combines Q19 (direct reallocation question), task structure (Q5-Q7: decomposable, standardized, low-context work is easier to redistribute), tacit knowledge (Q9), and physical presence requirements (Q11). Higher scores mean your work can be easily absorbed by others.</li>
-                            <li><strong>Senior productivity amplification ($B_{\text{amp}}$):</strong> AI only amplifies productivity for digital work (Q4). The boost ranges from 0 to 2.0× (can double senior output), scaled by current AI performance (Q1) and job readiness. Physical or tacit-heavy roles get minimal amplification even if tasks are reallocatable.</li>
+                            <li><strong>Senior productivity amplification ($B_{\text{amp}}$):</strong> AI only amplifies productivity for digital work (Q4). The boost ranges from 0 to 2.0 (up to +200% output; up to 3� productivity when used in <code>1 + B_{\text{amp}}</code>), scaled by current AI performance (Q1) and job readiness. Physical or tacit-heavy roles get minimal amplification even if tasks are reallocatable.</li>
                             <li><strong>Hierarchy vulnerability ($V_{\text{hierarchy}}$):</strong> Your position in the workflow determines exposure. Level 1 (many layers above) = 100% vulnerable. Level 4-5 (top of domain, no one above can do your work) = protected. A principal engineer who owns a system faces minimal compression risk despite being in a "senior" role title.</li>
                         </ol>
 
@@ -722,9 +736,20 @@
 
                         <p><strong>Example:</strong> An entry-level SWE (Level 1) with highly decomposable digital work (Q4=5, Q5=4, Q6=4, Q19=4) faces compression when AI reaches ~30% capability. At 40% capability, seniors are 1.6× more productive, triggering 15-25%/year compression hazard before automation hazard even activates. The green curve shows significant job loss risk 2-3 years earlier than the blue curve predicts, matching observed workforce reductions in software engineering.</p>
 
+                        <p><strong>Example 2 (protected): Senior engineer who owns system.</strong> Level 4, fully digital (Q4=5), structured/standardized (Q5=4, Q6=3), hard to reallocate (Q19=2), high tacit/context (Q7=5, Q9=5), normal physical presence (Q11=3). With modest current AI performance (Q1=2) and job readiness A_job�0.40: reallocationScore�0.35; amplificationBoost�0.20; compressionReadiness�0.42; base hazard�0.18/year; hierarchy vulnerability (Level 4) = 0.4 ? compression hazard�0.07/year. Outcome: protected by hierarchy � compression risk is low; main risk shifts to later full automation.</p>
+
+                        <p><strong>Example 3 (moderate): Entry-level accountant.</strong> Level 1; mostly digital (Q4=4), moderate structure (Q5=3, Q6=3), reallocation moderate (Q19=3). At A_job�0.40 and Q1=3: digitalFraction=0.75; amplificationBoost�0.30; compressionReadiness�0.65; base hazard�0.26/year; hierarchy vulnerability=1.0 ? compression hazard�0.26/year. Outcome: moderate compression risk, activating a bit later than SWE due to lower digitization (weaker amplification).</p>
+
                         <div class='insight-callout'>
-                            <p><strong>Protection mechanisms:</strong> Compression vulnerability is lowest when you combine: (1) high hierarchy position (Level 4-5: you own the domain), (2) low reallocation feasibility (Q19=1-2: unique expertise, hard to transfer), (3) high tacit/context load (Q7/Q9 high: work requires deep specialized knowledge), or (4) low digitization (Q4 low: AI can't amplify seniors in your domain). Physical presence (Q11 high) also protects by making remote redistribution difficult.</p>
-                        </div>
+    <p><strong>Protection mechanisms (user-actionable):</strong></p>
+    <ul>
+        <li>Move up hierarchy: reach Level 4–5 (own a domain/system)</li>
+        <li>Increase specialization: lower Q19 (make work harder to transfer)</li>
+        <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work)</li>
+        <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows)</li>
+        <li>Build unique relationships: strengthen Q10/Q11 protective value</li>
+    </ul>
+</div>
                     </section>
 
                     <section>

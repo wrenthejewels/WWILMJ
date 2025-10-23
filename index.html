@@ -2157,11 +2157,11 @@
         }
 
         const SENIORITY_PROFILES = [
-            { label: 'Entry',          thetaLift: -0.02, hazardShield: 0.00, delayShift: -0.4, reemploymentBoost: 1.00 },
-            { label: 'Mid-Level',      thetaLift: 0.00,  hazardShield: 0.02, delayShift: -0.1, reemploymentBoost: 1.03 },
-            { label: 'Senior',         thetaLift: 0.03,  hazardShield: 0.05, delayShift: 0.2,  reemploymentBoost: 1.06 },
-            { label: 'Lead/Principal', thetaLift: 0.05,  hazardShield: 0.08, delayShift: 0.4,  reemploymentBoost: 1.08 },
-            { label: 'Executive',      thetaLift: 0.08,  hazardShield: 0.10, delayShift: 0.6,  reemploymentBoost: 1.10 }
+            { label: 'Level 1: Many layers above',            thetaLift: -0.02, hazardShield: 0.00, delayShift: -0.4, reemploymentBoost: 1.00 },
+            { label: 'Level 2: Several layers above',         thetaLift: 0.00,  hazardShield: 0.02, delayShift: -0.1, reemploymentBoost: 1.03 },
+            { label: 'Level 3: Few above or mostly peers',    thetaLift: 0.03,  hazardShield: 0.05, delayShift: 0.2,  reemploymentBoost: 1.06 },
+            { label: 'Level 4: Top of domain',                thetaLift: 0.05,  hazardShield: 0.08, delayShift: 0.4,  reemploymentBoost: 1.08 },
+            { label: 'Level 5: Unique/irreplaceable owner',   thetaLift: 0.08,  hazardShield: 0.10, delayShift: 0.6,  reemploymentBoost: 1.10 }
         ];
 
         // Seniority-based task weight shifts (shift toward longer tasks for higher levels)
@@ -3304,8 +3304,7 @@
 
             const seniorityLevel = currentParams.seniority || 1;
 
-            // Level 4-5 are protected from compression (top of hierarchy)
-            if (seniorityLevel >= 4) return 0;
+            // Protection handled by hierarchy vulnerability scaling (Level 4→0.4, Level 5→0.2)
 
             const answers = currentParams.answers || {};
 
