@@ -3807,6 +3807,12 @@
                 const modelWeights = getTaskWeightsForSeniority(seniorityLevel, answers);
                 setInputsFromArray(modelWeights);
                 updateSum();
+                // Apply the reset values immediately
+                if (currentParams) {
+                    currentParams.userBaseWeights = modelWeights;
+                    console.log('[TaskBuckets] Reset to model weights:', modelWeights.map(v=>v.toFixed(3)));
+                    updateChart();
+                }
             });
 
             applyBtn && (applyBtn.onclick = () => {
