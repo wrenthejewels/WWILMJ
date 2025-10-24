@@ -3381,7 +3381,7 @@
             const q6 = answers.Q6 || 3;    // Standardization
             const q7 = answers.Q7 || 3;    // Context dependency
             const q9 = answers.Q9 || 3;    // Tacit knowledge
-            const q11 = answers.Q12 || 3;  // Physical presence
+            const q12 = answers.Q12 || 3;  // Physical presence
 
             const reallocationScore = (
                 norm(q10) * 0.50 +           // Direct reallocation feasibility (increased weight)
@@ -3389,7 +3389,7 @@
                 norm(q6) * 0.12 +            // Standardized = others can pick up
                 (1 - norm(q7)) * 0.08 +      // Low context = portable
                 (1 - norm(q9)) * 0.10 +      // Low tacit = teachable
-                (1 - norm(q11)) * 0.02       // Low physical presence = easier remote reallocation
+                (1 - norm(q12)) * 0.02       // Low physical presence = easier remote reallocation
             );
 
             // 2. Senior Productivity Amplification (only for AI-learnable digital work)
