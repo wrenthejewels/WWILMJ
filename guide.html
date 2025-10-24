@@ -374,7 +374,7 @@
         /* Compact bubble table for defaults */
         .bubble-table {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 16px;
             margin: 16px 0 24px;
         }
@@ -411,7 +411,9 @@
             text-align: right;
             flex-shrink: 0;
             font-size: 0.84rem;
-            white-space: nowrap;
+            white-space: normal;
+            max-width: 180px;
+            line-height: 1.3;
         }
 
         ol.action-list {
@@ -908,11 +910,11 @@
 
                     <section>
                         <h2>How your answers move the curve</h2>
-                        <p>Each questionnaire response maps to a coded value $x_i$. All responses use the same coding rule: Likert 1-5 responses convert to the symmetric set $\{-2,-1,0,+1,+2\}$ (i.e., $1\to -2, 3\to 0, 5\to +2$). Effects run in the correct direction via the weight's sign. The model tracks two channels: an amplifier sum $\sum w_{\text{amp}} x_i$ and a friction sum $\sum w_{\text{fric}} x_i$. After clamping each sum to $[-2, 2]$ we exponentiate them, multiply the results, then bound the overall multiplier to $[0.33, 3.0]$ for responsiveness.</p>
+                        <p>Your Likert scale responses (1-5) are converted to $\{-2, -1, 0, +1, +2\}$ so that 3 (neutral) = 0 and effects scale symmetrically. The model combines these into two weighted sums—amplifier ($\sum w_{\text{amp}} x_i$) and friction ($\sum w_{\text{fric}} x_i$)—exponentiates them to create multipliers, then combines and bounds the result to $[0.33, 3.0]$.</p>
                         <p>The prompts cluster into four themes:</p>
                         <ul class='detail-list'>
                             <li><strong>AI readiness (Q1-Q4):</strong> High scores strengthen the amplifier channel when you indicate strong capability for AI learning and completing your tasks. Additionally, Q1 (current AI performance), Q2 (example work availability), Q3 (benchmark clarity), and Q4 (work digitization) all contribute to role explicitness ($s_e$), which lowers the coverage threshold $\theta$ &mdash; making automation viable at lower overall capability levels.</li>
-                            <li><strong>Task structure (Q5&ndash;Q9):</strong> These questions affect the blue curve (technical feasibility) through multiple mechanisms: <strong>(1)</strong> Q5, Q6 shift the task duration profile (structured &rarr; shorter buckets, complex &rarr; longer buckets), <strong>(2)</strong> Q2, Q5, Q6, Q8 contribute to $s_e$ which <strong>lowers $\theta$</strong> (data-rich, decomposable, standardized, fast-feedback jobs become viable at lower capability), and <strong>(3)</strong> Q7, Q9 increase the domain penalty $p_{\text{domain}}$ (high context, tacit knowledge damp capability) &mdash; they do <em>not</em> change the doubling time. Together, these determine when your specific job crosses the automation threshold.</li>
+                            <li><strong>Task structure (Q5&ndash;Q9):</strong> These questions affect the blue curve (technical feasibility) through multiple mechanisms: <strong>(1)</strong> Q5, Q6 shift the task duration profile (structured &rarr; shorter buckets, complex &rarr; longer buckets), <strong>(2)</strong> Q2, Q5, Q6, Q8 contribute to $s_e$ which <strong>lowers $\theta$</strong> (data-rich, decomposable, standardized, fast-feedback jobs become viable at lower capability), and <strong>(3)</strong> Q7, Q9 increase the domain penalty $p_{\text{domain}}$ (high context, tacit knowledge damp capability). Together, these determine when your specific job crosses the automation threshold.</li>
                             <li><strong>Human moat (Q11-Q12):</strong> Relationship intensity and physical presence both load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
                             <li><strong>Firm and personal context (Q13-Q19):</strong> Company levers shape implementation delay. Job performance (Q19) delays displacement for top performers while also helping re-employment. Adaptability (Q18) and transferability (Q17) drive re-employment probability.</li>
                         </ul>
