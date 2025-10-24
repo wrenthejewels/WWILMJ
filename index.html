@@ -2035,7 +2035,6 @@
         <div class="parameter-breakdown">
             <div class="profile-timeline">
                     <h4 class="section-title" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                        <span>Your Automation Timeline</span>
                         <button id="edit-task-buckets" class="header-btn" style="padding:8px 16px; font-size:0.85rem; letter-spacing:0.05em;">
                             Edit task buckets (optional)
                         </button>
@@ -2043,7 +2042,7 @@
                     <div id="task-bucket-editor" class="additional-questions" style="margin-top:10px;">
                         <div style="background:#fff; border:1px solid #e6e0d4; border-radius:12px; padding:16px;">
                             <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;">
-                                <p style="margin:0; color:#495057; font-size:0.9rem;">Adjust your job’s baseline time split across task duration buckets. Values are percentages and will be normalized.</p>
+                                <p style="margin:0; color:#495057; font-size:0.9rem;">Adjust your job's baseline time split across task duration buckets.</p>
                                 <label style="display:flex; align-items:center; gap:8px; color:#495057; font-size:0.9rem;">
                                     <input type="checkbox" id="tb-auto" checked>
                                     <span>Follow model (auto)</span>
@@ -2079,16 +2078,18 @@
                             </div>
                         </div>
                     </div>
-                    <div id="personal-timeline"></div>
             </div>
         </div>
 
-            <div class="model-insights">
-                <p><strong>Role explicitness (s_e):</strong> <span id="insight-explicitness">-</span></p>
-                <p><strong>Required quality θ:</strong> <span id="insight-theta">-</span></p>
-                <p><strong>Adoption friction:</strong> <span id="insight-friction">-</span></p>
-                <p><strong>Domain alignment:</strong> <span id="insight-alignment">-</span></p>
-            </div>
+        <!-- Hidden elements to prevent JS errors -->
+        <div style="display:none;">
+            <div id="personal-timeline"></div>
+            <span id="insight-explicitness"></span>
+            <span id="insight-theta"></span>
+            <span id="insight-friction"></span>
+            <span id="insight-alignment"></span>
+        </div>
+
                 </div>
             </div>
         </div>
