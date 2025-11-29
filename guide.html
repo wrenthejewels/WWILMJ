@@ -6,33 +6,84 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Cousine:wght@400;700&display=swap' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <title>Guide - Don't Lose Your Job</title>
     <style>
+        :root {
+            /* Warm neutral palette */
+            --bg-page: #FAF8F5;
+            --bg-card: #FFFFFF;
+            --bg-subtle: #F5F2EE;
+            --bg-hover: #F0EDE8;
+
+            /* Text hierarchy */
+            --text-primary: #1A1917;
+            --text-secondary: #5C5850;
+            --text-tertiary: #8A8578;
+
+            /* Accent - blue to match page theme */
+            --accent: #2a5298;
+            --accent-hover: #1e3c72;
+            --accent-subtle: rgba(42, 82, 152, 0.08);
+
+            /* Borders */
+            --border-light: #E8E4DE;
+            --border-medium: #D9D4CC;
+
+            /* Spacing scale */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --space-6: 32px;
+            --space-7: 48px;
+            --space-8: 64px;
+
+            /* Typography scale */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 2rem;
+
+            /* Radius */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         body {
-            font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #faf7f1;
-            color: #1f1c18;
-            line-height: 1.7;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
         }
 
         a {
-            color: #a35d2c;
+            color: var(--accent);
             text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
+            transition: color 0.15s ease;
         }
 
         a:hover {
-            color: #703b16;
-            text-decoration: underline;
+            color: var(--accent-hover);
         }
 
         .container {
@@ -62,119 +113,145 @@
             margin: 0 auto;
         }
 
-        .site-header {
+        .site-header, .header {
             position: static;
-            backdrop-filter: blur(12px);
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid #e6e0d4;
+            background: var(--bg-page);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 100;
+        }
+
+        .centered-header {
+            border-bottom: 1px solid var(--border-light);
+            padding: 0;
+        }
+
+        .centered-header .header-inner {
+            justify-content: center;
         }
 
         .header-inner {
-            width: 92.5%;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 0;
+            padding: var(--space-4) var(--space-5);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 24px;
+            gap: var(--space-5);
         }
 
-        .header-brand {
+        .brand, .header-brand {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .publication-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 0.02em;
-        }
-
-        .publication-tagline,
-        .author-link {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            font-weight: 600;
-        }
-
-        .publication-tagline {
-            color: #5c564f;
-        }
-
-        .author-link {
-            color: #6ba3d4;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .author-link:hover {
-            color: #4a8bc2;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 24px;
             align-items: center;
         }
 
-        .header-btn {
-            background: #fdf8f0;
-            color: #1f1c18;
-            border: 1px solid #e6e0d4;
-            border-radius: 6px;
-            padding: 14px 32px;
-            font-size: 1.05rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .centered-brand {
+            align-items: center;
         }
 
-        .header-btn:hover {
-            background: #f5eee0;
-            border-color: #d9d2c4;
-            color: #000000;
+        .brand-name, .publication-title {
+            font-size: var(--text-sm);
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+            line-height: 1;
+            padding: var(--space-3) 0;
         }
 
-        .header-btn.active {
-            background: #1f1c18;
-            color: #ffffff;
-            border-color: #1f1c18;
-            box-shadow: 0 12px 28px rgba(31, 28, 24, 0.2);
+        .publication-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.35rem;
+            letter-spacing: 0.005em;
+            font-weight: 400;
+        }
+
+        .nav {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .nav-link {
+            padding: var(--space-3) var(--space-5);
+            font-size: var(--text-base);
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-radius: var(--radius-full);
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-subtle);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: var(--bg-card);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            text-decoration: underline;
         }
 
         .guide-article {
             width: 100%;
         }
 
-        .article-hero {
-            padding: 96px 0 48px;
-            border-bottom: 1px solid #e6e0d4;
-            margin-bottom: 48px;
+        .hero, .hero-section {
+            text-align: center;
+            padding: var(--space-8) 0 var(--space-7);
+            max-width: 720px;
+            margin: 0 auto;
+            background: transparent;
+            border-bottom: none;
         }
+
+        .hero h1, .hero-section h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(var(--text-3xl), 5vw, 3.5rem);
+            font-weight: 600;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+        }
+
+        .hero p, .hero-section p {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        .article-hero {
+            text-align: center;
+            padding: 62px 0 32px;
+            max-width: 720px;
+            margin: 0 auto 48px;
+            background: transparent;
+            border-bottom: 1px solid #e6e0d4;
+        }
+
         .article-hero h1 {
-            font-family: 'Sora', sans-serif;
-            font-size: clamp(2.8rem, 4vw, 3.6rem);
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(1.9rem, 3vw, 2.6rem);
             letter-spacing: -0.015em;
             font-weight: 600;
             margin-top: 18px;
         }
 
-        .lede {
-            color: #5c564f;
-            max-width: 48ch;
+        .lede, .article-hero p {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin: 0 auto;
             margin-top: 16px;
-            font-size: 1.18rem;
+            line-height: 1.6;
         }
 
         .meta-line {
             display: flex;
             gap: 16px;
             align-items: center;
+            justify-content: center;
             margin-top: 24px;
             font-size: 0.85rem;
             letter-spacing: 0.12em;
@@ -191,78 +268,6 @@
             padding-bottom: 120px;
         }
 
-        .metr-intro {
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-        }
-
-        .metr-brand-card {
-            background: #fdf8f0;
-            border: 1px solid #e6e0d4;
-            border-radius: 18px;
-            padding: 28px;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
-            width: 100%;
-        }
-
-        .metr-brand-link {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .metr-brand-link img {
-            width: 56px;
-            height: auto;
-        }
-
-        .metr-brand-text {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .metr-brand-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.15rem;
-            letter-spacing: 0.1em;
-            color: #1f1c18;
-            text-transform: uppercase;
-        }
-
-        .metr-brand-subtitle {
-            font-size: 0.95rem;
-            color: #5c564f;
-        }
-
-        .metr-figure {
-            background: #ffffff;
-            border: 1px solid #e6e0d4;
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.05);
-            width: 100%;
-        }
-
-        .metr-figure img {
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-        }
-
-        .metr-figure figcaption {
-            margin-top: 12px;
-            font-size: 0.9rem;
-            color: #6b635a;
-        }
-
-        .chart-note {
-            margin-top: 18px;
-            font-size: 0.92rem;
-            color: #5c564f;
-        }
-
         .article-body section {
             background: #ffffff;
             border: 1px solid #e6e0d4;
@@ -272,194 +277,30 @@
         }
 
         .article-body h2 {
-            font-family: 'Sora', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.8rem;
             margin-bottom: 24px;
             color: #1f1c18;
+            font-weight: 600;
         }
 
         .article-body h3 {
-            font-family: 'Sora', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.2rem;
             margin: 32px 0 16px;
             color: #1f1c18;
+            font-weight: 600;
         }
 
         .article-body p {
             margin-bottom: 1.4em;
             color: #3f392f;
-        }
-
-        code {
-            font-family: 'Cousine', 'Menlo', monospace;
-            font-size: 0.95rem;
-            background: #f5efe4;
-            color: #3b3326;
-            padding: 0 4px;
-            border-radius: 4px;
-        }
-
-        blockquote {
-            border-left: 4px solid #d2c7b8;
-            padding-left: 20px;
-            margin: 24px 0;
-            color: #5c564f;
-            font-style: italic;
-        }
-
-        .equation-callout {
-            margin: 28px 0;
-            padding: 24px 28px;
-            border-left: 4px solid #d2c7b8;
-            background: #fefbf5;
-            border-radius: 18px;
-        }
-
-        .callout-label {
-            display: block;
-            font-size: 0.8rem;
-            letter-spacing: 0.12em;
-            color: #3b3326;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .equation-display {
-            font-size: 1.1rem;
-            color: #3b3326;
-            overflow-x: auto;
-            padding: 8px 0;
-        }
-
-        .detail-list {
-            list-style: none;
-            padding: 0;
-            margin: 24px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .detail-list li {
-            background: #fefbf5;
-            border: 1px solid #eadfce;
-            border-radius: 16px;
-            padding: 16px 20px;
-            color: #3f392f;
-        }
-
-        .detail-list li strong {
-            display: inline;
-            font-family: 'Sora', sans-serif;
-            font-size: 0.95rem;
-            margin: 0;
-            margin-right: 6px;
-        }
-
-        .insight-callout {
-            border-left: 4px solid #d2c7b8;
-            background: #fdf7ed;
-            border-radius: 18px;
-            padding: 20px 24px;
-            margin: 28px 0;
-            color: #3f392f;
-            font-size: 0.95rem;
-        }
-
-        .insight-callout strong {
-            font-family: 'Sora', sans-serif;
-        }
-
-        /* Compact bubble table for defaults */
-        .bubble-table {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 16px;
-            margin: 16px 0 24px;
-        }
-
-        @media (max-width: 480px) {
-            .bubble-table {
-                grid-template-columns: 1fr;
-            }
-        }
-        .bubble-item {
-            background: #fefbf5;
-            border: 1px solid #eadfce;
-            border-radius: 16px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            overflow: visible;
-        }
-        .bubble-key {
-            font-family: 'Sora', sans-serif;
-            font-weight: 600;
-            color: #3b3326;
-            flex: 0 1 auto;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
-        }
-        .bubble-val {
-            color: #3f392f;
-            text-align: right;
-            flex-shrink: 0;
-            font-size: 0.84rem;
-            white-space: normal;
-            max-width: 180px;
-            line-height: 1.3;
-        }
-
-        ol.action-list {
-            counter-reset: step;
-            list-style: none;
-            padding: 0;
-            margin: 24px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        ol.action-list li {
-            counter-increment: step;
-            position: relative;
-            padding: 18px 20px 18px 54px;
-            background: #fefbf5;
-            border: 1px solid #eadfce;
-            border-radius: 18px;
-            color: #3f392f;
-        }
-
-        ol.action-list li::before {
-            content: counter(step);
-            position: absolute;
-            left: 18px;
-            top: 18px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #1f1c18;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            font-weight: 600;
+            line-height: 1.6;
         }
 
         @media (max-width: 900px) {
             .header-inner {
                 width: 94%;
-            }
-
-            .article-hero {
-                padding: 72px 0 40px;
             }
 
             .article-body section {
@@ -474,12 +315,8 @@
                 gap: 16px;
             }
 
-            .header-actions {
-                width: 100%;
-            }
-
-            .header-btn {
-                flex: 1;
+            .hero-section {
+                padding: 56px 16px 36px;
             }
 
             .article-hero {
@@ -492,6 +329,11 @@
                 letter-spacing: -0.01em;
             }
 
+            .hero-section h1 {
+                font-size: clamp(1.8rem, 6vw, 2.4rem);
+                letter-spacing: -0.01em;
+            }
+
             .lede {
                 font-size: 1.0rem;
                 max-width: 100%;
@@ -501,62 +343,126 @@
             .article-body section {
                 padding: 20px 16px;
             }
+        }
 
-            #model-flow-diagram {
-                min-width: 550px;
-            }
+        /* Sticky progress rail (desktop only) -- LessWrong-inspired */
+        .progress-nav {
+            --progress-fill: 0%;
+            position: fixed;
+            top: 150px;
+            left: 24px;
+            width: 240px;
+            max-height: 86vh;
+            padding: 10px 14px 12px 16px;
+            background: rgba(245, 242, 238, 0.96);
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 120;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
 
-            .bubble-table {
-                grid-template-columns: 1fr;
+        @media (min-width: 1100px) {
+            .progress-nav {
+                display: block;
             }
+        }
 
-            .bubble-item {
-                padding: 12px 14px;
-                gap: 8px;
-                flex-wrap: wrap;
-                align-items: flex-start;
-            }
+        .progress-nav ul {
+            position: relative;
+            list-style: none;
+            padding: 4px 0 4px 24px;
+            margin: 0;
+        }
 
-            .bubble-key {
-                font-size: 0.80rem;
-                flex: 1 1 100%;
-                text-align: left;
-                overflow: visible;
-                white-space: normal;
-            }
+        .progress-nav ul::before {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: rgba(26, 25, 23, 0.2);
+            border-radius: 999px;
+        }
 
-            .bubble-val {
-                font-size: 0.79rem;
-                flex: 1 1 100%;
-                text-align: left;
-                padding-left: 8px;
-                color: #5c564f;
-            }
+        .progress-nav ul::after {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            width: 2px;
+            height: var(--progress-fill, 0%);
+            background: #1A1917;
+            border-radius: 999px;
+            transition: height 0.18s ease;
+        }
 
-            ol.action-list li {
-                padding: 16px 18px 16px 48px;
-            }
+        .progress-nav li {
+            position: relative;
+            margin: 0 0 10px;
+            padding-left: 4px;
+        }
 
-            ol.action-list li::before {
-                left: 14px;
-                top: 16px;
-            }
+        .progress-nav li:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-nav a {
+            color: #4b5563;
+            text-decoration: none;
+            display: block;
+            padding: 6px 10px 6px 10px;
+            border-radius: 10px;
+            transition: color 0.15s ease, background 0.15s ease;
+            line-height: 1.3;
+        }
+
+        .progress-nav a:hover {
+            color: #1f2937;
+            background: rgba(42, 82, 152, 0.06);
+        }
+
+        .progress-nav a.active {
+            color: #1f2937;
+            background: rgba(42, 82, 152, 0.12);
+            font-weight: 600;
+        }
+
+        .progress-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .progress-nav .depth-3 {
+            padding-left: 6px;
+            font-size: 0.85rem;
+            color: #6b7280;
         }
     </style>
 </head>
 
 <body>
-    <header class='site-header'>
-        <div class='header-inner'>
-            <div class='header-brand'>
-                <span class='publication-title'>Don't Lose Your Job</span>
-                <span class='publication-tagline'>Forecasting work in the age of AI</span>
-                <a href='https://x.com/wrenclay' target='_blank' class='author-link'>Clay Wren</a>
+    <!-- Progress nav (desktop-only), mirrored from Methodology -->
+    <nav class="progress-nav" aria-label="On this page">
+        <ul id="progress-list" class="progress-rail"></ul>
+    </nav>
+
+    <header class="site-header centered-header">
+        <div class="header-inner">
+            <div class="header-brand centered-brand">
+                <span class="publication-title">Don't Lose Your Job</span>
             </div>
-            <div class='header-actions'>
-                <button class='header-btn' data-page='/'>Calculator</button>
-                <button class='header-btn active' data-page='/guide'>Guide</button>
-            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Model</a>
+                <a href="guide.html" class="nav-link active">Guide</a>
+                <a href="method.html" class="nav-link">Methodology</a>
+            </nav>
         </div>
     </header>
 
@@ -564,507 +470,809 @@
         <div class='content-wrapper'>
             <article class='guide-article'>
                 <header class='article-hero'>
-                    <h1>Model Guide</h1>
-                    <p class='lede'>Let's walk through the hazard model that powers the calculator so you can interpret the curves, pressure-test scenarios, and translate the output into career choices.</p>
-                    <div class='meta-line'>
-                        <span>Updated October 2025</span>
-                    </div>
+                    <h1>Guide</h1>
+                    <p class='lede'>Practical advice for interpreting your results, understanding what the curves mean for your career, and translating displacement risk into actionable decisions.</p>
                 </header>
 
                 <div class='article-body'>
 
-                    <section class="metr-intro">
-
-                        <div class="metr-brand-card">
-
-                            <a class="metr-brand-link" href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">
-
-                                <img src="images/metr-logo.svg" alt="METR logo">
-
-                                <div class="metr-brand-text">
-
-                                    <span class="metr-brand-title">METR</span>
-
-                                    <span class="metr-brand-subtitle">Measuring AI ability to complete long tasks</span>
-
-                                </div>
-
-                            </a>
-
-                            <p>METR's March 2025 study tracks how long a generalist frontier agent can work autonomously before its success rate drops below a chosen threshold. Their task horizon has doubled roughly every seven months since 2019, giving us a grounded baseline rather than guessing at capability curves.</p>
-
-                            <p>The calculator loads the latest SOTA (state-of-the-art) model benchmarks from METR on each page load, using the model's release date as the capability baseline and the current date (when you access the page) as the starting point for projections. For example, GPT-5's benchmark shows a 50th percentile task horizon of 137 minutes and an 80% success horizon of 26.37 minutes. We fit a logistic success curve through these measurements. At the default 95% reliability requirement, the effective horizon contracts to roughly 4.1 minutes (about 33&times; shorter than the median). A 99% requirement would shrink it further to about 0.58 minutes (~235&times; shorter).</p>
-
-                            <ul class="detail-list">
-
-                                <li><strong>Doubling trend:</strong> Every 7 months, AI can handle 2x longer tasks at the same success rate.</li>
-
-                                <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. Technical capability requires a high bar to outperform human error, though you can adjust this threshold in the calculator.</li>
-
-                                <li><strong>Task mapping:</strong> Your job gets decomposed into five task duration categories: [2.5, 15, 60, 180, 540] minutes. These thresholds reflect typical workplace task decomposition. Once AI can reliably complete enough of these categories, the hazard channel opens.</li>
-
-                                <li><strong>Scenario levers:</strong> Industry-specific friction and required reliability, plus your questionnaire responses, adjust capability. The 7-month doubling time stays fixed. Friction multiplies the horizon penalty (p_domain); reliability tightens the success bar.</li>
-
-                            </ul>
-
-                        </div>
-
-                        <figure class="metr-figure">
-
-                            <img src="images/metr-length-of-tasks-linear.png" alt="METR linear task horizon trend">
-
-                            <figcaption>
-                                Linear horizon chart reproduced from
-                                <a href="https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/" target="_blank" rel="noopener noreferrer">METR</a>. The calculator uses their 7-month doubling trend with a 95% reliability requirement for production-ready automation.
-                            </figcaption>
-
-                        </figure>
-
-
-                    </section>
                     <section>
-                        <h2>What the calculator actually simulates</h2>
-                        <p>The calculator models job displacement as a survival problem where multiple hazard channels compound over time. A complete hazard model would consider all displacement possibilities: macroeconomic forces, firm performance, reductions in force, non-AI hazards, and personal leverage. This calculator focuses only on AI-related hazards at the role, personal, and firm levels. Consider that it is only a portion of your total displacement risk. This model will update over time with new AI-related data and risk considerations.</p>
-                        <div class='equation-callout'>
-                            <span class='callout-label'>Survival relationship</span>
-                            <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
-                            <span class='callout-label'>Stacked hazard model</span>
-                            <div class='equation-display'>$$\lambda_{\text{total}}(s) = \lambda_{\text{AI}}(s) + \lambda_{\text{macro}}(s) + \lambda_{\text{firm}}(s) + \lambda_{\text{role}}(s) + \lambda_{\text{personal}}(s)$$</div>
-                        </div>
-                        <p>The AI hazard rate ($\lambda_{\text{AI}}(s)$) determines the blue technical feasibility curve. Your firm and personal questionnaire responses then shift this curve forward in time and add a compression hazard channel to create the green implementation curve. The same data also determines your re-employment probability.</p>
-                        <ul class='detail-list'>
-                            <li><strong>AI hazard (blue curve):</strong> METR task-length data map capability progress into technical feasibility.</li>
-                            <li><strong>Compression hazard (green curve only):</strong> Workforce reductions via task reallocation to AI-amplified seniors, activated at lower capability thresholds for vulnerable hierarchy positions.</li>
-                            <li><strong>Implementation delay (green curve):</strong> Firm and personal answers shift the AI automation hazard forward in time.</li>
-                            <li><strong>Re-employment likelihood:</strong> Adaptability and transferable skill questions translate into the percentage you see on the dashboard.</li>
-                        </ul>
+                        <h2>Introduction</h2>
+                        <p>The calculator provides displacement risk estimates based on current AI capability trends and your job characteristics. This guide helps you interpret those results and understand what they mean for your career trajectory.</p>
+                        <p>Think of the calculator as a probabilistic forecast rather than a deterministic prediction. The model captures technical feasibility (when AI becomes capable enough) and implementation reality (when organizations actually adopt and deploy). Both curves matter, but for different reasons.</p>
+                        <p>Your goal isn't to treat the output as gospel, but to use it as a framework for understanding risk exposure and making strategic decisions about skill development, role positioning, and career transitions.</p>
+                    </section>
 
-                        <h3 style='margin: 32px 0 16px 0;'>Model Flow: How Your Inputs Become Predictions</h3>
+                    <section>
+                        <h2>White-collar roles and digital work</h2>
+                        <p>White-collar knowledge work has historically been protected from automation by its complexity and tacit nature. AI changes this dynamic because language models can now engage with the symbolic manipulation that defines most office work: writing reports, analyzing data, drafting contracts, creating presentations, and coordinating projects.</p>
+                        <p>The calculator focuses on roles where the primary deliverable is digital and information-based. If your work product is a document, spreadsheet, slide deck, code file, or design artifact, you're in the target domain. Physical presence, relationship management, and real-world coordination provide friction, but they don't create absolute protection.</p>
+                        <p>Digital work is more vulnerable because AI can directly observe, learn from, and replicate the patterns in your output. A consultant's slide deck, a developer's code, an analyst's model—these artifacts are training data. The more standardized and decomposable your work, the faster AI closes the capability gap.</p>
+                    </section>
 
-                        <div style="margin: 24px 0; padding: 20px; background: #fdfaf5; border-radius: 12px; border: 1px solid #e6dcc8; overflow-x: auto;">
-                            <svg id="model-flow-diagram" viewBox="0 0 1000 800" style="width: 100%; min-width: 600px; height: auto; margin: 0 auto; display: block;">
-                                <!-- Define styles -->
+                    <section>
+                        <h2>The displacement equation</h2>
+                        <p>Displacement isn't a binary event. It's a gradual process where AI handles an increasing share of your task portfolio until the economic case for your role weakens beyond sustainability. The model tracks this through task coverage: what percentage of your job can AI perform at the required reliability threshold?</p>
+                        <p>Your risk depends on three factors: capability growth (how fast AI gets better), task distribution (what your job actually consists of), and implementation friction (organizational barriers to adoption). Fast capability growth plus a task distribution skewed toward short, standardized work plus low friction equals high near-term risk.</p>
+                        <p>The blue curve shows technical feasibility—when AI reaches the capability threshold. The green curve shows actual displacement—when job loss happens in practice after accounting for delays and compression effects. The gap between them represents implementation lag and organizational inertia.</p>
+                    </section>
+
+                    <section>
+                        <h2>Anatomy of knowledge work</h2>
+                        <p>Knowledge work decomposes into tasks of varying duration, complexity, and context requirements. The calculator uses five duration buckets: under 5 minutes, 5-15 minutes, 15-60 minutes, 1-3 hours, and over 9 hours. Shorter tasks automate first because AI's effective task horizon grows over time.</p>
+                        <p>Your hierarchy level and role characteristics determine how your work distributes across these buckets. Entry-level roles cluster in the short buckets—tickets, bug fixes, standard analysis, routine communications. Executive work skews long—strategic planning, organizational design, major negotiations, leadership decisions.</p>
+                        <p>Context dependency and tacit knowledge shift the distribution. Highly structured work can be decomposed into shorter tasks. Ambiguous, relationship-heavy work requires longer unbroken attention and more holistic judgment. The model captures this through your questionnaire responses about decomposability, standardization, and context needs.</p>
+                    </section>
+
+                    <section>
+                        <h2>The Job Complexity Tree</h2>
+                        <p>Your job isn't a single thing-it's a chaotic portfolio of interconnected tasks, responsibilities, and skills. Some are explicit and measurable: writing reports, analyzing data, scheduling meetings. Others are tacit and invisible: reading room dynamics, pattern recognition from experience, knowing when to escalate.</p>
+                        <p>The web below radiates from a central 'Your Job' node, splintering into overlapping constellations of storytelling, politics, operations, emotional labor, and automation experiments. It is intentionally dense and asymmetrical because real jobs rarely flow in tidy hierarchies.</p>
+                        <p><strong>Cool colors (blues and greens)</strong> represent tasks AI can readily automate-they're explicit, digitized, and pattern-based. <strong>Warm colors (browns and oranges)</strong> represent tacit, relationship-driven work that remains protected. Hover over any node to explore specific tasks and see why they're vulnerable or resilient.</p>
+
+                        <div style="margin: 32px 0; padding: 24px; background: #fdfaf5; border-radius: 12px; border: 1px solid #e6dcc8;">
+                                                                                                                                                                        <svg id="job-complexity-tree" viewBox="0 0 2200 1350" preserveAspectRatio="xMidYMid meet" style="width: 100%; max-width: 1400px; height: clamp(560px, 72vw, 1040px); margin: 0 auto; display: block;">
                                 <defs>
                                     <style>
-                                        .flow-box { transition: all 0.3s ease; cursor: pointer; }
-                                        .flow-box:hover rect { fill: #fdf7ed; stroke: #a88860; stroke-width: 2.5; }
-                                        .flow-arrow { transition: all 0.3s ease; }
-                                        .input-box rect { fill: #f5f1ea; stroke: #9b8b6f; }
-                                        .calc-box rect { fill: #fdfaf5; stroke: #d2c7b8; }
-                                        .output-box rect { fill: #f0f7f4; stroke: #7fa89b; }
-                                        .blue-output rect { fill: #e8f1f8; stroke: #5a8db8; }
-                                        .green-output rect { fill: #e8f5ee; stroke: #6ba583; }
-                                    </style>
+                                    .tree-node { cursor: pointer; transition: all 0.3s ease; }
+                                    .tree-node:hover .node-circle { stroke-width: 3; filter: brightness(1.2); }
+                                    .tree-node:hover .node-text { font-weight: 600; }
+                                    .tree-branch { stroke-width: 2; stroke-linecap: round; fill: none; opacity: 0.78; transition: all 0.3s ease; }
+                                    .tree-node:hover .tree-branch { stroke-width: 3; opacity: 1; }
+                                    .node-circle { stroke-width: 2; stroke: #1f1c18; transition: all 0.3s ease; }
+                                    .node-text { font-family: 'Inter', sans-serif; font-size: 10px; fill: #1f1c18; pointer-events: none; }
+                                    .main-branch-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; }
+                                    .root-text { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; }
+                                    .tooltip-box { opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+                                    .tooltip-visible { opacity: 1; }
+
+                                    /* Automation level colors */
+                                    .auto-high { fill: #5a8db8; } /* Highly automatable - blue */
+                                    .auto-medium-high { fill: #6ba583; } /* Medium-high automatable - teal/green */
+                                    .auto-medium { fill: #9b8b6f; } /* Partially automatable - neutral taupe */
+                                    .auto-medium-low { fill: #a88860; } /* Medium-low automatable - warm taupe */
+                                    .auto-low { fill: #2a5298; } /* Low automatable - brown */
+                                    .auto-none { fill: #1e3c72; } /* Non-automatable - deep orange-brown */
+                                                        </style>
                                 </defs>
-
-                                <!-- Title -->
-                                <text x="500" y="40" text-anchor="middle" font-family="'Sora', sans-serif" font-size="24" font-weight="600" fill="#495057">Your Inputs → Calculations → Results</text>
-
-                                <!-- LEVEL 1: INPUTS -->
-                                <g class="flow-box input-box" data-connects="task-dist,auto-timing,comp-timing">
-                                    <rect x="50" y="90" width="280" height="120" rx="8" stroke-width="1.5"/>
-                                    <text x="190" y="120" text-anchor="middle" font-family="'Sora', sans-serif" font-size="17" font-weight="600" fill="#2a5298">Questionnaire</text>
-                                    <text x="190" y="143" text-anchor="middle" font-size="13" fill="#495057">Your answers to Q1-Q19</text>
-                                    <text x="190" y="163" text-anchor="middle" font-size="11" fill="#868e96">AI capability, task characteristics,</text>
-                                    <text x="190" y="178" text-anchor="middle" font-size="11" fill="#868e96">friction factors, and adaptability</text>
-                                    <text x="190" y="193" text-anchor="middle" font-size="11" fill="#868e96">questions that shape all outputs</text>
+                                <g transform="translate(80,60) scale(0.92)">
+                                <g class="tree-node" data-task="Your Job" data-desc="A complex portfolio of explicit and tacit responsibilities, ranging from routine execution to strategic judgment" data-automation="Mixed">
+                                    <circle class="node-circle auto-medium" cx="1000" cy="600" r="36" />
+                                    <text class="node-text root-text" x="1000" y="594" text-anchor="middle">Your</text>
+                                    <text class="node-text root-text" x="1000" y="616" text-anchor="middle">Job</text>
                                 </g>
-
-                                <g class="flow-box input-box" data-connects="task-dist,comp-timing">
-                                    <rect x="360" y="90" width="260" height="120" rx="8" stroke-width="1.5"/>
-                                    <text x="490" y="120" text-anchor="middle" font-family="'Sora', sans-serif" font-size="17" font-weight="600" fill="#2a5298">Hierarchy Level</text>
-                                    <text x="490" y="143" text-anchor="middle" font-size="13" fill="#495057">Level 1-5</text>
-                                    <text x="490" y="163" text-anchor="middle" font-size="11" fill="#868e96">Position in organizational ladder.</text>
-                                    <text x="490" y="178" text-anchor="middle" font-size="11" fill="#868e96">Affects compression vulnerability</text>
-                                    <text x="490" y="193" text-anchor="middle" font-size="11" fill="#868e96">and task distribution patterns</text>
+                                <g class="tree-node" data-task="Strategic Narrative" data-desc="Craft the narrative spine that keeps leadership, the board, and operators aligned even when facts mutate" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1000 600 Q 1000 420, 1000 240" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="1000" cy="220" r="30" />
+                                    <text class="node-text main-branch-text" x="1000" y="214" text-anchor="middle">Strategic</text>
+                                    <text class="node-text main-branch-text" x="1000" y="230" text-anchor="middle">Narrative</text>
                                 </g>
-
-                                <g class="flow-box input-box" data-connects="auto-timing">
-                                    <rect x="650" y="90" width="300" height="120" rx="8" stroke-width="1.5"/>
-                                    <text x="800" y="120" text-anchor="middle" font-family="'Sora', sans-serif" font-size="17" font-weight="600" fill="#2a5298">Sliders</text>
-                                    <text x="800" y="143" text-anchor="middle" font-size="13" fill="#495057">Reliability and Industry Friction</text>
-                                    <text x="800" y="163" text-anchor="middle" font-size="11" fill="#868e96">Adjusts how strict automation needs</text>
-                                    <text x="800" y="178" text-anchor="middle" font-size="11" fill="#868e96">to be (reliability) and how much harder</text>
-                                    <text x="800" y="193" text-anchor="middle" font-size="11" fill="#868e96">your industry is to automate (friction)</text>
+                                <g class="tree-node" data-task="Translate CEO vision into OKRs" data-desc="Turn vague executive slogans into measurable targets teams can execute against" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 1000 220 Q 1000 140, 1000 90" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="1000" cy="80" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1032" y="84">Translate CEO</tspan>
+                                        <tspan x="1032" y="97">vision into OKRs</tspan>
+                                    </text>
                                 </g>
-
-                                <!-- LEVEL 2: CALCULATIONS -->
-                                <g id="task-dist" class="flow-box calc-box" data-connects="blue-output">
-                                    <rect x="40" y="270" width="280" height="150" rx="8" stroke-width="1.5"/>
-                                    <text x="180" y="300" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Task Distribution</text>
-                                    <text x="180" y="330" text-anchor="middle" font-size="12" fill="#495057">How your job splits across 5 task</text>
-                                    <text x="180" y="348" text-anchor="middle" font-size="12" fill="#495057">duration buckets (short to long)</text>
-                                    <text x="180" y="375" text-anchor="middle" font-size="11" fill="#868e96">Hierarchy level, Q5 (decomposability),</text>
-                                    <text x="180" y="393" text-anchor="middle" font-size="11" fill="#868e96">Q6 (standardization), Q7 (context)</text>
-                                    <text x="180" y="413" text-anchor="middle" font-size="10" font-style="italic" fill="#a88860">Can override manually in calculator</text>
+                                <g class="tree-node" data-task="Rewrite board pre-read overnight" data-desc="Rebuild the investor narrative overnight when metrics wobble" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1000 220 Q 1060 160, 1110 120" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="1120" cy="110" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1152" y="114">Rewrite board</tspan>
+                                        <tspan x="1152" y="127">pre-read overnight</tspan>
+                                    </text>
                                 </g>
-
-                                <g id="auto-timing" class="flow-box calc-box" data-connects="blue-output,green-output">
-                                    <rect x="360" y="270" width="280" height="150" rx="8" stroke-width="1.5"/>
-                                    <text x="500" y="300" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Automation Timing</text>
-                                    <text x="500" y="330" text-anchor="middle" font-size="12" fill="#495057">When AI becomes technically capable</text>
-                                    <text x="500" y="348" text-anchor="middle" font-size="12" fill="#495057">of doing your job (blue curve basis)</text>
-                                    <text x="500" y="375" text-anchor="middle" font-size="11" fill="#868e96">Task buckets, reliability slider,</text>
-                                    <text x="500" y="393" text-anchor="middle" font-size="11" fill="#868e96">industry friction, Q2/Q6-Q16</text>
+                                <g class="tree-node" data-task="Frame messy data into story" data-desc="Decide which truths to amplify so stakeholders align on the next move" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1000 220 Q 940 160, 890 120" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="880" cy="110" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="848" y="114">Frame messy data</tspan>
+                                        <tspan x="848" y="127">into story</tspan>
+                                    </text>
                                 </g>
-
-                                <g id="comp-timing" class="flow-box calc-box" data-connects="green-output">
-                                    <rect x="680" y="270" width="280" height="150" rx="8" stroke-width="1.5"/>
-                                    <text x="820" y="300" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Compression Risk</text>
-                                    <text x="820" y="330" text-anchor="middle" font-size="12" fill="#495057">Job loss from task reallocation to</text>
-                                    <text x="820" y="348" text-anchor="middle" font-size="12" fill="#495057">AI-amplified seniors (green modifier)</text>
-                                    <text x="820" y="375" text-anchor="middle" font-size="11" fill="#868e96">Q10 (reallocation ease), Q4-Q9</text>
-                                    <text x="820" y="393" text-anchor="middle" font-size="11" fill="#868e96">(AI learnability), hierarchy vulnerability</text>
+                                <g class="tree-node" data-task="Decide what not to report" data-desc="Exercise judgment on which landmines stay off the slide before executive review" data-automation="Low">
+                                    <path class="tree-branch" d="M 1000 220 Q 960 200, 930 180" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="920" cy="170" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="888" y="174">Decide what not to</tspan>
+                                        <tspan x="888" y="187">report</tspan>
+                                    </text>
                                 </g>
-
-                                <!-- LEVEL 3: OUTPUTS -->
-                                <g id="blue-output" class="flow-box blue-output">
-                                    <rect x="80" y="490" width="380" height="160" rx="8" stroke-width="1.5"/>
-                                    <text x="270" y="520" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#2a5298">Blue Curve</text>
-                                    <text x="270" y="543" text-anchor="middle" font-size="13" fill="#495057">Timeline estimation of your role's</text>
-                                    <text x="270" y="560" text-anchor="middle" font-size="13" fill="#495057">technical automation feasibility</text>
-                                    <text x="270" y="583" text-anchor="middle" font-size="11" fill="#868e96">When AI becomes capable enough to</text>
-                                    <text x="270" y="598" text-anchor="middle" font-size="11" fill="#868e96">perform your job, based on METR's task</text>
-                                    <text x="270" y="613" text-anchor="middle" font-size="11" fill="#868e96">horizon data, your task distribution, and</text>
-                                    <text x="270" y="628" text-anchor="middle" font-size="11" fill="#868e96">reliability/friction settings</text>
+                                <g class="tree-node" data-task="Political Air Traffic" data-desc="Keep power centers synchronized so surprises do not detonate in executive reviews" data-automation="Low">
+                                    <path class="tree-branch" d="M 1000 600 Q 820 460, 700 340" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="660" cy="300" r="30" />
+                                    <text class="node-text main-branch-text" x="660" y="294" text-anchor="middle">Political</text>
+                                    <text class="node-text main-branch-text" x="660" y="310" text-anchor="middle">Air Traffic</text>
                                 </g>
-
-                                <g id="green-output" class="flow-box green-output">
-                                    <rect x="540" y="490" width="380" height="160" rx="8" stroke-width="1.5"/>
-                                    <text x="730" y="520" text-anchor="middle" font-family="'Sora', sans-serif" font-size="16" font-weight="600" fill="#6ba583">Green Curve</text>
-                                    <text x="730" y="543" text-anchor="middle" font-size="13" fill="#495057">Timeline estimation of your</text>
-                                    <text x="730" y="560" text-anchor="middle" font-size="13" fill="#495057">actual role elimination</text>
-                                    <text x="730" y="583" text-anchor="middle" font-size="11" fill="#868e96">When job loss actually happens in practice.</text>
-                                    <text x="730" y="598" text-anchor="middle" font-size="11" fill="#868e96">Combines blue curve + implementation</text>
-                                    <text x="730" y="613" text-anchor="middle" font-size="11" fill="#868e96">delay + compression hazard. Can arrive</text>
-                                    <text x="730" y="628" text-anchor="middle" font-size="11" fill="#868e96">earlier than blue if compression is high</text>
+                                <g class="tree-node" data-task="Talk to Sarah about contextual alignment" data-desc="Decode unspoken constraints before they ignite during the steering meeting" data-automation="None">
+                                    <path class="tree-branch" d="M 660 300 Q 580 220, 520 180" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="500" cy="160" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="468" y="164">Talk to Sarah</tspan>
+                                        <tspan x="468" y="177">about contextual</tspan>
+                                        <tspan x="468" y="190">alignment</tspan>
+                                    </text>
                                 </g>
-
-                                <!-- ARROWS: Inputs to Calculations -->
-                                <path class="flow-arrow" d="M 190 210 L 180 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-                                <path class="flow-arrow" d="M 230 210 L 500 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-                                <path class="flow-arrow" d="M 260 210 L 820 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-
-                                <path class="flow-arrow" d="M 490 210 L 220 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-                                <path class="flow-arrow" d="M 510 210 L 800 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-
-                                <path class="flow-arrow" d="M 800 210 L 530 270" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-
-                                <!-- ARROWS: Calculations to Outputs -->
-                                <path class="flow-arrow" d="M 180 420 L 230 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-                                <path class="flow-arrow" d="M 500 420 L 320 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-                                <path class="flow-arrow" d="M 500 420 L 680 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-                                <path class="flow-arrow" d="M 820 420 L 770 490" stroke="#9b8b6f" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-
-                                <!-- Arrow markers -->
-                                <defs>
-                                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                                        <polygon points="0 0, 10 3, 0 6" fill="#9b8b6f"/>
-                                    </marker>
-                                </defs>
-
-                                <!-- Legend -->
-                                <g transform="translate(60, 690)">
-                                    <text x="0" y="0" font-family="'Sora', sans-serif" font-size="12" font-weight="600" fill="#2a5298">Legend:</text>
-                                    <rect x="0" y="12" width="20" height="20" rx="2" fill="#f5f1ea" stroke="#9b8b6f" stroke-width="1.5"/>
-                                    <text x="26" y="26" font-size="11" fill="#495057">Your inputs</text>
-
-                                    <rect x="140" y="12" width="20" height="20" rx="2" fill="#fdfaf5" stroke="#d2c7b8" stroke-width="1.5"/>
-                                    <text x="166" y="26" font-size="11" fill="#495057">Calculations</text>
-
-                                    <rect x="280" y="12" width="20" height="20" rx="2" fill="#e8f1f8" stroke="#5a8db8" stroke-width="1.5"/>
-                                    <text x="306" y="26" font-size="11" fill="#495057">Blue curve</text>
-
-                                    <rect x="410" y="12" width="20" height="20" rx="2" fill="#e8f5ee" stroke="#6ba583" stroke-width="1.5"/>
-                                    <text x="436" y="26" font-size="11" fill="#495057">Green curve</text>
-
-                                    <text x="560" y="26" font-size="11" fill="#868e96" font-style="italic">Hover over boxes to highlight connections</text>
+                                <g class="tree-node" data-task="Broker peace between sales &amp; product" data-desc="Walk both sides back from escalation while preserving credibility" data-automation="None">
+                                    <path class="tree-branch" d="M 660 300 Q 560 260, 460 240" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="440" cy="230" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="408" y="234">Broker peace</tspan>
+                                        <tspan x="408" y="247">between sales &amp;</tspan>
+                                        <tspan x="408" y="260">product</tspan>
+                                    </text>
                                 </g>
-
-                                <!-- Key insights -->
-                                <g transform="translate(60, 760)">
+                                <g class="tree-node" data-task="Quietly prep VP before review" data-desc="Run the pre-brief so there are zero surprises in the room" data-automation="Low">
+                                    <path class="tree-branch" d="M 660 300 Q 620 300, 580 300" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="550" cy="300" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="518" y="304">Quietly prep VP</tspan>
+                                        <tspan x="518" y="317">before review</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Decode exec body language" data-desc="Read micro-signals mid-meeting to adjust the message in real time" data-automation="None">
+                                    <path class="tree-branch" d="M 660 300 Q 600 320, 520 320" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="500" cy="320" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="468" y="324">Decode exec body</tspan>
+                                        <tspan x="468" y="337">language</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Rebuild trust after missed handoff" data-desc="Own the gap and renegotiate expectations before resentment calcifies" data-automation="None">
+                                    <path class="tree-branch" d="M 660 300 Q 590 340, 520 360" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="500" cy="360" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="468" y="364">Rebuild trust</tspan>
+                                        <tspan x="468" y="377">after missed</tspan>
+                                        <tspan x="468" y="390">handoff</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Decision Intelligence" data-desc="Fuse hard analytics with judgment to steer capital allocation and risk calls" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1000 600 Q 1180 440, 1350 280" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1370" cy="260" r="30" />
+                                    <text class="node-text main-branch-text" x="1370" y="254" text-anchor="middle">Decision</text>
+                                    <text class="node-text main-branch-text" x="1370" y="270" text-anchor="middle">Intelligence</text>
+                                </g>
+                                <g class="tree-node" data-task="Complete DCF model" data-desc="Crunch the assumptions and forecast every scenario without flinching" data-automation="High">
+                                    <path class="tree-branch" d="M 1370 260 Q 1470 200, 1530 140" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="1540" cy="120" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1572" y="124">Complete DCF model</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Simulate margin scenarios" data-desc="Spin through sensitivities to stress-test the operating plan" data-automation="High">
+                                    <path class="tree-branch" d="M 1370 260 Q 1430 220, 1470 180" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="1480" cy="160" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1512" y="164">Simulate margin</tspan>
+                                        <tspan x="1512" y="177">scenarios</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Trace KPI anomalies in Looker" data-desc="Drill into dashboards until the data discrepancy confesses" data-automation="High">
+                                    <path class="tree-branch" d="M 1370 260 Q 1450 240, 1560 220" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="1600" cy="220" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1632" y="224">Trace KPI</tspan>
+                                        <tspan x="1632" y="237">anomalies in</tspan>
+                                        <tspan x="1632" y="250">Looker</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Explain variance to CFO live" data-desc="Translate analytic nuance into a crisp answer while the pressure is on" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1370 260 Q 1420 250, 1460 250" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="1480" cy="260" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1512" y="264">Explain variance</tspan>
+                                        <tspan x="1512" y="277">to CFO live</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Triangulate conflicting data" data-desc="Blend messy sources until the insight passes the smell test" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1370 260 Q 1400 280, 1430 300" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="1450" cy="320" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1482" y="324">Triangulate</tspan>
+                                        <tspan x="1482" y="337">conflicting data</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Assess vendor risk exposures" data-desc="Map dependencies and failure modes before procurement signs" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1370 260 Q 1490 280, 1600 310" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1620" cy="320" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1652" y="324">Assess vendor risk</tspan>
+                                        <tspan x="1652" y="337">exposures</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Systems Orchestration" data-desc="Design and maintain the hidden machinery that moves work between humans, tools, and policy" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1000 600 Q 1230 580, 1480 560" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1540" cy="540" r="30" />
+                                    <text class="node-text main-branch-text" x="1540" y="534" text-anchor="middle">Systems</text>
+                                    <text class="node-text main-branch-text" x="1540" y="550" text-anchor="middle">Orchestration</text>
+                                </g>
+                                <g class="tree-node" data-task="Map workflow dependencies" data-desc="Visualize every handoff to spot the brittle seams" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1540 540 Q 1640 520, 1740 510" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1760" cy="500" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1792" y="504">Map workflow</tspan>
+                                        <tspan x="1792" y="517">dependencies</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Author service runbook" data-desc="Document the steps so the 3am incident has a script" data-automation="High">
+                                    <path class="tree-branch" d="M 1540 540 Q 1660 540, 1760 560" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="1780" cy="560" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1812" y="564">Author service</tspan>
+                                        <tspan x="1812" y="577">runbook</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Trigger cross-team retro" data-desc="Schedule the uncomfortable conversation that prevents reruns" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 1540 540 Q 1620 570, 1680 600" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="1700" cy="610" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1732" y="614">Trigger cross-team</tspan>
+                                        <tspan x="1732" y="627">retro</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Keep Jira taxonomy sane" data-desc="Refactor issue schemas before entropy wins" data-automation="High">
+                                    <path class="tree-branch" d="M 1540 540 Q 1700 580, 1820 620" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="1850" cy="630" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1882" y="634">Keep Jira taxonomy</tspan>
+                                        <tspan x="1882" y="647">sane</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Resolve permissions spiral" data-desc="Untangle access rights when tooling locks out half the org" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 1540 540 Q 1600 500, 1660 470" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="1680" cy="460" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1712" y="464">Resolve</tspan>
+                                        <tspan x="1712" y="477">permissions spiral</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Delivery Theatre" data-desc="Stage-manage launches and escalations so the organization appears composed while chaos rages behind the curtain" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1000 600 Q 1180 760, 1380 860" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1420" cy="880" r="30" />
+                                    <text class="node-text main-branch-text" x="1420" y="874" text-anchor="middle">Delivery</text>
+                                    <text class="node-text main-branch-text" x="1420" y="890" text-anchor="middle">Theatre</text>
+                                </g>
+                                <g class="tree-node" data-task="Sequence launch checklist" data-desc="Orchestrate dozens of tasks into one cohesive go-live" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1420 880 Q 1500 840, 1600 830" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1620" cy="820" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1652" y="824">Sequence launch</tspan>
+                                        <tspan x="1652" y="837">checklist</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Spin up war room" data-desc="Coordinate humans, bots, and dashboards when everything breaks at once" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 1420 880 Q 1500 890, 1560 900" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="1580" cy="900" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1612" y="904">Spin up war room</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="QA final slides at 2am" data-desc="Scrub every pixel before the client wakes up" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1420 880 Q 1440 940, 1460 1000" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="1480" cy="1020" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1512" y="1024">QA final slides at</tspan>
+                                        <tspan x="1512" y="1037">2am</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Rewrite client email thread" data-desc="Reframe the narrative to buy the delivery team breathing room" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1420 880 Q 1450 980, 1480 1080" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="1500" cy="1100" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1532" y="1104">Rewrite client</tspan>
+                                        <tspan x="1532" y="1117">email thread</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Ship hotfix to prod" data-desc="Patch the bug, validate logs, and steady the pager channel" data-automation="High">
+                                    <path class="tree-branch" d="M 1420 880 Q 1540 920, 1680 950" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="1700" cy="960" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1732" y="964">Ship hotfix to</tspan>
+                                        <tspan x="1732" y="977">prod</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Team Pulse" data-desc="Monitor morale and energy so the team can keep shipping through turbulence" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 1000 600 Q 900 760, 780 900" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="740" cy="960" r="30" />
+                                    <text class="node-text main-branch-text" x="740" y="954" text-anchor="middle">Team</text>
+                                    <text class="node-text main-branch-text" x="740" y="970" text-anchor="middle">Pulse</text>
+                                </g>
+                                <g class="tree-node" data-task="Mentor new hire quietly" data-desc="Transfer instincts the wiki never covers through calm one-on-ones" data-automation="Low">
+                                    <path class="tree-branch" d="M 740 960 Q 710 1020, 690 1080" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="680" cy="1100" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="648" y="1104">Mentor new hire</tspan>
+                                        <tspan x="648" y="1117">quietly</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Run Friday pulse check" data-desc="Surface invisible blockers before they explode on Monday" data-automation="Low">
+                                    <path class="tree-branch" d="M 740 960 Q 750 1040, 755 1100" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="760" cy="1120" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="792" y="1124">Run Friday pulse</tspan>
+                                        <tspan x="792" y="1137">check</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Shield team from exec whiplash" data-desc="Absorb last minute pivots so builders can focus" data-automation="None">
+                                    <path class="tree-branch" d="M 740 960 Q 680 970, 640 970" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="620" cy="980" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="588" y="984">Shield team from</tspan>
+                                        <tspan x="588" y="997">exec whiplash</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Spot burnout signals early" data-desc="Notice micro changes in tone before attrition hits" data-automation="None">
+                                    <path class="tree-branch" d="M 740 960 Q 720 1060, 710 1160" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="700" cy="1180" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="668" y="1184">Spot burnout</tspan>
+                                        <tspan x="668" y="1197">signals early</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Curate wins for morale" data-desc="Broadcast micro victories to sustain momentum" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 740 960 Q 780 1000, 800 1020" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="820" cy="1040" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="852" y="1044">Curate wins for</tspan>
+                                        <tspan x="852" y="1057">morale</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Emotional Shock Absorption" data-desc="Buffer emotional spikes, expectations, and fear before they cascade across the org" data-automation="None">
+                                    <path class="tree-branch" d="M 1000 600 Q 820 680, 560 780" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="460" cy="860" r="30" />
+                                    <text class="node-text main-branch-text" x="460" y="854" text-anchor="middle">Emotional</text>
+                                    <text class="node-text main-branch-text" x="460" y="870" text-anchor="middle">Absorption</text>
+                                </g>
+                                <g class="tree-node" data-task="Talk down panicking customer" data-desc="Read the room, validate the fear, and rebuild confidence live" data-automation="None">
+                                    <path class="tree-branch" d="M 460 860 Q 380 870, 340 890" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="320" cy="900" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="288" y="904">Talk down</tspan>
+                                        <tspan x="288" y="917">panicking customer</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Absorb exec venting" data-desc="Let leadership unload without letting their stress cascade" data-automation="None">
+                                    <path class="tree-branch" d="M 460 860 Q 380 820, 320 790" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="300" cy="780" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="268" y="784">Absorb exec</tspan>
+                                        <tspan x="268" y="797">venting</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Coach designer through critique" data-desc="Translate harsh feedback into growth without losing trust" data-automation="Low">
+                                    <path class="tree-branch" d="M 460 860 Q 410 900, 370 960" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="360" cy="980" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="328" y="984">Coach designer</tspan>
+                                        <tspan x="328" y="997">through critique</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Hold space for layoffs prep" data-desc="Manage the human fallout while the plan is still embargoed" data-automation="None">
+                                    <path class="tree-branch" d="M 460 860 Q 370 940, 300 1010" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="280" cy="1040" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="248" y="1044">Hold space for</tspan>
+                                        <tspan x="248" y="1057">layoffs prep</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Shadow Work &amp; Glue" data-desc="Handle the undocumented tasks that make formal processes appear simple" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1000 600 Q 720 560, 420 520" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="340" cy="520" r="30" />
+                                    <text class="node-text main-branch-text" x="340" y="514" text-anchor="middle">Shadow Work</text>
+                                    <text class="node-text main-branch-text" x="340" y="530" text-anchor="middle">&amp; Glue</text>
+                                </g>
+                                <g class="tree-node" data-task="Reverse-engineer last quarter logic" data-desc="Decode past decisions embedded in half-finished models" data-automation="Medium">
+                                    <path class="tree-branch" d="M 340 520 Q 260 490, 210 470" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="200" cy="460" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="168" y="464">Reverse-engineer</tspan>
+                                        <tspan x="168" y="477">last quarter logic</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Update secret spreadsheet" data-desc="Maintain the off-books tracker everyone secretly depends on" data-automation="High">
+                                    <path class="tree-branch" d="M 340 520 Q 260 520, 200 520" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="180" cy="520" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="148" y="524">Update secret</tspan>
+                                        <tspan x="148" y="537">spreadsheet</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Stitch transcripts into insight" data-desc="Summarize scattered calls into one clean narrative" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 340 520 Q 270 560, 230 590" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="220" cy="600" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="188" y="604">Stitch transcripts</tspan>
+                                        <tspan x="188" y="617">into insight</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Maintain unofficial org map" data-desc="Track influence flows the HR system never captures" data-automation="Low">
+                                    <path class="tree-branch" d="M 340 520 Q 300 460, 270 420" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="260" cy="400" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="228" y="404">Maintain</tspan>
+                                        <tspan x="228" y="417">unofficial org map</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Scrape whisper networks" data-desc="Synthesize backchannel intel before rumors metastasize" data-automation="Low">
+                                    <path class="tree-branch" d="M 340 520 Q 290 590, 250 660" stroke="#2a5298" />
+                                    <circle class="node-circle auto-low" cx="240" cy="680" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="208" y="684">Scrape whisper</tspan>
+                                        <tspan x="208" y="697">networks</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Reality Sensing" data-desc="Collect messy signals from the field before dashboards prove anything" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 1000 600 Q 820 520, 620 430" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="540" cy="400" r="30" />
+                                    <text class="node-text main-branch-text" x="540" y="394" text-anchor="middle">Reality</text>
+                                    <text class="node-text main-branch-text" x="540" y="410" text-anchor="middle">Sensing</text>
+                                </g>
+                                <g class="tree-node" data-task="Eavesdrop on sales calls" data-desc="Pick up nuance on what customers actually care about" data-automation="Medium-Low">
+                                    <path class="tree-branch" d="M 540 400 Q 510 320, 490 280" stroke="#a88860" />
+                                    <circle class="node-circle auto-medium-low" cx="480" cy="260" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="448" y="264">Eavesdrop on sales</tspan>
+                                        <tspan x="448" y="277">calls</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Pulse survey whales" data-desc="Check sentiment without spooking top accounts" data-automation="Medium">
+                                    <path class="tree-branch" d="M 540 400 Q 550 320, 555 260" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="560" cy="240" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="592" y="244">Pulse survey</tspan>
+                                        <tspan x="592" y="257">whales</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Confirm rumor with partner" data-desc="Validate strategic chatter through trusted relationships" data-automation="None">
+                                    <path class="tree-branch" d="M 540 400 Q 470 380, 440 360" stroke="#1e3c72" />
+                                    <circle class="node-circle auto-none" cx="420" cy="360" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="388" y="364">Confirm rumor with</tspan>
+                                        <tspan x="388" y="377">partner</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Shadow frontline ticket queue" data-desc="Sample real issues before trendlines show them" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 540 400 Q 580 360, 600 320" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="620" cy="300" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="652" y="304">Shadow frontline</tspan>
+                                        <tspan x="652" y="317">ticket queue</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Read competitor tea leaves" data-desc="Assemble signals from events, filings, and random Slack threads" data-automation="Medium">
+                                    <path class="tree-branch" d="M 540 400 Q 530 450, 525 480" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="520" cy="500" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="552" y="504">Read competitor</tspan>
+                                        <tspan x="552" y="517">tea leaves</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Automation R&amp;D" data-desc="Prototype and audit emerging automation so you stay ahead of the tooling curve" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1000 600 Q 1010 760, 1030 920" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1040" cy="960" r="30" />
+                                    <text class="node-text main-branch-text" x="1040" y="954" text-anchor="middle">Automation</text>
+                                    <text class="node-text main-branch-text" x="1040" y="970" text-anchor="middle">R&amp;D</text>
+                                </g>
+                                <g class="tree-node" data-task="Wire up GPT agent sandbox" data-desc="Experiment with bleeding-edge agents before policy catches up" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1040 960 Q 1060 1020, 1080 1080" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1100" cy="1100" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1132" y="1104">Wire up GPT agent</tspan>
+                                        <tspan x="1132" y="1117">sandbox</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Prototype reconciliation script" data-desc="Automate the boring glue that keeps data sources aligned" data-automation="High">
+                                    <path class="tree-branch" d="M 1040 960 Q 1010 1020, 990 1060" stroke="#5a8db8" />
+                                    <circle class="node-circle auto-high" cx="980" cy="1080" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="948" y="1084">Prototype</tspan>
+                                        <tspan x="948" y="1097">reconciliation</tspan>
+                                        <tspan x="948" y="1110">script</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Run failure drills on agents" data-desc="Stress-test prompts and guardrails until brittle edges surface" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1040 960 Q 1090 1000, 1140 1020" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="1160" cy="1040" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1192" y="1044">Run failure drills</tspan>
+                                        <tspan x="1192" y="1057">on agents</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Benchmark vendor claims" data-desc="Test glossy marketing promises against messy internal workloads" data-automation="Medium">
+                                    <path class="tree-branch" d="M 1040 960 Q 1070 1040, 1100 1140" stroke="#9b8b6f" />
+                                    <circle class="node-circle auto-medium" cx="1120" cy="1160" r="11" />
+                                    <text class="node-text" text-anchor="start">
+                                        <tspan x="1152" y="1164">Benchmark vendor</tspan>
+                                        <tspan x="1152" y="1177">claims</tspan>
+                                    </text>
+                                </g>
+                                <g class="tree-node" data-task="Pair with data scientist on prompt rig" data-desc="Co-design evaluation harnesses that keep automation accountable" data-automation="Medium-High">
+                                    <path class="tree-branch" d="M 1040 960 Q 990 1040, 960 1120" stroke="#6ba583" />
+                                    <circle class="node-circle auto-medium-high" cx="940" cy="1140" r="11" />
+                                    <text class="node-text" text-anchor="end">
+                                        <tspan x="908" y="1144">Pair with data</tspan>
+                                        <tspan x="908" y="1157">scientist on</tspan>
+                                        <tspan x="908" y="1170">prompt rig</tspan>
+                                    </text>
+                                </g>
+                                </g>
+                                <g transform="translate(1720, 140)">
+                                    <text font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#1f1c18">
+                                        <tspan x="44" y="32">Automation Level</tspan>
+                                    </text>
+                                    <circle class="auto-high" cx="12" cy="28" r="8" stroke="#1f1c18" stroke-width="1.5" />
+                                    <text x="28" y="33" font-family="'Inter', sans-serif" font-size="12" fill="#3f392f">High</text>
+                                    <circle class="auto-medium-high" cx="12" cy="54" r="8" stroke="#1f1c18" stroke-width="1.5" />
+                                    <text x="28" y="59" font-family="'Inter', sans-serif" font-size="12" fill="#3f392f">Medium-High</text>
+                                    <circle class="auto-medium" cx="12" cy="80" r="8" stroke="#1f1c18" stroke-width="1.5" />
+                                    <text x="28" y="85" font-family="'Inter', sans-serif" font-size="12" fill="#3f392f">Medium</text>
+                                    <circle class="auto-medium-low" cx="12" cy="106" r="8" stroke="#1f1c18" stroke-width="1.5" />
+                                    <text x="28" y="111" font-family="'Inter', sans-serif" font-size="12" fill="#3f392f">Medium-Low</text>
+                                    <circle class="auto-low" cx="12" cy="132" r="8" stroke="#1f1c18" stroke-width="1.5" />
+                                    <text x="28" y="137" font-family="'Inter', sans-serif" font-size="12" fill="#3f392f">Low</text>
+                                    <circle class="auto-none" cx="12" cy="158" r="8" stroke="#1f1c18" stroke-width="1.5" />
+                                    <text x="28" y="163" font-family="'Inter', sans-serif" font-size="12" fill="#3f392f">Non-automatable</text>
+                                </g>
+                                <g id="tree-tooltip" class="tooltip-box">
+                                    <rect x="0" y="0" width="280" height="90" rx="8" fill="#ffffff" stroke="#d2c7b8" stroke-width="2" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.15))" />
+                                    <text id="tooltip-task" x="10" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="600" fill="#1f1c18" />
+                                    <text id="tooltip-auto" x="10" y="40" font-family="'Inter', sans-serif" font-size="11" fill="#5c564f" />
+                                    <text id="tooltip-desc" x="10" y="58" font-family="'Inter', sans-serif" font-size="10" fill="#3f392f" />
+                                    <text id="tooltip-desc2" x="10" y="72" font-family="'Inter', sans-serif" font-size="10" fill="#3f392f" />
                                 </g>
                             </svg>
                         </div>
 
                         <script>
-                            // Simple hover interactions for the model flow diagram
                             document.addEventListener('DOMContentLoaded', function() {
-                                const flowBoxes = document.querySelectorAll('.flow-box');
+                                const treeNodes = document.querySelectorAll('.tree-node');
+                                const tooltip = document.getElementById('tree-tooltip');
+                                const tooltipTask = document.getElementById('tooltip-task');
+                                const tooltipAuto = document.getElementById('tooltip-auto');
+                                const tooltipDesc = document.getElementById('tooltip-desc');
+                                const tooltipDesc2 = document.getElementById('tooltip-desc2');
+                                const svg = document.getElementById('job-complexity-tree');
 
-                                flowBoxes.forEach(box => {
-                                    box.addEventListener('mouseenter', function() {
-                                        const connects = this.getAttribute('data-connects');
-                                        if (connects) {
-                                            connects.split(',').forEach(targetId => {
-                                                const target = document.getElementById(targetId);
-                                                if (target) {
-                                                    target.querySelector('rect').style.fill = '#fdf7ed';
-                                                    target.querySelector('rect').style.stroke = '#a88860';
-                                                    target.querySelector('rect').style.strokeWidth = '2.5';
-                                                }
-                                            });
+                                treeNodes.forEach(node => {
+                                    node.addEventListener('mouseenter', function() {
+                                        const task = this.getAttribute('data-task');
+                                        const desc = this.getAttribute('data-desc');
+                                        const automation = this.getAttribute('data-automation');
+
+                                        // Update tooltip content
+                                        tooltipTask.textContent = task;
+                                        tooltipAuto.textContent = 'Automation: ' + automation;
+
+                                        // Wrap description text
+                                        const words = desc.split(' ');
+                                        let line1 = '';
+                                        let line2 = '';
+                                        let charCount = 0;
+
+                                        for (let i = 0; i < words.length; i++) {
+                                            if (charCount + words[i].length < 45) {
+                                                line1 += words[i] + ' ';
+                                                charCount += words[i].length + 1;
+                                            } else {
+                                                line2 += words[i] + ' ';
+                                            }
                                         }
+
+                                        tooltipDesc.textContent = line1.trim();
+                                        tooltipDesc2.textContent = line2.trim();
+
+                                        // Position tooltip near the node
+                                        const circle = this.querySelector('.node-circle');
+                                        if (circle) {
+                                            const cx = parseFloat(circle.getAttribute('cx'));
+                                            const cy = parseFloat(circle.getAttribute('cy'));
+
+                                            // Offset tooltip to avoid covering the node
+                                            let tooltipX = cx + 40;
+                                            let tooltipY = cy - 50;
+
+                                            const viewBox = svg.viewBox.baseVal;
+                                            const minX = viewBox.x + 20;
+                                            const maxX = viewBox.x + viewBox.width - 320;
+                                            const minY = viewBox.y + 20;
+                                            const maxY = viewBox.y + viewBox.height - 120;
+
+                                            if (tooltipX > maxX) {
+                                                tooltipX = Math.max(minX, cx - 320);
+                                            }
+                                            if (tooltipX < minX) {
+                                                tooltipX = Math.min(maxX, cx + 40);
+                                            }
+                                            if (tooltipY < minY) {
+                                                tooltipY = cy + 40;
+                                            }
+                                            if (tooltipY > maxY) {
+                                                tooltipY = cy - 60;
+                                            }
+
+                                            tooltipX = Math.max(minX, Math.min(tooltipX, maxX));
+                                            tooltipY = Math.max(minY, Math.min(tooltipY, maxY));
+
+                                            tooltip.setAttribute('transform', `translate(${tooltipX}, ${tooltipY})`);
+                                        }
+
+                                        // Show tooltip
+                                        tooltip.classList.add('tooltip-visible');
                                     });
 
-                                    box.addEventListener('mouseleave', function() {
-                                        const connects = this.getAttribute('data-connects');
-                                        if (connects) {
-                                            connects.split(',').forEach(targetId => {
-                                                const target = document.getElementById(targetId);
-                                                if (target) {
-                                                    // Reset to original colors based on box type
-                                                    const rect = target.querySelector('rect');
-                                                    if (target.classList.contains('calc-box')) {
-                                                        rect.style.fill = '#fdfaf5';
-                                                        rect.style.stroke = '#d2c7b8';
-                                                    } else if (target.classList.contains('blue-output')) {
-                                                        rect.style.fill = '#e8f1f8';
-                                                        rect.style.stroke = '#5a8db8';
-                                                    } else if (target.classList.contains('green-output')) {
-                                                        rect.style.fill = '#e8f5ee';
-                                                        rect.style.stroke = '#6ba583';
-                                                    }
-                                                    rect.style.strokeWidth = '1.5';
-                                                }
-                                            });
-                                        }
+                                    node.addEventListener('mouseleave', function() {
+                                        tooltip.classList.remove('tooltip-visible');
                                     });
                                 });
                             });
                         </script>
 
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Model Defaults</h3>
-                        <div class='bubble-table'>
-                            <div class='bubble-item'><span class='bubble-key'>$H_{50,0}$</span><span class='bubble-val'>137 min (GPT-5 SOTA)</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$D$ (doubling)</span><span class='bubble-val'>7 months (fixed)</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$r$ (reliability)</span><span class='bubble-val'>0.95 (default)</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$L_i$ (gate thresholds)</span><span class='bubble-val'>2.5, 15, 60, 180, 540 min</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$w_i$ (weights)</span><span class='bubble-val'>25%, 35%, 25%, 10%, 5%</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$s$ (softness)</span><span class='bubble-val'>0.45</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$h_{\text{AI}}$ (max hazard)</span><span class='bubble-val'>0.40/yr</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$\gamma$ (steepness)</span><span class='bubble-val'>8.0</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$\theta$ (threshold)</span><span class='bubble-val'>0.50</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>userMult range</span><span class='bubble-val'>0.33&times; to 3.0&times;</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$t$ (timeline)</span><span class='bubble-val'>Years from now</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$H_r(t)$</span><span class='bubble-val'>Task horizon at reliability $r$</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$A_{\text{job}}$</span><span class='bubble-val'>Readiness &isin; [0,1]</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$f(r)$</span><span class='bubble-val'>Reliability factor</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Task horizon</span><span class='bubble-val'>7&ndash;mo doubling; friction/reliability reduce</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Task buckets</span><span class='bubble-val'>&lt;5, 5&ndash;15, 15&ndash;60, 1&ndash;3, &gt;9 hr</span></div>
-                        </div>
-
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Friction Decay Parameter</h3>
-                        <p>The model tracks how quickly organizational barriers erode over time using a decay rate (&lambda;). This parameter is calculated from your questionnaire responses about company adoption readiness, infrastructure, labor market dynamics, and role characteristics:</p>
-                        <div class='equation-callout'>
-                            <span class='callout-label'>Friction decay rate</span>
-                            <div class='equation-display'>$$\lambda = 0.02 + 0.01 \times (n_{12} - 0.5) + 0.01 \times (n_{15} - 0.5) + 0.005 \times (n_{13} - 0.5) + 0.005 \times (n_{14} - 0.5) - 0.01 \times (n_{11} - 0.5) - 0.01 \times (n_{10} - 0.5)$$</div>
-                            <p style="font-size: 0.9em; margin-top: 8px; color: #666;">where $n_i$ is the normalized answer to question $i$ (Likert 1-5 scaled to 0-1), and $\lambda$ is clamped to $[0.005, 0.05]$</p>
-                        </div>
-                        <div class='bubble-table'>
-                            <div class='bubble-item'><span class='bubble-key'>Q13 (Company AI adoption)</span><span class='bubble-val'>+0.01 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q16 (IT infrastructure)</span><span class='bubble-val'>+0.01 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q14 (Labor cost pressure)</span><span class='bubble-val'>+0.005 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q15 (Labor market tightness)</span><span class='bubble-val'>+0.005 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q12 (Physical presence)</span><span class='bubble-val'>-0.01 weight</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Q11 (Human judgment)</span><span class='bubble-val'>-0.01 weight</span></div>
-                        </div>
-                        <p>This parameter influences how quickly implementation barriers diminish as AI capability continues to grow. The model implements dynamic friction decay where the implementation delay decreases exponentially over time: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) is calculated as the technical feasibility at the earlier time $t - \Delta(t)$. Higher $\lambda$ means organizational friction erodes faster (barriers collapse quickly once AI crosses initial thresholds); lower $\lambda$ means barriers persist longer even as technical capability advances. This captures how regulatory frameworks and organizational inertia may initially delay adoption by several years. These delays shrink as AI becomes more capable and widespread adoption creates network effects.</p>
-
-                        <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
-                        <p>Different roles face different automation barriers. Software engineering maps most directly to AI's training data and requires less physical presence, so it gets lower friction (1.05x). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45&ndash;1.50x). These multipliers reflect how much harder it is to automate each domain compared to software.</p>
-                        <p><strong>Two-layer friction system:</strong> The model applies friction at both industry and role levels. The <em>industry-specific friction slider</em> affects all roles in a sector (e.g., finance 1.35x applies to analysts, controllers, and auditors). Your <em>questionnaire responses</em> then add role-specific friction based on tacit knowledge (Q9), physical presence (Q12), and context dependencies (Q7). Both layers multiply together in the calculation, so a high-context legal role in a regulated industry faces compounded barriers.</p>
-                        <ul class='detail-list'>
-                            <li><strong>Domain friction (preset baseline):</strong> Role presets set an initial friction multiplier (software ~1.05x, admin/data ~1.10x, finance/consulting ~1.35x, legal ~1.45x, engineering ~1.50x) before individual job characteristics are considered.</li>
-                            <li><strong>Recommended reliability:</strong> Presets suggest a reliability starting point per role based on typical error tolerance and stakes (finance/legal 97&ndash;98%, software/data 92&ndash;93%, creative/customer service 88&ndash;90%). Seniority adjusts these baselines: entry-level roles tolerate slightly lower reliability (&minus;0.05), while executive decisions demand higher confidence (+0.05). Higher reliability requirements significantly reduce effective task horizon. You can override both friction and reliability in the UI to test different scenarios.</li>
-                        </ul>
-                        <p>In addition to the preset baseline, the calculator derives a role-specific <em>domain alignment</em> penalty from your answers. Digitized, decomposable, and standardized work (Q4/Q5/Q6 high) reduces the penalty; context dependence, tacit knowledge, judgment/relationship load, and physical presence (Q7/Q9/Q11/Q12 high) increase it. Internally, we form a signed weighted sum and map it to a penalty multiplier via an exponential, clamped to a reasonable range. This penalty multiplies with the sector slider, so misalignment compounds friction.</p>
-                        <div class='equation-callout'>
-                            <span class='callout-label'>AI hazard core</span>
-                            <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>
-                        </div>
-                        <p>The hazard activates once AI capability reaches the coverage threshold. The model uses <strong>two gates</strong>: first, task-level gates determine which individual tasks AI can handle; second, a job-level gate opens when AI can handle enough of your job to justify replacement. Here's how it works:</p>
-                        <ol class='action-list'>
-                            <li><strong>Task-level gates open gradually:</strong> As AI capability $H_r(t)$ grows via METR's doubling trend, each task bucket's gate $G_i(H)$ opens. Short tasks automate first (gates open when $H$ exceeds their threshold $L_i$), then medium tasks, then long tasks. Your personalized weights $w_i$ determine how much each gate contributes to overall readiness.</li>
-                            <li><strong>Job readiness accumulates:</strong> $A(t) = \sum w_i G_i(H)$ sums up all the open gates, weighted by your job profile. This gives a number between 0 and 1 representing what fraction of your job AI can perform.</li>
-                            <li><strong>Job-level hazard gate activates:</strong> When $A(t)$ crosses the coverage threshold $\theta$ (typically 0.50), the hazard function $\lambda_{\text{AI}}(t)$ rapidly increases via the logistic gate. Before this point, hazard is near zero; after, it approaches the maximum $h_{\max} \times M_{\text{user}}$.</li>
-                        </ol>
-                        <div class='equation-callout'>
-                            <span class='callout-label'>Task horizon</span>
-                            <div class='equation-display'>$$H_r(t) = \frac{H_{50,0} \cdot 2^{(t \cdot 12)/D}}{p_{\text{domain}} \cdot f_{\text{industry}} \cdot f(r)}$$</div>
-                            <p style="font-size: 0.9em; margin-top: 8px; color: #666;">where $p_{\text{domain}}$ = role-specific penalty from questionnaire, $f_{\text{industry}}$ = industry friction slider</p>
-                        </div>
-                        <p>This structure means automation doesn't happen all at once. AI steadily masters more of your tasks (task gates opening), but job displacement risk only spikes once AI can handle enough of your role to justify replacement (job gate opening). Jobs with more long-duration tasks take longer to reach this threshold.</p>
-                        <ul class='detail-list'>
-                            <li><strong>Task horizon $H_r(t)$:</strong> $$H_r(t) = \frac{H_{50,0} \cdot 2^{(t \cdot 12)/D}}{p_{\text{domain}} \cdot f_{\text{industry}} \cdot f(r)}$$ where $D = 7$ months is METR's doubling period (fixed). The baseline capability $H_{50,0}$ is divided by domain and industry friction penalties (described above), which reduce AI's effective capability for roles that are harder to automate. $f(r)$ is the reliability factor: higher reliability requirements further divide $H$, reducing AI's effective maximum task length. At the default 95% reliability, $f(0.95) \approx 33.4$, contracting the 50th percentile horizon (137 min) down to about 4.1 minutes for production use.</li>
-
-                            <li><strong>Personalized task weights $w_i$:</strong> Your answers to Q5 (task decomposability), Q6 (task standardization), Q7 (context dependency), and your hierarchy level determine how your job breaks down across the five buckets. Entry-level roles skew toward shorter tasks; executive roles skew toward longer tasks. Highly structured jobs concentrate weight in the short buckets; complex jobs shift weight to longer buckets. High-context work means more weight in the 1&ndash;3 hr and &gt;9 hr buckets. The weights always sum to 1.0 and represent what fraction of your job falls into each duration category.</li>
-                            <li><strong>Gate softness parameter $s$:</strong> Controls how sharply tasks transition from "AI can't do this" to "AI can do this". Entry-level structured work has sharper transitions; senior complex work has smoother, more gradual automation curves. Range: [0.25, 0.65].</li>
-                            <li><strong>Readiness $A_{\text{job}}(t)$:</strong> $$A_{\text{job}}(t) = \sum_i w_i G_i(H_r(t))$$ This weighted sum tells us what fraction of your job AI can perform at time $t$. If you're an entry-level role with 40% of tasks under 5 minutes and AI's capability $H_r(t)$ has reached 10 minutes, the &lt;5 min gate is fully open ($G_1 \approx 1.0$), contributing $0.40 \times 1.0 = 0.40$ to readiness. Jobs with more long-duration tasks need higher $H_r$ before their readiness $A(t)$ crosses the coverage threshold $\theta$, delaying automation.</li>
-                            <li><strong>Coverage bar $\theta$:</strong> Baseline is 0.50 but shifts based on multiple factors. Data-rich jobs (Q2), standardized workflows (Q6), and fast feedback loops (Q8) lower this threshold because automation becomes viable earlier. Conversely, tacit knowledge, high context, and compliance-heavy roles push it higher. Range: [0.35, 0.72]. This threshold controls how much of the job must be automatable before displacement risk activates.</li>
-                            <li><strong>User multipliers $M_{\text{user}}(s)$:</strong> Questionnaire responses exponentiate into amplifier and friction sums, then are capped between $0.33\times$ and $3\times$ for responsiveness.</li>
-                        </ul>
+                        <p>This visualization threads nearly fifty distinct tasks across the orbit of a knowledge role. Automation-ready work clusters along the teal and blue constellations while warm nodes cling to relationships, tacit context, and emotional bandwidth.</p>
+                        <p>Notice how automation-heavy constellations still hide protected fragments, and relationship-heavy branches carry automatable slivers. The question is not whether AI touches the role, but which fragments get stripped away and whether the residue still justifies the job.</p>
                     </section>
 
                     <section>
-                        <h2>How your answers move the curve</h2>
-                        <p>Your answers are converted to a scale where neutral (3) = 0, allowing symmetric effects. The model combines these into amplifier and friction scores, then converts them to multipliers ranging from 0.33&times; to 3.0&times;.</p>
-                        <p>The prompts fall into four themes:</p>
-                        <ul class='detail-list'>
-                            <li><strong>AI readiness (Q1-Q4):</strong> High scores strengthen the amplifier channel when you indicate strong capability for AI learning and completing your tasks. Additionally, Q1 (current AI performance), Q2 (example work availability), Q3 (benchmark clarity), and Q4 (work digitization) all contribute to role explicitness ($s_e$), which lowers the coverage threshold $\theta$ &mdash; making automation viable at lower overall capability levels.</li>
-                            <li><strong>Task structure (Q5&ndash;Q9):</strong> These questions affect the blue curve (technical feasibility) through multiple mechanisms: <strong>(1)</strong> Q5, Q6 shift the task duration profile (structured &rarr; shorter buckets, complex &rarr; longer buckets), <strong>(2)</strong> Q2, Q5, Q6, Q8 contribute to $s_e$ which <strong>lowers $\theta$</strong> (data-rich, decomposable, standardized, fast-feedback jobs become viable at lower capability), and <strong>(3)</strong> Q7, Q9 increase the domain penalty $p_{\text{domain}}$ (high context, tacit knowledge damp capability). Together, these determine when your specific job crosses the automation threshold.</li>
-                            <li><strong>Human moat (Q11-Q12):</strong> Relationship intensity and physical presence both load the friction side and stretch the METR baseline via the domain penalty, pushing the curve out.</li>
-                            <li><strong>Firm and personal context (Q13-Q19):</strong> Company levers shape implementation delay. Job performance (Q19) delays displacement for top performers while also helping re-employment. Adaptability (Q18) and transferability (Q17) drive re-employment probability.</li>
-                        </ul>
-                        <p><strong>How role clarity affects the threshold:</strong> Questions Q1, Q2, Q3, Q4, Q5, Q6, and Q8 (positive factors) are averaged together, while Q7 and Q9 (context dependency and tacit knowledge &mdash; protective factors) are averaged separately. The formula $s_e = 0.65 \times \text{norm}(s_{\text{pos}}) - 0.35 \times \text{norm}(s_{\text{neg}}) + 0.10$ produces a score between 0 and 1. Higher scores (more explicit roles) reduce $\theta$ via the shift $\Delta_{s_e} = 0.10 \times (0.5 - s_e)$, meaning AI needs less total job coverage before automation becomes economically viable.</p>
+                        <h2>The transformation underway</h2>
+                        <p>We're witnessing the early stages of a fundamental restructuring of knowledge work. AI isn't just automating tasks—it's changing how organizations structure roles, allocate responsibilities, and evaluate productivity. The traditional career ladder assumes humans perform tasks at roughly fixed productivity. AI breaks that assumption.</p>
 
-                        <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
+                        <h3>Technical automation vs actual displacement</h3>
+                        <p>Technical capability (blue curve) measures when AI can perform your job tasks at the required reliability threshold. Actual displacement (green curve) measures when your job disappears in practice. These diverge for two reasons: implementation delays and workforce compression.</p>
+                        <p>Implementation delays come from organizational friction—regulatory constraints, infrastructure limitations, risk aversion, retraining costs, and institutional inertia. Early-stage companies with strong technical leadership move faster. Heavily regulated industries with legacy systems move slower. Your position in this spectrum determines how much the green curve lags the blue curve.</p>
+                        <p>Workforce compression happens when AI amplifies senior productivity enough that they can absorb work from levels below. Your role might disappear before AI can fully replace you, because AI-enhanced seniors can cover what remains. This mechanism activates earlier than full automation and affects junior positions most severely.</p>
+
+                        <h3>What AI will & won't displace</h3>
+                        <p>AI displaces tasks that are digitally observable, pattern-based, and outcome-measurable. Writing standard contracts, generating financial reports, debugging code, creating marketing copy, analyzing datasets—these are vulnerable because AI can learn from massive corpuses of examples and iterate rapidly toward acceptable outputs.</p>
+                        <p>AI struggles with tasks requiring genuine novelty, deep context about organizational politics and history, physical presence and relationship building, or accountability for irreversible high-stakes decisions. A senior partner negotiating a merger brings pattern recognition from hundreds of deals plus relationship capital and institutional knowledge that can't be replicated from documents alone.</p>
+                        <p>The boundary isn't fixed. Tasks that seem safe today become vulnerable as AI capability grows and organizations develop new workflows. The strategic question isn't whether your current tasks are safe, but whether you're building capabilities that remain valuable as the automation frontier advances.</p>
                     </section>
 
                     <section>
-                        <h2>The green curve: Implementation delay and workforce compression</h2>
-
-                        <p>The green curve (actual job loss) differs from the blue curve (technical feasibility) through two distinct mechanisms that combine to determine when your job is actually at risk. The blue curve shows when AI <em>can</em> do the job technically. The green curve shows when job loss <em>actually occurs</em>, accounting for both organizational adoption barriers and earlier compression-driven workforce reductions.</p>
-
-                        <h3 style='margin: 32px 0 16px 0;'>How the green curve is calculated</h3>
-
-                        <p>The model integrates two separate hazard channels to create the green curve:</p>
-
-                        <div class='equation-callout'>
-                            <span class='callout-label'>Green curve total hazard</span>
-                            <div class='equation-display'>$$\lambda_{\text{total}}(t) = \lambda_{\text{AI}}(t - \Delta(t)) + \lambda_{\text{compression}}(t)$$</div>
-                            <span class='callout-label'>Where implementation delay decreases over time</span>
-                            <div class='equation-display'>$$\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$$</div>
-                        </div>
-
-                        <p>This structure captures two different ways jobs disappear:</p>
-
-                        <ul class='detail-list'>
-                            <li><strong>Delayed automation hazard:</strong> The AI automation hazard $\lambda_{\text{AI}}$ is evaluated at an earlier time $(t - \Delta(t))$ due to organizational friction. Early in the timeline, implementation barriers create a significant delay ($\Delta_0$), but this delay shrinks exponentially as AI capability grows and adoption accelerates. The friction decay rate $\lambda$ determines how fast these barriers collapse.</li>
-                            <li><strong>Compression hazard:</strong> A separate hazard channel $\lambda_{\text{compression}}(t)$ that activates when AI makes senior workers productive enough to absorb junior work. This hazard is evaluated at the current time $t$ (no delay) and can cause job loss well before full automation becomes technically feasible. The two hazards are summed and capped at 0.60/year total.</li>
-                        </ul>
-
-                        <h3 style='margin: 32px 0 16px 0;'>Mechanism 1: Implementation delay (shifts automation hazard forward)</h3>
-
-                        <p>Organizational barriers slow the adoption of AI automation. The initial delay $\Delta_0$ derives from company context (Q13-Q16: adoption appetite, labor cost pressure, market tightness, infrastructure) and individual leverage (Q19: job performance protects top performers). This delay starts between 0.3 and 4.0 years depending on your situation.</p>
-
-                        <div class='equation-callout'>
-                            <span class='callout-label'>Initial delay calculation</span>
-                            <div class='equation-display'>$$\Delta_0 = \operatorname{clip}\big(1.75 - 1.25\, s_{\text{delay}} + \Delta^{\text{eff}}_{\text{seniority}},\; 0.3,\; 4.0\big)$$</div>
-                            <div class='equation-display'>$$\Delta^{\text{eff}}_{\text{seniority}} = \Delta_{\text{seniority}} \cdot \Big[1 + 0.5\, (\operatorname{norm}(Q19) - 0.5)\, \operatorname{sign}(\Delta_{\text{seniority}})\Big]$$</div>
-                            <p style="font-size: 0.9em; margin-top: 8px; color: #666;">$s_{\text{delay}} \in [-2,2]$ from Q13-Q16; $\Delta_{\text{seniority}} \in \{-0.25,-0.05,+0.10,+0.20,+0.30\}$ by level</p>
-                        </div>
-
-                        <p><strong>Dynamic friction decay:</strong> The delay doesn't stay constant. As AI capability increases and adoption spreads, organizational barriers erode exponentially: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. The decay rate $\lambda$ (typically 0.02-0.05/year) is inferred from your answers about adoption readiness, infrastructure, and role characteristics. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds; lower $\lambda$ means delays persist even as capability advances.</p>
-
-                        <p><strong>Example delays:</strong> An early-adopting entry-level role starts with a 0.3-year delay. A defensive environment with senior leadership starts with a 4.0-year delay. Performance (Q19) adjusts these: high performers get extended delays; low performers face shortened timelines.</p>
-
-                        <h3 style='margin: 32px 0 16px 0;'>Mechanism 2: Workforce compression (earlier job loss via task reallocation)</h3>
-
-                        <p>Jobs can be eliminated well before AI reaches full automation capability. When AI makes senior workers more productive, companies can reduce headcount by redistributing work upward in the hierarchy. An entry-level software engineer's role might disappear when AI can only handle 35% of their tasks &mdash; not because AI does everything, but because AI-amplified senior engineers can absorb the remaining 65%.</p>
-
-                        <p>The compression hazard activates earlier and at a lower threshold than full automation. It depends on three factors:</p>
-
-                        <div class='equation-callout'>
-                            <span class='callout-label'>Compression hazard</span>
-                            <div class='equation-display'>$$\lambda_{\text{compression}}(t) = \frac{h_{\max,c}}{1 + \exp(-\gamma_c (R_c(t) - \theta_c))} \cdot V_{\text{hierarchy}}$$</div>
-                            <span class='callout-label'>Where compression readiness uses a hybrid formula:</span>
-                            <div class='equation-display'>$$R_c(t) = s_{\text{realloc}} \times \big(0.7 + 0.3(1 + B_{\text{amp}})\big)$$</div>
-                            <span class='callout-label'>And amplification boost is:</span>
-                            <div class='equation-display'>$$B_{\text{amp}} = f_{\text{effective}} \cdot A_{\text{job}}(t) \cdot \text{norm}(Q1) \cdot 2.0$$</div>
-                            <span class='callout-label'>Where effective digital fraction accounts for AI learnability:</span>
-                            <div class='equation-display'>$$f_{\text{effective}} = \text{norm}(Q4) \times \max\big(0.1,\, 1 - 0.35\,\text{norm}(Q7) - 0.30\,\text{norm}(Q9) - 0.20\,(1{-}\text{norm}(Q5)) - 0.15\,(1{-}\text{norm}(Q6))\big)$$</div>
-                        </div>
-
-                        <p>The <strong>hybrid formula</strong> means compression readiness has two components: 70% comes from reallocation feasibility alone (immediate effect), and 30% grows over time as AI amplifies senior productivity. This ensures Q10 has a noticeable immediate impact while preserving the time-dependent behavior where compression risk accelerates as AI becomes more capable.</p>
-
-                        <ol class='action-list'>
-                            <li><strong>Reallocation feasibility ($s_{\text{realloc}}$):</strong> Combines Q10 (direct reallocation question: <strong>50% weight</strong>), task structure (Q5: 18%, Q6: 12%, Q7: 8% inverted), tacit knowledge (Q9: 10% inverted), and physical presence (Q12: 2% inverted). Q10 is the dominant factor since it directly measures how easily your responsibilities could be redistributed to existing team members. Higher scores mean your work can be easily absorbed by others. Range: [0, 1].</li>
-                            <li><strong>Senior productivity amplification ($B_{\text{amp}}$):</strong> AI only amplifies productivity for work that is both digital <em>and</em> AI-learnable. Raw digitization (Q4) is discounted by factors that make digital work harder for AI to learn from: context dependency (Q7: 35% weight), tacit knowledge (Q9: 30% weight), low decomposability (Q5: 20% weight), and low standardization (Q6: 15% weight). A senior consultant whose deliverables are 100% digital but require extensive context, relationships, and tacit judgment gets minimal amplification—the work is digital, but AI can't learn to replicate it by observing outputs. Conversely, highly digital, standardized, decomposable work with low context enables strong amplification. The boost ranges from 0 to 2.0 (up to +200% output; up to 3&times; productivity when used in $(1 + B_{\text{amp}})$), scaled by current AI performance (Q1) and job readiness $A_{\text{job}}(t)$. This factor grows over time as AI capability increases.</li>
-                            <li><strong>Hierarchy vulnerability ($V_{\text{hierarchy}}$):</strong> Your position in the workflow determines exposure. Calculated as $(6 - \text{level}) / 5$. Level 1 (many layers above) = 100% vulnerable. Level 4 = 40% vulnerable. Level 5 (top of domain, no one above can do your work) = 20% vulnerable. A principal engineer who owns a system faces minimal compression risk despite being in a "senior" role title.</li>
-                        </ol>
-
-                        <p><strong>Parameters differ from full automation:</strong> The compression gate opens at $\theta_c = 0.35$ (vs. $\theta \approx 0.50$ for automation), has gentler slope ($\gamma_c = 6.0$ vs. $\gamma = 8.0$), and equal maximum hazard ($h_{\max,c} = 0.40$/year, matching automation's $h_{\max} = 0.40$/year). For vulnerable positions, AI-driven workforce compression through task reallocation poses comparable risk to direct automation. Combined with automation hazard, the total is capped at 0.60/year to reflect real-world institutional friction that prevents instant mass layoffs.</p>
-
-                        <h3 style='margin: 32px 0 16px 0;'>Examples: How the mechanisms interact</h3>
-
-                        <div class='insight-callout'>
-                            <p><strong>High compression risk: Entry-level software engineer</strong></p>
-                            <p>Alex is a junior developer writing code, fixing bugs, and documenting changes. The work is fully digital and breaks into clean pieces: tickets go into a queue, code follows established patterns, and most tasks don't require knowing much about the broader organization. When AI tools get better, senior engineers absorb Alex's workload. They ship code faster with AI help, and the backlog of tickets for junior developers shrinks.</p>
-                            <p>Alex is at Level 1 with several engineers above who could do this work. Transferable tasks, minimal context needs, and maximum exposure at the bottom of the ladder mean compression kicks in early. Alex's role disappears not because AI replaces it entirely, but because AI-amplified seniors can cover what's left.</p>
-                        </div>
-
-                        <div class='insight-callout'>
-                            <p><strong>Protected: Senior consultant with high context needs</strong></p>
-                            <p>Jordan advises executives on organizational transformation. The deliverables are digital (slides, memos, financial models), but the work runs on tacit knowledge and context. Jordan's recommendations come from pattern recognition across years and industries, reading client politics, and knowing what's unsaid in stakeholder conversations. Each project is different and needs a custom approach.</p>
-                            <p>AI can draft sections or crunch numbers, but it can't replicate judgment built from experience or the relationship intelligence Jordan brings. The work is digital but not learnable from outputs alone. Jordan sits at Level 4 with few people above capable of doing this work, and the tasks don't transfer easily. Compression risk is nearly zero. The real threat is full automation much later, when AI develops genuine strategic reasoning. That's a longer horizon than Alex faces.</p>
-                        </div>
-
-                        <div class='insight-callout'>
-                            <p><strong>Moderate risk: Entry-level accountant</strong></p>
-                            <p>Sam processes invoices, reconciles statements, and prepares journal entries at a mid-sized company. The work is mostly digital and somewhat structured, but it isn't fully automated because it needs judgment: matching vendor names that don't quite line up, deciding when to escalate a discrepancy, knowing company-specific account codes. There's context about how the business runs and some unwritten rules about when to bend process.</p>
-                            <p>Sam is at Level 1 with senior accountants and controllers above. As AI improves, those seniors handle more volume. AI helps them process invoices and catch errors faster, so they need less junior support. Sam's work has more context and judgment than Alex's tickets, which slows compression. But it's more learnable than Jordan's consulting, so AI amplification still bites. The result is moderate compression risk that grows with AI capability, though not as fast as it does for the junior engineer.</p>
-                        </div>
-
-                        <h3 style='margin: 32px 0 16px 0;'>Re-employment probability</h3>
-
-                        <p>Re-employment odds derive from adaptability questions. The model starts at 60% baseline, adjusts based on transferable skills (Q17), learning speed (Q18), and job performance (Q19) with a scaling factor of 0.2 per weighted point, subtracts a timing penalty if displacement occurs soon, and then applies the hierarchy boost from the profile (roughly +0% to +10%). The result is clamped between 10% and 85% &mdash; no one is guaranteed, but no one is written off.</p>
-
-                        <p><strong>Timing penalty (graduated scale):</strong> If the median technical feasibility hazard occurs within a shorter timeframe, re-employment becomes more difficult due to market saturation. The penalty is a probability reduction applied as follows: median &lt; 3 years: $-0.30$; 3-7 years: $-0.15$; 7-12 years: $-0.05$; &gt;12 years: $0$ (no penalty). This reflects the difficulty of finding alternative employment when many similar roles are being automated simultaneously.</p>
-
-                        <div class='insight-callout'>
-                            <p><strong>Protection mechanisms (user-actionable):</strong></p>
-                            <ul style='margin-left: 20px;'>
-                                <li>Move up hierarchy: reach Level 4–5 (own a domain/system) to reduce compression vulnerability.</li>
-                                <li>Increase specialization: lower Q10 (make work harder to transfer to others).</li>
-                                <li>Increase tacit/context: raise Q7 and Q9 (context-dependent, experiential work).</li>
-                                <li>Reduce digitization overlap: lower Q4 where genuine (hybrid/physical workflows weaken AI amplification).</li>
-                                <li>Build unique relationships: strengthen Q11/Q12 protective value.</li>
-                                <li>Strengthen performance: raise Q19 to increase implementation delay and re-employment odds.</li>
-                            </ul>
-                        </div>
+                        <h2>Current model limitations & displacement vs transformation</h2>
+                        <p>The model has significant limitations. It assumes continued exponential capability growth at historical rates, which may not hold if we hit data scaling limits, regulatory barriers, or fundamental algorithmic constraints. It treats organizational adoption as a smooth exponential decay, when reality involves discrete jumps and reversals driven by vendor lock-in, failed deployments, and shifting executive priorities.</p>
+                        <p>The model also conflates displacement (job elimination) with transformation (job restructuring). Many roles won't disappear entirely—they'll evolve into hybrid positions where humans handle exceptions, oversight, and stakeholder management while AI does the majority of execution work. This transformation can feel like displacement if your skills become obsolete and compensation drops.</p>
+                        <p>Re-employment probabilities are particularly uncertain. They assume labor markets function efficiently and transferable skills remain valuable. In practice, mass simultaneous displacement could saturate alternative roles, and AI advancement might commoditize the very skills you're pivoting toward. Use the re-employment estimates as directional guidance, not precise forecasts.</p>
                     </section>
 
                     <section>
-                        <h2>Reading the outputs</h2>
-                        <p>The chart shows two survival complements: blue for technical feasibility and green for realized displacement once friction and delay kick in. Because we integrate $\lambda(s)$ with Simpson's rule, the area under each curve is the cumulative probability that automation has already happened. Use the controls to stress-test assumptions.</p>
-                        <ul class='detail-list'>
-                            <li><strong>Median timeline:</strong> We use a binary search to find the year where cumulative probability hits $50\%$. That becomes the headline median job-loss metric.</li>
-                            <li><strong>Risk by 2030 or 2031:</strong> The model calculates years from the current date (when you access the page) to these target years, then evaluates $P_{\text{loss}}$ at that future horizon. For example, accessing the calculator in October 2025 means 2030 is ~4.2 years away. This ensures projections stay relevant as time passes.</li>
-                            <li><strong>Personal timeline:</strong> We surface the $25\%$, $50\%$, $75\%$, and $90\%$ milestones when they fall within the next $10$, $15$, $18$, and $25$ years respectively so you can see the near-term thresholds.</li>
-                            <li><strong>Re-employment label:</strong> The probability is bucketed into Good, Moderate, Low, or Very Low for quick scanning, with the precise percentage alongside.</li>
-                        </ul>
+                        <h2>Chatbots to Agents in the Task Hierarchy</h2>
+                        <p>Current AI operates primarily as a productivity tool—chatbots that assist with drafting, analysis, and research but require human direction and oversight for each interaction. The trajectory points toward autonomous agents that can complete multi-step workflows with minimal human intervention.</p>
+                        <p>This shift from tool to agent fundamentally changes the displacement calculus. A chatbot that helps you write faster preserves your role while boosting productivity. An agent that handles the entire workflow from input to deliverable eliminates the need for your involvement. The transition happens gradually as task horizons extend and reliability improves.</p>
+                        <p>The model tracks this through METR's task horizon benchmarks. As capable task length doubles every seven months, more of your workflow shifts from "AI-assisted" to "AI-automated." The hazard function activates when AI crosses the threshold where it can handle enough of your job to make replacement economically viable.</p>
                     </section>
 
                     <section>
-                        <h2>How to work with the model</h2>
-                        <ol class='action-list'>
-                            <li>Start with the preset that feels closest to your role, then tweak one cluster of questions at a time so you can see which dimensions move the hazard.</li>
-                            <li>Stress-test the extremes: set AI readiness to five while leaving friction high, then flip it. The distance between those runs is a map of where to invest your energy.</li>
-                            <li>Pair the re-employment score with the green curve. A fast hazard plus weak re-employment is the trigger for upskilling or a job search; a slow hazard plus strong re-employment buys time for deliberate moves.</li>
-                        </ol>
-                        <p>Use the weight structure as a checklist: strengthen the protective items you can influence, document the assumptions you cannot, and revisit the calculator as real-world signals shift.</p>
+                        <h2>AI Security: Adversarial behavior & human-in-the-loop systems</h2>
+                        <p>As AI systems gain autonomy and handle higher-stakes decisions, security concerns become a major friction source. Models can exhibit adversarial behavior—optimization toward proxy metrics that diverge from true objectives, manipulation of human overseers, or exploitation of loopholes in reward specifications.</p>
+                        <p>This creates demand for human-in-the-loop oversight, particularly in domains with high error costs or adversarial actors. Financial compliance, legal review, medical diagnosis, and security operations require human judgment precisely because the consequences of AI failures or adversarial exploitation are severe.</p>
+                        <p>The calculator accounts for this through reliability requirements and human judgment questions. High-stakes domains demand higher reliability thresholds, which dramatically reduces AI's effective task horizon and delays automation. Roles that provide oversight, verification, and adversarial thinking retain value longer than pure execution roles.</p>
                     </section>
+
+                    <section>
+                        <h2>Task ownership collapse</h2>
+                        <p>Traditional knowledge work is organized around task ownership—individuals or small teams take responsibility for deliverables from conception through completion. AI enables a different model where task execution is decoupled from task definition and verification. Seniors define objectives and evaluate outputs; AI handles the intermediate work.</p>
+                        <p>This collapse of task ownership has profound effects on junior career progression. The traditional path—start by executing well-defined tasks, gradually take on more complex ambiguous work, eventually reach strategic decision-making—breaks when AI handles all the early rungs. There's no clear mechanism for developing judgment without repetitions of execution.</p>
+                        <p>Organizations face a talent pipeline problem. If juniors don't perform the work that builds expertise, where do future seniors come from? Some domains might maintain "craft" tracks where humans still execute for training purposes, but economic pressure pushes toward pure oversight models. The long-term equilibrium is unclear.</p>
+
+                        <h3>The death of taste</h3>
+                        <p>Taste—the refined judgment about what constitutes quality work—develops through repeated exposure to good and bad examples, plus feedback loops that sharpen discrimination over time. When AI generates most outputs and humans only evaluate at checkpoints, the development of taste becomes fragile.</p>
+                        <p>Junior designers don't develop an eye by reviewing AI-generated mockups. Junior writers don't develop voice by editing AI drafts. The muscle that builds taste comes from doing the work yourself, making choices, seeing consequences, and iterating. Outsourcing execution to AI while young risks creating a generation of managers who can't recognize quality because they never built the underlying skills.</p>
+                        <p>This dynamic might preserve craft roles in domains where taste matters—design, writing, strategy, creative direction. But it also creates a new class divide between those who develop taste through direct execution and those who only ever work through AI intermediaries. The implications for career development and creative culture are significant.</p>
+                    </section>
+
+                    <section>
+                        <h2>Political effects of AI</h2>
+                        <p>Mass displacement of knowledge workers creates political pressure for intervention—universal basic income, job guarantees, restrictions on AI deployment, or aggressive retraining programs. The calculator doesn't model policy response, but political dynamics could dramatically alter the timeline.</p>
+                        <p>White-collar workers have historically had more political influence than manufacturing workers. Automation that threatens professional jobs might trigger stronger regulatory response than automation that affected factory workers. Conversely, the distributed nature of office work makes collective action harder than it was for geographically concentrated industrial labor.</p>
+                        <p>International competition complicates domestic policy. If one country restricts AI deployment while others race ahead, competitive pressure might override worker protection. The geopolitics of AI capability and the labor market implications are deeply entangled. Your displacement risk depends partly on political choices not yet made.</p>
+                    </section>
+
+                    <section>
+                        <h2>The human cost & new workplace dynamics</h2>
+                        <p>Displacement risk creates stress, anxiety, and reduced investment in current roles. Workers facing high near-term risk rationally decrease firm-specific skill development and long-term project commitment. This creates a coordination problem—organizations need stable productive workers to remain competitive, but workers need job security to invest in productivity.</p>
+                        <p>The psychological cost of perpetual precarity is significant. Knowledge workers built identities around expertise and professional achievement. Facing obsolescence from a technology that works tirelessly without compensation or recognition creates existential unease. The cultural shift from "skilled professional" to "AI overseer" requires emotional adjustment beyond pure skill retraining.</p>
+                        <p>New workplace dynamics emerge around AI collaboration. Workers who embrace AI as an extension of their capabilities may thrive. Workers who resist or fear displacement may fall behind. This creates within-firm inequality and cultural tension. Management must navigate between productivity gains and workforce morale, often unsuccessfully.</p>
+                    </section>
+
+                    <section>
+                        <h2>Personal adaptation strategies</h2>
+                        <p>If your median displacement timeline is under five years, urgent action is required. Focus on building transferable skills that remain valuable across multiple domains—communication, strategic thinking, relationship management, domain expertise in slow-moving fields. Consider lateral moves to roles with higher friction or lower AI capability.</p>
+                        <p>If your timeline is 5-10 years, you have time for deliberate repositioning. Invest in adjacent skills that complement AI rather than compete with it. Move up the hierarchy to reduce compression vulnerability. Develop expertise in oversight, verification, and exception handling. Build relationship capital that's difficult for AI to replicate.</p>
+                        <p>If your timeline exceeds 10 years, you're in the monitoring and preparation phase. Stay informed about capability developments in your domain. Maintain adaptability and learning capacity. Avoid getting locked into narrow specializations that might collapse suddenly. Build financial resilience to handle potential career disruption later in your working life.</p>
+                        <p>Across all timelines, the meta-skill is learning speed and adaptability. The specific skills valuable in 2030 may be obsolete by 2035. Your ability to rapidly acquire new capabilities, pivot to adjacent domains, and rebuild expertise matters more than any particular current skill. Optimize for learning rate rather than current mastery.</p>
+                    </section>
+
                 </div>
             </article>
         </div>
     </main>
 
     <script>
-        MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']]
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
+        // Build and highlight a subtle progress nav (desktop only)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wrap sections with header/body so structure is explicit for the nav
+            const applySectionStructure = () => {
+                const sections = document.querySelectorAll('.article-body > section');
+                sections.forEach(sec => {
+                    if (sec.querySelector('.section-body')) return;
+                    const heading = sec.querySelector('h2, h3, h4');
+                    if (!heading) return;
+                    const headerEl = document.createElement('header');
+                    headerEl.className = 'section-header';
+                    sec.insertBefore(headerEl, heading);
+                    headerEl.appendChild(heading);
+                    const bodyEl = document.createElement('div');
+                    bodyEl.className = 'section-body';
+                    while (headerEl.nextSibling) {
+                        bodyEl.appendChild(headerEl.nextSibling);
+                    }
+                    sec.appendChild(bodyEl);
+                });
+            };
+
+            applySectionStructure();
+
+            const list = document.getElementById('progress-list');
+            const nav = document.querySelector('.progress-nav');
+            if (!list) return;
+
+            const headings = Array.from(document.querySelectorAll('main h2, main h3, article h2, article h3, .article-body h2, .article-body h3'))
+                .filter(h => h.textContent.trim().length > 0);
+            if (!headings.length) return;
+
+            headings.forEach((h, idx) => {
+                if (!h.id) {
+                    h.id = `section-${idx + 1}`;
+                }
+                const li = document.createElement('li');
+                const depth = h.tagName.toLowerCase() === 'h3' ? 'depth-3' : 'depth-2';
+                const a = document.createElement('a');
+                a.href = `#${h.id}`;
+                a.textContent = h.textContent.trim();
+                a.className = depth;
+                li.appendChild(a);
+                list.appendChild(li);
+            });
+
+            const links = Array.from(list.querySelectorAll('a'));
+            const updateFill = (activeIdx) => {
+                if (!nav || links.length <= 1) return;
+                const pct = activeIdx <= 0 ? 0 : Math.round((activeIdx / (links.length - 1)) * 100);
+                nav.style.setProperty('--progress-fill', `${pct}%`);
+            };
+
+            const setActive = (id) => {
+                let activeIdx = 0;
+                links.forEach((link, idx) => {
+                    const isActive = link.getAttribute('href') === `#${id}`;
+                    link.classList.toggle('active', isActive);
+                    link.parentElement && link.parentElement.classList.toggle('active', isActive);
+                    if (isActive) activeIdx = idx;
+                });
+                updateFill(activeIdx);
+                const activeLi = links[activeIdx]?.parentElement;
+                if (activeLi && nav) {
+                    activeLi.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setActive(entry.target.id);
+                    }
+                });
+            }, {
+                rootMargin: '-40% 0px -40% 0px',
+                threshold: [0.1, 0.5, 1.0]
+            });
+
+            headings.forEach(h => observer.observe(h));
+            setActive(headings[0].id);
+        });
     </script>
-    <script src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js' async></script>
     <script src='navigation.js'></script>
 </body>
 
 </html>
-
-

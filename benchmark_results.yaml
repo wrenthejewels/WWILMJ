@@ -455,3 +455,39 @@ results:
           estimate: 0.56634
         is_sota: false
     release_date: 2025-08-05
+  gpt_5_1_codex_max:
+    agents:
+      flock-camel:
+        p50_horizon_length:
+          estimate: 161.753349
+          ci_low: 74.813807
+          ci_high: 348.268743
+        p80_horizon_length:
+          estimate: 31.306248
+          ci_low: 9.742196
+          ci_high: 80.259676
+        average_score:
+          estimate: 0.715789
+        usage:
+          working_time: 15773.459491111113
+          usd: 112.11515250000001
+        is_sota: true
+    release_date: 2025-11-19
+  kimi_k2_thinking:
+    agents:
+      flock-public:
+        p50_horizon_length:
+          estimate: 54.194148
+          ci_low: 25.48195
+          ci_high: 98.247233
+        p80_horizon_length:
+          estimate: 11.552024
+          ci_low: 3.691064
+          ci_high: 28.045555
+        average_score:
+          estimate: 0.591943
+        usage:
+          working_time: 10518.310689444445
+          usd: 264.2665219908333
+        is_sota: false
+    release_date: 2025-11-06
