@@ -6,7 +6,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
     <title>Guide - Don't Lose Your Job</title>
     <style>
         :root {
@@ -151,7 +151,9 @@
         }
 
         .centered-brand {
+            flex-direction: column;
             align-items: center;
+            gap: 4px;
         }
 
         .brand-name, .publication-title {
@@ -164,10 +166,21 @@
         }
 
         .publication-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.35rem;
-            letter-spacing: 0.005em;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.75rem;
+            letter-spacing: 0.05em;
             font-weight: 400;
+            text-transform: uppercase;
+            color: #1A1917;
+        }
+
+        .author-name-header {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #8A8578;
+            opacity: 0.7;
         }
 
         .nav {
@@ -528,6 +541,7 @@
         <div class="header-inner">
             <div class="header-brand centered-brand">
                 <span class="publication-title">Don't Lose Your Job</span>
+                <span class="author-name-header">by Clay Wren</span>
             </div>
             <nav class="nav">
                 <a href="/" class="nav-link">Model</a>
