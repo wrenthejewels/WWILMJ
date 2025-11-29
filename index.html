@@ -3070,8 +3070,16 @@
             <div class="setup-section">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Job characteristics</h2>
-                        <p class="card-description">Answer these questions to calibrate the model for your specific role.</p>
+                        <div class="section-title--with-actions">
+                            <div>
+                                <h2 class="card-title">Job characteristics</h2>
+                                <p class="card-description">Answer these questions to calibrate the model for your specific role.</p>
+                            </div>
+                            <label class="task-bucket-toggle" style="margin-left:auto;">
+                                <input type="checkbox" id="prefill-questions">
+                                <span>Prefill from inferred role + hierarchy characteristics</span>
+                            </label>
+                        </div>
                     </div>
 
                 <div class="category">
@@ -5563,6 +5571,44 @@
             }
         }
 
+        // Auto-fill Job Characteristics answers from role + hierarchy presets
+        function applyQuestionPreset() {
+            const presets = window.WWILMJ_PRESETS;
+            if (!presets || typeof presets.buildQuestionPreset !== 'function') {
+                console.warn('[applyQuestionPreset] WWILMJ_PRESETS.buildQuestionPreset missing');
+                return;
+            }
+            if (!selectedRole) {
+                console.warn('[applyQuestionPreset] No role selected');
+                return;
+            }
+
+            const seniorityChecked = document.querySelector('input[name="seniority"]:checked');
+            const seniorityLevel = seniorityChecked ? parseInt(seniorityChecked.value) : 1;
+            const answerMap = presets.buildQuestionPreset(selectedRole, seniorityLevel);
+
+            Object.entries(answerMap || {}).forEach(([qid, value]) => {
+                const qNum = qid.replace('Q', '');
+                const radio = document.querySelector(`input[name="q${qNum}"][value="${value}"]`);
+                if (radio) {
+                    radio.checked = true;
+                }
+            });
+        }
+
+        // Reset Job Characteristics answers to neutral defaults
+        function resetQuestionsToNeutral() {
+            const presets = window.WWILMJ_PRESETS;
+            const neutral = presets && presets.NEUTRAL_ANSWERS ? presets.NEUTRAL_ANSWERS : {};
+            for (let i = 1; i <= 19; i++) {
+                const target = neutral[`Q${i}`] ?? 3;
+                const radio = document.querySelector(`input[name="q${i}"][value="${target}"]`);
+                if (radio) {
+                    radio.checked = true;
+                }
+            }
+        }
+
         // Tests will be run after DOM is ready (see DOMContentLoaded handler below)
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -6467,6 +6513,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const roleSelect = document.getElementById('role-select');
             const hierarchySelect = document.getElementById('hierarchy-select');
+            const prefillToggle = document.getElementById('prefill-questions');
             const dotRole = document.getElementById('dot-role');
             const dotHierarchy = document.getElementById('dot-hierarchy');
             const dotDone = document.getElementById('dot-done');
@@ -6494,6 +6541,17 @@
             function tryShowResults() {
                 if (roleSelect?.value && hierarchySelect?.value) {
                     showBlock(resultsSection);
+                }
+            }
+
+            function setPrefillState() {
+                if (!prefillToggle) return;
+                const ready = !!(roleSelect?.value && hierarchySelect?.value);
+                if (!ready) {
+                    prefillToggle.checked = false;
+                    prefillToggle.disabled = true;
+                } else {
+                    prefillToggle.disabled = false;
                 }
             }
 
@@ -6526,6 +6584,11 @@
                 }
                 updateChartSubtitle();
                 tryShowResults();
+                setPrefillState();
+                if (prefillToggle?.checked) {
+                    applyQuestionPreset();
+                    analyzeRole();
+                }
             });
 
             hierarchySelect?.addEventListener('change', () => {
@@ -6536,6 +6599,11 @@
                 }
                 updateChartSubtitle();
                 tryShowResults();
+                setPrefillState();
+                if (prefillToggle?.checked) {
+                    applyQuestionPreset();
+                    analyzeRole();
+                }
             });
 
             // Pin chart toggle with FLIP animation
@@ -6612,6 +6680,22 @@
                 }
             });
 
+            // Prefill answers on demand (toggle style)
+            prefillToggle?.addEventListener('change', () => {
+                if (prefillToggle.disabled) return;
+                if (prefillToggle.checked) {
+                    if (!selectedRole) {
+                        alert('Pick a role and hierarchy level first.');
+                        prefillToggle.checked = false;
+                        return;
+                    }
+                    applyQuestionPreset();
+                } else {
+                    resetQuestionsToNeutral();
+                }
+                analyzeRole();
+            });
+
             // Navigation buttons (Guide/Methodology)
             document.querySelectorAll('.nav-button').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -6637,6 +6721,7 @@
             // Immediate reveal
             sequenceItems.forEach((el) => el.classList.add('is-visible'));
 
+            setPrefillState();
             initModelTuningPanel();
         });
 
