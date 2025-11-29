@@ -7,8 +7,8 @@
     // Configuration for page routes
     const routes = {
         '/': 'index.html',
-        '/guide': 'guide.html',
-        '/method': 'method.html'
+        '/guide': 'guide/index.html',
+        '/method': 'method/index.html'
     };
 
     // Initialize navigation on page load
