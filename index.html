@@ -2513,28 +2513,25 @@
         body.chart-pinned .container {
             max-width: none;
             margin: 0;
-            padding-left: 40px;
-            padding-right: 40px;
+            padding-left: 32px;
+            padding-right: 32px;
             display: flex;
-            gap: 48px;
+            gap: 32px;
             align-items: flex-start;
-            position: relative;
         }
 
         body.chart-pinned .content-wrapper {
             flex: 1 1 0;
-            max-width: 1200px;
-            margin-right: min(520px, 40vw);
+            max-width: none;
+            padding-right: 0;
         }
 
         body.chart-pinned .pinnable-section {
-            position: absolute;
-            right: 40px;
-            top: var(--pinnable-top, 120px);
-            width: min(520px, 40vw);
+            position: sticky;
+            top: var(--pinnable-top, 96px);
             flex: 1 1 0;
-            min-width: 420px;
-            max-width: 520px;
+            min-width: 460px;
+            max-width: none;
             align-self: flex-start;
             flex-direction: column;
         }
