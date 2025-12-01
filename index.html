@@ -2995,7 +2995,7 @@
                         <div class="step-card step-card-button sequence-item" data-seq="6" style="min-height:70px;">
                             <button id="questionnaire-button" class="step-button" style="width:100%; height:100%;">Personalize attributes</button>
                         </div>
-                        <div class="step-caption sequence-item" data-seq="7">Fine-tune hazard and compression weights for accuracy.</div>
+                        <div class="step-caption sequence-item" data-seq="7">Answer questions about your role to calibrate the model.</div>
                     </div>
                 </div>
                 <hr class="resources-divider">
@@ -3717,7 +3717,7 @@
                     </div>
                 </div>
 
-                <div class="model-explanation" style="margin-top: 48px; margin-bottom: 32px;">
+                <div class="model-explanation hidden-block" id="model-explanation-section" style="margin-top: 48px; margin-bottom: 32px;">
                     <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Understanding the chart and metrics</h3>
                     <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 12px;">
                         Your results are forecasts, not certainties. They depend on assumptions about how fast AI capabilities improve and how quickly your industry, organization, and role will adopt them, all of which remain deeply uncertain.
@@ -6582,6 +6582,7 @@
             const dotHierarchy = document.getElementById('dot-hierarchy');
             const dotDone = document.getElementById('dot-done');
             const resultsSection = document.getElementById('results-column');
+            const explanationSection = document.getElementById('model-explanation-section');
             const legacyWizard = document.querySelector('.legacy-wizard');
             const sequenceItems = Array.from(document.querySelectorAll('.sequence-item'))
                 .sort((a, b) => (parseInt(a.dataset.seq || '0') || 0) - (parseInt(b.dataset.seq || '0') || 0));
@@ -6605,6 +6606,7 @@
             function tryShowResults() {
                 if (roleSelect?.value && hierarchySelect?.value) {
                     showBlock(resultsSection);
+                    showBlock(explanationSection);
                 }
             }
 
@@ -6759,6 +6761,7 @@
                 if (roleSelect?.value && hierarchySelect?.value) {
                     activate(dotDone);
                     showBlock(resultsSection);
+                    showBlock(explanationSection);
                 }
             });
 
