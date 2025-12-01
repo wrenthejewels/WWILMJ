@@ -2527,7 +2527,7 @@
 
         body.chart-pinned .pinnable-section {
             position: sticky;
-            top: 18vh;
+            top: 96px;
             flex: 1 1 0;
             min-width: 520px;
             max-width: 1200px;
@@ -6656,9 +6656,51 @@
                 }
             });
 
-            // Pin chart toggle - keep section in place and just adjust layout
+            // Pin chart toggle with layout shift + smooth FLIP animation
             document.getElementById('pin-chart-toggle')?.addEventListener('change', function() {
-                document.body.classList.toggle('chart-pinned', this.checked);
+                const container = document.querySelector('.container');
+                const pinnableSection = document.getElementById('pinnable-section');
+                const rightColumn = document.getElementById('results-column');
+                const contentWrapper = document.querySelector('.content-wrapper');
+
+                // Capture initial positions
+                const firstRect = pinnableSection.getBoundingClientRect();
+                const contentFirstRect = contentWrapper.getBoundingClientRect();
+
+                if (this.checked) {
+                    // Move pinnable section beside content
+                    container.appendChild(pinnableSection);
+                    document.body.classList.add('chart-pinned');
+                } else {
+                    // Return pinnable section to the right column
+                    rightColumn.insertBefore(pinnableSection, rightColumn.firstChild);
+                    document.body.classList.remove('chart-pinned');
+                }
+
+                // Capture final positions
+                const lastRect = pinnableSection.getBoundingClientRect();
+                const contentLastRect = contentWrapper.getBoundingClientRect();
+
+                // Compute deltas
+                const deltaX = firstRect.left - lastRect.left;
+                const deltaY = firstRect.top - lastRect.top;
+                const contentDeltaX = contentFirstRect.left - contentLastRect.left;
+
+                // Apply inverse transform
+                pinnableSection.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                pinnableSection.style.transition = 'none';
+                contentWrapper.style.transform = `translateX(${contentDeltaX}px)`;
+                contentWrapper.style.transition = 'none';
+
+                // Animate to final position
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        pinnableSection.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                        pinnableSection.style.transform = '';
+                        contentWrapper.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                        contentWrapper.style.transform = '';
+                    });
+                });
             });
 
             document.getElementById('step-open-survey')?.addEventListener('click', () => {
