@@ -2527,12 +2527,14 @@
 
         body.chart-pinned .container > .pinnable-section {
             position: sticky;
-            top: 72px;
+            top: 110px;
             flex: 1 1 0;
             min-width: 520px;
             max-width: 1200px;
             align-self: flex-start;
             flex-direction: column;
+            max-height: calc(100vh - 130px);
+            overflow: auto;
         }
 
         body.chart-pinned .container > .pinnable-section .chart-container {
