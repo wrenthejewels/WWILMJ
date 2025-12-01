@@ -2518,19 +2518,23 @@
             display: flex;
             gap: 48px;
             align-items: flex-start;
+            position: relative;
         }
 
         body.chart-pinned .content-wrapper {
             flex: 1 1 0;
             max-width: 1200px;
+            margin-right: min(520px, 40vw);
         }
 
         body.chart-pinned .pinnable-section {
-            position: sticky;
-            top: 96px;
+            position: absolute;
+            right: 40px;
+            top: var(--pinnable-top, 120px);
+            width: min(520px, 40vw);
             flex: 1 1 0;
-            min-width: 520px;
-            max-width: 1200px;
+            min-width: 420px;
+            max-width: 520px;
             align-self: flex-start;
             flex-direction: column;
         }
@@ -6656,13 +6660,27 @@
                 }
             });
 
+            const container = document.querySelector('.container');
+            const pinnableSection = document.getElementById('pinnable-section');
+            const rightColumn = document.getElementById('results-column');
+            const contentWrapper = document.querySelector('.content-wrapper');
+
+            const updatePinnedPosition = () => {
+                if (!document.body.classList.contains('chart-pinned')) return;
+                const containerRect = container.getBoundingClientRect();
+                const scrollTop = window.scrollY;
+                const containerTop = containerRect.top + scrollTop;
+                const containerBottom = containerTop + container.offsetHeight;
+                const pinnedHeight = pinnableSection.offsetHeight;
+                const viewportAnchor = scrollTop + window.innerHeight * 0.3;
+                const minTop = containerTop + 40;
+                const maxTop = Math.max(minTop, containerBottom - pinnedHeight - 40);
+                const desired = Math.min(Math.max(viewportAnchor, minTop), maxTop);
+                document.documentElement.style.setProperty('--pinnable-top', `${desired - containerTop}px`);
+            };
+
             // Pin chart toggle with layout shift + smooth FLIP animation
             document.getElementById('pin-chart-toggle')?.addEventListener('change', function() {
-                const container = document.querySelector('.container');
-                const pinnableSection = document.getElementById('pinnable-section');
-                const rightColumn = document.getElementById('results-column');
-                const contentWrapper = document.querySelector('.content-wrapper');
-
                 // Capture initial positions
                 const firstRect = pinnableSection.getBoundingClientRect();
                 const contentFirstRect = contentWrapper.getBoundingClientRect();
@@ -6671,10 +6689,12 @@
                     // Move pinnable section beside content
                     container.appendChild(pinnableSection);
                     document.body.classList.add('chart-pinned');
+                    updatePinnedPosition();
                 } else {
                     // Return pinnable section to the right column
                     rightColumn.insertBefore(pinnableSection, rightColumn.firstChild);
                     document.body.classList.remove('chart-pinned');
+                    document.documentElement.style.removeProperty('--pinnable-top');
                 }
 
                 // Capture final positions
@@ -6702,6 +6722,9 @@
                     });
                 });
             });
+
+            window.addEventListener('scroll', updatePinnedPosition, { passive: true });
+            window.addEventListener('resize', updatePinnedPosition);
 
             document.getElementById('step-open-survey')?.addEventListener('click', () => {
                 if (legacyWizard) {
