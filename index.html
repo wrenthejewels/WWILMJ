@@ -2525,9 +2525,9 @@
             max-width: 1200px;
         }
 
-        body.chart-pinned .container > .pinnable-section {
+        body.chart-pinned .pinnable-section {
             position: sticky;
-            top: 20vh;
+            top: 18vh;
             flex: 1 1 0;
             min-width: 520px;
             max-width: 1200px;
@@ -2535,13 +2535,13 @@
             flex-direction: column;
         }
 
-        body.chart-pinned .container > .pinnable-section .chart-container {
+        body.chart-pinned .pinnable-section .chart-container {
             width: 100%;
             flex: none;
             margin-bottom: 24px;
         }
 
-        body.chart-pinned .container > .pinnable-section .results {
+        body.chart-pinned .pinnable-section .results {
             flex: none;
             width: 100%;
             display: grid;
@@ -6656,51 +6656,9 @@
                 }
             });
 
-            // Pin chart toggle with FLIP animation
+            // Pin chart toggle - keep section in place and just adjust layout
             document.getElementById('pin-chart-toggle')?.addEventListener('change', function() {
-                const container = document.querySelector('.container');
-                const pinnableSection = document.getElementById('pinnable-section');
-                const rightColumn = document.getElementById('results-column');
-                const contentWrapper = document.querySelector('.content-wrapper');
-
-                // FIRST: capture initial positions
-                const firstRect = pinnableSection.getBoundingClientRect();
-                const contentFirstRect = contentWrapper.getBoundingClientRect();
-
-                if (this.checked) {
-                    // Move pinnable section to container
-                    container.appendChild(pinnableSection);
-                    document.body.classList.add('chart-pinned');
-                } else {
-                    // Move back to right column
-                    rightColumn.insertBefore(pinnableSection, rightColumn.firstChild);
-                    document.body.classList.remove('chart-pinned');
-                }
-
-                // LAST: capture final positions
-                const lastRect = pinnableSection.getBoundingClientRect();
-                const contentLastRect = contentWrapper.getBoundingClientRect();
-
-                // INVERT: calculate the difference
-                const deltaX = firstRect.left - lastRect.left;
-                const deltaY = firstRect.top - lastRect.top;
-                const contentDeltaX = contentFirstRect.left - contentLastRect.left;
-
-                // Apply inverse transform (element appears in original position)
-                pinnableSection.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-                pinnableSection.style.transition = 'none';
-                contentWrapper.style.transform = `translateX(${contentDeltaX}px)`;
-                contentWrapper.style.transition = 'none';
-
-                // PLAY: animate to final position
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        pinnableSection.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                        pinnableSection.style.transform = '';
-                        contentWrapper.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                        contentWrapper.style.transform = '';
-                    });
-                });
+                document.body.classList.toggle('chart-pinned', this.checked);
             });
 
             document.getElementById('step-open-survey')?.addEventListener('click', () => {
