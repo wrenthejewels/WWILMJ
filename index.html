@@ -2530,21 +2530,24 @@
             position: sticky;
             top: var(--pinnable-top, 72px);
             flex: 1 1 0;
-            min-width: 460px;
-            max-width: none;
+            min-width: 380px;
+            max-width: 1200px;
             align-self: flex-start;
-            flex-direction: column;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
         }
 
         body.chart-pinned .pinnable-section .chart-container {
-            width: 100%;
-            flex: none;
-            margin-bottom: 24px;
+            flex: 1 1 60%;
+            max-width: 720px;
+            min-width: 340px;
+            margin-bottom: 0;
         }
 
         body.chart-pinned .pinnable-section .results {
-            flex: none;
-            width: 100%;
+            flex: 1 1 40%;
+            min-width: 260px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 12px;
