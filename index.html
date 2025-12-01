@@ -6790,10 +6790,10 @@
                     }
                     applyQuestionPreset();
 
-                    // Smooth scroll past questions to results/chart section
-                    if (resultsSection) {
+                    // Smooth scroll to "Understanding your output" section
+                    if (explanationSection) {
                         setTimeout(() => {
-                            resultsSection.scrollIntoView({
+                            explanationSection.scrollIntoView({
                                 behavior: 'smooth',
                                 block: 'start'
                             });
