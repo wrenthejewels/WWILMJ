@@ -1374,12 +1374,11 @@
         }
 
         .hero p, .hero-section p, .article-hero p {
-            font-size: var(--text-lg);
+            font-size: 1rem;
             color: var(--text-secondary);
             max-width: 540px;
-            margin: 0 auto;
-            margin-top: 16px;
-            line-height: 1.6;
+            margin: 6px auto 0;
+            line-height: 1.55;
         }
 
         .lede {
@@ -1445,10 +1444,11 @@
         }
 
         .centered-header .header-inner {
-            justify-content: center;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            gap: 16px;
+            text-align: left;
         }
 
         .header-inner {
@@ -1472,6 +1472,11 @@
             gap: 4px;
         }
 
+        .centered-header .header-brand {
+            flex: 1;
+            align-items: flex-start;
+        }
+
         .brand-name, .publication-title {
             font-size: 1.2rem;
             font-weight: 700;
@@ -1492,9 +1497,13 @@
             gap: var(--space-2);
         }
 
+        .centered-header .nav {
+            margin-left: auto;
+        }
+
         .nav-link {
-            padding: var(--space-3) var(--space-5);
-            font-size: var(--text-base);
+            padding: 14px 30px;
+            font-size: 1.05rem;
             font-weight: 500;
             color: var(--text-secondary);
             border-radius: var(--radius-full);
@@ -1608,8 +1617,11 @@
 
         /* Centered header styling */
         .centered-header .header-inner {
-            justify-content: center;
-            text-align: center;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            text-align: left;
         }
 
         .centered-brand {
@@ -2596,8 +2608,19 @@
         @media (max-width: 640px) {
             .header-inner {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center;
                 gap: 16px;
+                text-align: center;
+            }
+
+            .centered-header .header-brand {
+                align-items: center;
+            }
+
+            .centered-header .nav {
+                margin-left: 0;
+                justify-content: center;
+                width: 100%;
             }
 
             .header-actions {
@@ -2644,8 +2667,8 @@
             }
 
             .nav-link {
-                padding: 10px 16px;
-                font-size: 0.9rem;
+                padding: 12px 18px;
+                font-size: 0.95rem;
             }
 
             .centered-header .header-inner {
@@ -2872,7 +2895,8 @@
             }
 
             .hero p, .hero-section p {
-                font-size: 0.95rem;
+                font-size: 0.92rem;
+                margin-top: 6px;
             }
 
             .model-explanation,
