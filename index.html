@@ -1464,14 +1464,14 @@
 
         .brand, .header-brand {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
+            align-items: center;
+            gap: 6px;
+            flex-direction: row;
         }
 
         .centered-brand,
         .centered-header .header-brand {
-            align-items: flex-start;
+            align-items: center;
             flex: 1;
         }
 
@@ -1482,13 +1482,9 @@
             letter-spacing: -0.01em;
             line-height: 1;
             padding: var(--space-3) 0;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .publication-title span {
-            display: block;
+            display: inline-flex;
+            flex-direction: row;
+            gap: 0.35ch;
         }
 
         .brand-tagline, .publication-tagline {
@@ -2925,12 +2921,7 @@
     <header class="site-header centered-header">
         <div class="header-inner">
             <div class="header-brand centered-brand">
-                <span class="publication-title">
-                    <span>Don't</span>
-                    <span>Lose</span>
-                    <span>Your</span>
-                    <span>Job</span>
-                </span>
+                <span class="publication-title">Don't Lose Your Job</span>
             </div>
             <nav class="nav">
                 <a href="index.html" class="nav-link active">Model</a>
