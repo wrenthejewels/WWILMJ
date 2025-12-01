@@ -2528,7 +2528,7 @@
 
         body.chart-pinned .pinnable-section {
             position: sticky;
-            top: var(--pinnable-top, 96px);
+            top: var(--pinnable-top, 72px);
             flex: 1 1 0;
             min-width: 460px;
             max-width: none;
@@ -6661,17 +6661,19 @@
             const pinnableSection = document.getElementById('pinnable-section');
             const rightColumn = document.getElementById('results-column');
             const contentWrapper = document.querySelector('.content-wrapper');
+            let rafPending = false;
 
             const updatePinnedPosition = () => {
+                rafPending = false;
                 if (!document.body.classList.contains('chart-pinned')) return;
                 const containerRect = container.getBoundingClientRect();
                 const scrollTop = window.scrollY;
                 const containerTop = containerRect.top + scrollTop;
                 const containerBottom = containerTop + container.offsetHeight;
                 const pinnedHeight = pinnableSection.offsetHeight;
-                const viewportAnchor = scrollTop + window.innerHeight * 0.3;
-                const minTop = containerTop + 40;
-                const maxTop = Math.max(minTop, containerBottom - pinnedHeight - 40);
+                const viewportAnchor = scrollTop + window.innerHeight * 0.25;
+                const minTop = containerTop + 32;
+                const maxTop = Math.max(minTop, containerBottom - pinnedHeight - 32);
                 const desired = Math.min(Math.max(viewportAnchor, minTop), maxTop);
                 document.documentElement.style.setProperty('--pinnable-top', `${desired - containerTop}px`);
             };
@@ -6720,8 +6722,19 @@
                 });
             });
 
-            window.addEventListener('scroll', updatePinnedPosition, { passive: true });
-            window.addEventListener('resize', updatePinnedPosition);
+            window.addEventListener('scroll', () => {
+                if (!rafPending) {
+                    rafPending = true;
+                    requestAnimationFrame(updatePinnedPosition);
+                }
+            }, { passive: true });
+
+            window.addEventListener('resize', () => {
+                if (!rafPending) {
+                    rafPending = true;
+                    requestAnimationFrame(updatePinnedPosition);
+                }
+            });
 
             document.getElementById('step-open-survey')?.addEventListener('click', () => {
                 if (legacyWizard) {
