@@ -6777,11 +6777,10 @@
                     }
                     applyQuestionPreset();
 
-                    // Smooth scroll to questions section
-                    const firstCategory = document.querySelector('.category');
-                    if (firstCategory) {
+                    // Smooth scroll past questions to results/chart section
+                    if (resultsSection) {
                         setTimeout(() => {
-                            firstCategory.scrollIntoView({
+                            resultsSection.scrollIntoView({
                                 behavior: 'smooth',
                                 block: 'start'
                             });
