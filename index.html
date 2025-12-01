@@ -2527,11 +2527,28 @@
 
         body.chart-pinned .container > .pinnable-section {
             position: sticky;
-            top: 80px;
+            top: 72px;
             flex: 1;
             min-width: 500px;
             align-self: flex-start;
             flex-direction: column;
+        }
+
+        /* Ensure pinned chart stays visible on desktop */
+        @media (min-width: 960px) {
+            body.chart-pinned .container {
+                position: relative;
+            }
+
+            body.chart-pinned .container > .pinnable-section {
+                position: fixed;
+                top: 72px;
+                right: 40px;
+                width: min(440px, 36vw);
+                max-height: calc(100vh - 90px);
+                overflow: auto;
+                z-index: 30;
+            }
         }
 
         body.chart-pinned .container > .pinnable-section .chart-container {
