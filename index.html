@@ -2987,7 +2987,7 @@
                                 <option value="5">Level 5: Unique/irreplaceable (own entire function/system)</option>
                             </select>
                         </div>
-                        <div class="step-caption sequence-item" data-seq="7">Select your hierarchy level based on how many people <strong>above you</strong> could realistically do your job. This differs from total seniority: someone may outrank you but be unable to perform your core duties. If you're the sole owner of a product, system, or program, you're likely Level 4–5.</div>
+                        <div class="step-caption sequence-item" data-seq="7">Select your hierarchy level based on how many people <strong>above you</strong> could realistically do your job. This differs from total seniority: someone may outrank you but be unable to perform your core duties.</div>
                     </div>
 
                     <div class="step">
@@ -6776,6 +6776,17 @@
                         return;
                     }
                     applyQuestionPreset();
+
+                    // Smooth scroll to questions section
+                    const firstCategory = document.querySelector('.category');
+                    if (firstCategory) {
+                        setTimeout(() => {
+                            firstCategory.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }, 100);
+                    }
                 } else {
                     resetQuestionsToNeutral();
                 }
