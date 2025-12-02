@@ -1169,7 +1169,7 @@
                             <div class='bubble-item'><span class='bubble-key'>$L_i$ (gate thresholds)</span><span class='bubble-val'>5, 30, 120, 360, 720 min</span></div>
                             <div class='bubble-item'><span class='bubble-key'>$w_i$ (weights)</span><span class='bubble-val'>15%, 30%, 30%, 15%, 10%</span></div>
                             <div class='bubble-item'><span class='bubble-key'>$s$ (softness)</span><span class='bubble-val'>0.35 (range 0.20&ndash;0.55)</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>$h_{\text{AI}}$ (max hazard)</span><span class='bubble-val'>0.40/yr</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>$h_{\text{AI}}$ (max hazard)</span><span class='bubble-val'>0.45/yr</span></div>
                             <div class='bubble-item'><span class='bubble-key'>$\gamma$ (steepness)</span><span class='bubble-val'>8.0</span></div>
                             <div class='bubble-item'><span class='bubble-key'>$\theta$ (threshold)</span><span class='bubble-val'>0.50</span></div>
                             <div class='bubble-item'><span class='bubble-key'>userMult range</span><span class='bubble-val'>0.33&times; to 3.0&times;</span></div>
@@ -1179,6 +1179,10 @@
                             <div class='bubble-item'><span class='bubble-key'>$f(r)$</span><span class='bubble-val'>Reliability factor</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Task horizon</span><span class='bubble-val'>~6-7 mo doubling (computed); friction/reliability reduce</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Task buckets</span><span class='bubble-val'>&lt;10 min, 10-45 min, 45 min-3 hr, 3-8 hr, &gt;12 hr</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Hazard floor</span><span class='bubble-val'>0.03/yr minimum risk</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Domain clamp</span><span class='bubble-val'>Penalty clamped to 0.8&ndash;1.6&times;</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Compression</span><span class='bubble-val'>Readiness mix 70/30; cap gain 1.04; floor 0.15</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Residual human floor</span><span class='bubble-val'>3% minimum surviving share</span></div>
                         </div>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Friction Decay Parameter</h3>
@@ -1197,6 +1201,7 @@
                             <div class='bubble-item'><span class='bubble-key'>Q10 (Task reallocation)</span><span class='bubble-val'>-0.01 weight</span></div>
                         </div>
                         <p>This parameter controls how quickly implementation barriers diminish as AI capability grows. The model implements dynamic friction decay where implementation delay decreases exponentially: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) equals technical feasibility at the earlier time $t - \Delta(t)$. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds; lower $\lambda$ means barriers persist even as capability advances. This captures how regulatory frameworks and organizational inertia may initially delay adoption by several years, but these delays shrink as AI becomes more capable and widespread adoption creates network effects.</p>
+                        <p>Delay dynamics apply a knee and saturation shaping to $\lambda$: the knee is at 0.025, with a saturation boost of 0.6 and a capability gain factor of 0.8. These shape how quickly delays compress once capability and organizational readiness compound.</p>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
                         <p>Different roles face different automation barriers. Software engineering maps most directly to AI's training data and requires less physical presence, so it gets lower friction (1.05x). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45&ndash;1.50x). These multipliers reflect how much harder it is to automate each domain compared to software.</p>

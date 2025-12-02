@@ -4806,6 +4806,10 @@
                             <input type="number" step="0.01" data-config-path="hazardGates.hazardCap" value="${fmt(modelConfig.hazardGates.hazardCap)}">
                         </div>
                         <div class="tuning-field">
+                            <label>Hazard floor (minimum annual risk)</label>
+                            <input type="number" step="0.001" data-config-path="hazardGates.hazardFloor" value="${fmt(modelConfig.hazardGates.hazardFloor)}">
+                        </div>
+                        <div class="tuning-field">
                             <label>Doubling time (days)</label>
                             <div class="tuning-split-2" style="align-items:center;">
                                 <input type="number" min="1" step="1" data-config-path="metr.doublingDays" value="${fmt(modelConfig.metr.doublingDays)}">
@@ -4886,6 +4890,14 @@
                             <label>Delay performance sensitivity</label>
                             <input type="number" step="0.01" data-config-path="delay.performanceSensitivity" value="${fmt(modelConfig.delay.performanceSensitivity)}">
                         </div>
+                        <div class="tuning-field">
+                            <label>Delay lambda shaping (knee / saturation boost / capability gain)</label>
+                            <div class="tuning-split-3">
+                                <input type="number" step="0.001" data-config-path="delay.lambdaKnee" value="${fmt(modelConfig.delay.lambdaKnee)}">
+                                <input type="number" step="0.01" data-config-path="delay.lambdaSaturationBoost" value="${fmt(modelConfig.delay.lambdaSaturationBoost)}">
+                                <input type="number" step="0.01" data-config-path="delay.lambdaCapabilityGain" value="${fmt(modelConfig.delay.lambdaCapabilityGain)}">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="tuning-card">
@@ -4962,6 +4974,13 @@
                             <thead><tr><th>Question</th><th>Weight</th></tr></thead>
                             <tbody>${buildWeightTable(modelConfig.domainAlignmentWeights, 'domainAlignmentWeights')}</tbody>
                         </table>
+                        <div class="tuning-field" style="margin-top:12px;">
+                            <label>Domain penalty clamp (min / max)</label>
+                            <div class="tuning-split-2">
+                                <input type="number" step="0.01" data-config-path="domainPenaltyClamp.min" value="${fmt(modelConfig.domainPenaltyClamp.min)}">
+                                <input type="number" step="0.01" data-config-path="domainPenaltyClamp.max" value="${fmt(modelConfig.domainPenaltyClamp.max)}">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="tuning-card">
@@ -5002,6 +5021,10 @@
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.min" value="${fmt(modelConfig.reemploymentConfig.min)}">
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.max" value="${fmt(modelConfig.reemploymentConfig.max)}">
                             </div>
+                        </div>
+                        <div class="tuning-field">
+                            <label>Residual human floor (minimum surviving share)</label>
+                            <input type="number" step="0.001" data-config-path="residualHumanFloor" value="${fmt(modelConfig.residualHumanFloor)}">
                         </div>
                         <h5 style="margin-top:12px;">k (steepness shift) weights</h5>
                         <table class="tuning-table">
@@ -5062,6 +5085,10 @@
                                         <input type="number" step="0.01" data-config-path="compressionWeights.hierarchy.min" value="${fmt(compCfg.hierarchy.min)}">
                                         <input type="number" step="0.01" data-config-path="compressionWeights.hierarchy.max" value="${fmt(compCfg.hierarchy.max)}">
                                     </div>
+                                </div>
+                                <div class="tuning-field">
+                                    <label>Readiness floor (compression starts after)</label>
+                                    <input type="number" step="0.01" data-config-path="compressionWeights.readinessFloor" value="${fmt(compCfg.readinessFloor)}">
                                 </div>
                             </div>
                         </div>
