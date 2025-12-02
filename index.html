@@ -2586,6 +2586,25 @@
             }
         }
 
+        /* Prevent title/checkbox collision when chart is pinned and narrow */
+        body.chart-pinned .pinnable-section .chart-container .chart-header-top {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        body.chart-pinned .pinnable-section .chart-container .chart-title {
+            font-size: 1.1rem;
+            max-width: 100%;
+            padding-right: 80px;
+        }
+
+        /* Hide checkbox when pinned chart is too narrow */
+        @media (max-width: 1800px) {
+            body.chart-pinned .pin-checkbox-label {
+                display: none;
+            }
+        }
+
         .results {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2990,7 +3009,6 @@
                                 <option value="">Select role</option>
                                 <option value="software">Software/Tech</option>
                                 <option value="admin">Administrative</option>
-                                <option value="customer-service">Customer Service</option>
                                 <option value="data-analysis">Data Analysis</option>
                                 <option value="finance">Finance/Accounting</option>
                                 <option value="sales">Sales/Marketing</option>
@@ -3058,9 +3076,6 @@
                         </button>
                         <button class="preset-btn" data-role="admin">
                             Administrative
-                        </button>
-                        <button class="preset-btn" data-role="customer-service">
-                            Customer Service
                         </button>
                         <button class="preset-btn" data-role="data-analysis">
                             Data Analysis

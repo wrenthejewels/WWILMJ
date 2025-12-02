@@ -9,7 +9,6 @@
   const ROLE_PRESETS = {
     'software':              { friction: 1.05, reliabilityBase: 0.92 },
     'admin':                 { friction: 1.10, reliabilityBase: 0.90 },
-    'customer-service':      { friction: 1.15, reliabilityBase: 0.88 },
     'data-analysis':         { friction: 1.10, reliabilityBase: 0.93 },
     'finance':               { friction: 1.35, reliabilityBase: 0.97 },
     'sales':                 { friction: 1.25, reliabilityBase: 0.90 },
@@ -42,10 +41,6 @@
     'admin': {
       Q1: 3, Q2: 4, Q3: 3, Q4: 4, Q5: 4, Q6: 4, Q7: 2, Q8: 4, Q9: 2, Q10: 3,
       Q11: 2, Q12: 3, Q13: 3, Q14: 4, Q15: 3, Q16: 3, Q17: 3, Q18: 3, Q19: 3,
-    },
-    'customer-service': {
-      Q1: 3, Q2: 3, Q3: 3, Q4: 4, Q5: 3, Q6: 3, Q7: 3, Q8: 4, Q9: 3, Q10: 4,
-      Q11: 3, Q12: 3, Q13: 3, Q14: 4, Q15: 3, Q16: 3, Q17: 3, Q18: 3, Q19: 3,
     },
     'data-analysis': {
       Q1: 5, Q2: 5, Q3: 4, Q4: 5, Q5: 4, Q6: 4, Q7: 2, Q8: 4, Q9: 2, Q10: 2,
