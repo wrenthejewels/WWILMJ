@@ -4129,7 +4129,6 @@
                 min: 0.1,
                 max: 0.85
             },
-            residualHumanFloor: 0.03,
             kWeights: {
                 Q1: +0.20, Q2: +0.10, Q3: +0.10, Q4: +0.15, Q8: +0.12,
                 Q5: -0.20, Q6: -0.20, Q7: -0.20, Q9: -0.15, Q10: -0.15, Q11: -0.15
@@ -5021,10 +5020,6 @@
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.min" value="${fmt(modelConfig.reemploymentConfig.min)}">
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.max" value="${fmt(modelConfig.reemploymentConfig.max)}">
                             </div>
-                        </div>
-                        <div class="tuning-field">
-                            <label>Residual human floor (minimum surviving share)</label>
-                            <input type="number" step="0.001" data-config-path="residualHumanFloor" value="${fmt(modelConfig.residualHumanFloor)}">
                         </div>
                         <h5 style="margin-top:12px;">k (steepness shift) weights</h5>
                         <table class="tuning-table">
