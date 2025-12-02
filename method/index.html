@@ -1181,7 +1181,7 @@
                             <div class='bubble-item'><span class='bubble-key'>Task buckets</span><span class='bubble-val'>&lt;10 min, 10-45 min, 45 min-3 hr, 3-8 hr, &gt;12 hr</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Hazard floor</span><span class='bubble-val'>0.03/yr minimum risk</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Domain clamp</span><span class='bubble-val'>Penalty clamped to 0.8&ndash;1.6&times;</span></div>
-                            <div class='bubble-item'><span class='bubble-key'>Compression</span><span class='bubble-val'>Readiness mix 70/30; cap gain 1.04; floor 0.15; amp 2.0; gate θ=0.33</span></div>
+                            <div class='bubble-item'><span class='bubble-key'>Compression</span><span class='bubble-val'>Readiness mix 70/30; cap gain 1.04; floor 0.15; amp 2.0; gate θ=0.33, γ=6.0, h_max=0.45/yr</span></div>
                         </div>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Friction Decay Parameter</h3>
@@ -1283,7 +1283,7 @@
                             <span class='callout-label'>Initial delay calculation</span>
                             <div class='equation-display'>$$\Delta_0 = \operatorname{clip}\big(1.75 - 1.25\, s_{\text{delay}} + \Delta^{\text{eff}}_{\text{seniority}},\; 0.3,\; 4.0\big)$$</div>
                             <div class='equation-display'>$$\Delta^{\text{eff}}_{\text{seniority}} = \Delta_{\text{seniority}} \cdot \Big[1 + 0.5\, (\operatorname{norm}(Q19) - 0.5)\, \operatorname{sign}(\Delta_{\text{seniority}})\Big]$$</div>
-                            <p style="font-size: 0.9em; margin-top: 8px; color: #666;">$s_{\text{delay}} \in [-2,2]$ from Q13-Q16; $\Delta_{\text{seniority}} \in \{-0.25,-0.05,+0.10,+0.20,+0.30\}$ by level</p>
+                            <p style="font-size: 0.9em; margin-top: 8px; color: #666;">$s_{\text{delay}} \in [-2,2]$ from Q13-Q16; $\Delta_{\text{seniority}} \in \{-0.10,-0.03,+0.06,+0.10,+0.12\}$ by level</p>
                         </div>
 
                         <p><strong>Dynamic friction decay:</strong> The delay doesn't stay constant. As AI capability increases and adoption spreads, organizational barriers erode exponentially: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. The decay rate $\lambda$ (typically 0.02-0.05/year) is inferred from your answers about adoption readiness, infrastructure, and role characteristics. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds; lower $\lambda$ means delays persist even as capability advances.</p>
@@ -1297,11 +1297,13 @@
                         <p>The compression hazard activates earlier and at a lower threshold than full automation. It depends on three factors:</p>
 
                         <div class='equation-callout'>
-                            <span class='callout-label'>Compression hazard</span>
-                            <div class='equation-display'>$$\lambda_{\text{compression}}(t) = \frac{h_{\max,c}}{1 + \exp(-\gamma_c (R_c(t) - \theta_c))} \cdot V_{\text{hierarchy}}$$</div>
-                            <span class='callout-label'>Where compression readiness uses a hybrid formula:</span>
-                            <div class='equation-display'>$$R_c(t) = s_{\text{realloc}} \times \big(0.7 + 0.3(1 + B_{\text{amp}})\big)$$</div>
-                            <span class='callout-label'>And amplification boost is:</span>
+                            <span class='callout-label'>Compression hazard (base calculation)</span>
+                            <div class='equation-display'>$$\lambda_{\text{compression}}(t) = \frac{h_{\max,c}}{1 + \exp(-\gamma_c (R_c(t) - \theta_c))} \cdot V_{\text{hierarchy}} \cdot G_{\text{readiness}}(t)$$</div>
+                            <span class='callout-label'>Where compression readiness uses a hybrid formula with capability scaling:</span>
+                            <div class='equation-display'>$$R_c(t) = s_{\text{realloc}} \times \big(0.7 + 0.3(1 + B_{\text{amp}})\big) \times \big(1 + 1.04 \cdot A_{\text{job}}(t)\big)$$</div>
+                            <span class='callout-label'>And readiness gate prevents premature compression:</span>
+                            <div class='equation-display'>$$G_{\text{readiness}}(t) = \max\Big(0,\, \min\Big(1,\, \frac{A_{\text{job}}(t) - 0.15}{1 - 0.15}\Big)\Big)$$</div>
+                            <span class='callout-label'>Amplification boost is:</span>
                             <div class='equation-display'>$$B_{\text{amp}} = f_{\text{effective}} \cdot A_{\text{job}}(t) \cdot \text{norm}(Q1) \cdot 2.0$$</div>
                             <span class='callout-label'>Where effective digital fraction accounts for AI learnability:</span>
                             <div class='equation-display'>$$f_{\text{effective}} = \text{norm}(Q4) \times \max\big(0.1,\, 1 - 0.35\,\text{norm}(Q7) - 0.30\,\text{norm}(Q9) - 0.20\,(1{-}\text{norm}(Q5)) - 0.15\,(1{-}\text{norm}(Q6))\big)$$</div>
@@ -1309,13 +1311,17 @@
 
                         <p>The <strong>hybrid formula</strong> means compression readiness has two components: 70% comes from reallocation feasibility alone (immediate effect), and 30% grows over time as AI amplifies senior productivity. This ensures Q10 has a noticeable immediate impact while preserving the time-dependent behavior where compression risk accelerates as AI becomes more capable.</p>
 
+                        <p>The <strong>capability scaling factor</strong> $(1 + 1.04 \cdot A_{\text{job}}(t))$ further amplifies compression readiness as AI capability grows. When AI can perform none of your job ($A_{\text{job}} = 0$), the factor is 1.0 (no scaling). When AI can perform your entire job ($A_{\text{job}} = 1$), the factor reaches 2.04, meaning compression readiness roughly doubles at full capability. This captures how organizational willingness to restructure accelerates as AI proves itself capable.</p>
+
+                        <p>The <strong>readiness gate</strong> $G_{\text{readiness}}(t)$ ensures compression hazard remains at zero until AI reaches at least 15% job readiness ($A_{\text{job}} \geq 0.15$), then ramps linearly to full strength by 100% readiness. This prevents spurious compression risk predictions when AI capability is still minimal.</p>
+
                         <ol class='action-list'>
                             <li><strong>Reallocation feasibility ($s_{\text{realloc}}$):</strong> Combines Q10 (direct reallocation question: <strong>50% weight</strong>), task structure (Q5: 18%, Q6: 12%, Q7: 8% inverted), tacit knowledge (Q9: 10% inverted), and physical presence (Q12: 2% inverted). Q10 is the dominant factor since it directly measures how easily your responsibilities could be redistributed to existing team members. Higher scores mean your work can be easily absorbed by others. Range: [0, 1].</li>
                             <li><strong>Senior productivity amplification ($B_{\text{amp}}$):</strong> AI only amplifies productivity for work that is both digital <em>and</em> AI-learnable. Raw digitization (Q4) is discounted by factors that make digital work harder for AI to learn from: context dependency (Q7: 35% weight), tacit knowledge (Q9: 30% weight), low decomposability (Q5: 20% weight), and low standardization (Q6: 15% weight). A senior consultant whose deliverables are 100% digital but require extensive context, relationships, and tacit judgment gets minimal amplification. The work is digital, but AI can't learn to replicate it by observing outputs. Conversely, highly digital, standardized, decomposable work with low context enables strong amplification. The boost ranges from 0 to 2.0 (up to +200% output; up to 3&times; productivity when used in $(1 + B_{\text{amp}})$), scaled by current AI performance (Q1) and job readiness $A_{\text{job}}(t)$. This factor grows over time as AI capability increases.</li>
                             <li><strong>Hierarchy vulnerability ($V_{\text{hierarchy}}$):</strong> Your position in the workflow determines exposure. Calculated as $(6 - \text{level}) / 5$. Level 1 (many layers above) = 100% vulnerable. Level 4 = 40% vulnerable. Level 5 (top of domain, no one above can do your work) = 20% vulnerable. A principal engineer who owns a system faces minimal compression risk despite being in a "senior" role title.</li>
                         </ol>
 
-                        <p><strong>Parameters differ from full automation:</strong> The compression gate opens at $\theta_c = 0.35$ (vs. $\theta \approx 0.50$ for automation), has gentler slope ($\gamma_c = 6.0$ vs. $\gamma = 8.0$), and equal maximum hazard ($h_{\max,c} = 0.40$/year, matching automation's $h_{\max} = 0.40$/year). For vulnerable positions, AI-driven workforce compression through task reallocation poses comparable risk to direct automation. Combined with automation hazard, the total is capped at 0.60/year to reflect real-world institutional friction that prevents instant mass layoffs.</p>
+                        <p><strong>Parameters differ from full automation:</strong> The compression gate opens at $\theta_c = 0.33$ (vs. $\theta \approx 0.50$ for automation), has gentler slope ($\gamma_c = 6.0$ vs. $\gamma = 8.0$), and equal maximum hazard ($h_{\max,c} = 0.45$/year, matching automation's $h_{\max} = 0.45$/year). For vulnerable positions, AI-driven workforce compression through task reallocation poses comparable risk to direct automation. Combined with automation hazard, the total is capped at 0.60/year to reflect real-world institutional friction that prevents instant mass layoffs.</p>
 
                         <h3 style='margin: 32px 0 16px 0;'>Examples: How the mechanisms interact</h3>
 

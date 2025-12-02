@@ -6231,7 +6231,7 @@
             const compressionReadiness = reallocationScore * (compCfg.readinessMix.immediate + compCfg.readinessMix.capability * (1.0 + amplificationBoost)) * capabilityScale;
 
             // 4. Compression Hazard Gate (lower threshold than automation)
-            const h_max_compression = compCfg.gate.hMax;  // Equal to automation's 0.40 - AI-driven compression is equally serious
+            const h_max_compression = compCfg.gate.hMax;  // Equal to automation's 0.45 - AI-driven compression is equally serious
             const gamma_compression = compCfg.gate.gamma;   // Gentler slope than automation's 8.0
             const theta_compression = compCfg.gate.theta;  // Lower threshold than automation's ~0.50
 
@@ -6243,7 +6243,7 @@
             const hierarchyVuln = clamp((6 - seniorityLevel) / 5, compCfg.hierarchy.min, compCfg.hierarchy.max);
 
             // 6. Gate compression by actual AI readiness so it ramps as capability grows
-            const readinessFloor = compCfg.readinessFloor || 0.2;
+            const readinessFloor = compCfg.readinessFloor || 0.15;
             const readinessGate = clamp((A_current - readinessFloor) / (1 - readinessFloor), 0, 1); // zero until floor readiness, full by ~100%
             const finalCompressionHazard = baseCompressionHazard * hierarchyVuln * readinessGate;
 
