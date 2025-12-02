@@ -5045,6 +5045,10 @@
                                     </div>
                                 </div>
                                 <div class="tuning-field">
+                                    <label>Capability gain multiplier</label>
+                                    <input type="number" step="0.01" data-config-path="compressionWeights.capabilityGain" value="${fmt(compCfg.capabilityGain)}">
+                                </div>
+                                <div class="tuning-field">
                                     <label>Compression gate (hmax / gamma / theta)</label>
                                     <div class="tuning-split-3">
                                         <input type="number" step="0.01" data-config-path="compressionWeights.gate.hMax" value="${fmt(compCfg.gate.hMax)}">
