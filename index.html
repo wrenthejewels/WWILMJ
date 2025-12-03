@@ -960,6 +960,56 @@
         #reemployment-card {
             grid-column: span 2;
         }
+
+        #reemployment-card .bubble-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #reemployment-card .bubble-cta:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        #reemployment-card .bubble-cta .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #5df2c1;
+            display: inline-block;
+        }
+
+        #reemployment-card .result-value {
+            display: none;
+        }
+
+        #reemployment-card .reemployment-info {
+            display: none;
+            text-align: left;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #e8eefc;
+            line-height: 1.5;
+        }
+
+        #reemployment-card .reemployment-info p {
+            margin: 8px 0;
+        }
+
+        #reemployment-card.revealed .result-value,
+        #reemployment-card.revealed .reemployment-info {
+            display: block;
+        }
         
         .result-card.critical {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
@@ -3810,8 +3860,20 @@
                         <div class="result-value" id="risk-2031">-</div>
                     </div>
                     <div class="result-card" id="reemployment-card">
-                        <h4>Re-employment Likelihood</h4>
+                        <div class="result-card-header" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <h4 style="margin:0;">Re-employment Likelihood</h4>
+                            <button type="button" class="bubble-cta" id="reemployment-cta">
+                                <span class="dot"></span>
+                                <span>Examine re-employment likelihood</span>
+                            </button>
+                        </div>
                         <div class="result-value" id="reemployment-value">-</div>
+                        <div class="reemployment-info" id="reemployment-info">
+                            <p class="reemployment-blurb" data-variant="a"></p>
+                            <p class="reemployment-blurb" data-variant="b"></p>
+                            <p class="reemployment-blurb" data-variant="c"></p>
+                            <p style="margin-top:10px; opacity:0.9;">For the full breakdown, see the Methodology page.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3962,6 +4024,13 @@
         let selectedRole = null;
         let currentParams = null;
         let chart = null;
+        let reemploymentRevealed = false;
+
+        const REEMPLOYMENT_BLURBS = [
+            'This probability blends your transferable skills, learning speed, task granularity, labor market tightness, and where displacement hits on the technical feasibility (blue) curve. Later displacement means fewer safe harbors. See Methodology for the math.',
+            'We score re-employment from your adaptability answers, how chunkable/explicit your tasks are, how tight the labor market is, and how far along the blue curve the world is when you\'re displaced. It is noisier than the main timeline metrics—check Methodology for details.',
+            'Your odds combine adaptability (Q17–Q19), task granularity (Q5/6/8), labor tightness (Q15), and a penalty that grows as the blue curve advances. This is harder to model than the core hazard curves; Methodology explains the assumptions.'
+        ];
 
         const domainPaceSliderBaseline = 1.0;
 
@@ -6632,19 +6701,25 @@
                 `${(Math.max(0, risk2031) * 100).toFixed(1)}%`;
 
             // Re-employment likelihood (calculated here with median displacement timing)
-            const reemployProb = calculateReemploymentProbability(
-                currentParams.answers,
-                currentParams.seniority,
-                medianActual
-            );
-            const reemployPct = (reemployProb * 100).toFixed(0);
-            let reemployLabel = 'Moderate';
-            if (reemployProb >= 0.7) reemployLabel = 'Good';
-            else if (reemployProb >= 0.5) reemployLabel = 'Moderate';
-            else if (reemployProb >= 0.3) reemployLabel = 'Low';
-            else reemployLabel = 'Very Low';
-            document.getElementById('reemployment-value').textContent =
-                `${reemployLabel} (${reemployPct}%)`;
+            const reemploymentValueEl = document.getElementById('reemployment-value');
+            if (!reemploymentRevealed) {
+                if (reemploymentValueEl) reemploymentValueEl.textContent = 'Hidden until opened';
+            } else {
+                const reemployProb = calculateReemploymentProbability(
+                    currentParams.answers,
+                    currentParams.seniority,
+                    medianActual
+                );
+                const reemployPct = (reemployProb * 100).toFixed(0);
+                let reemployLabel = 'Moderate';
+                if (reemployProb >= 0.7) reemployLabel = 'Good';
+                else if (reemployProb >= 0.5) reemployLabel = 'Moderate';
+                else if (reemployProb >= 0.3) reemployLabel = 'Low';
+                else reemployLabel = 'Very Low';
+                if (reemploymentValueEl) {
+                    reemploymentValueEl.textContent = `${reemployLabel} (${reemployPct}%)`;
+                }
+            }
 
             document.getElementById('insight-explicitness').textContent = describeExplicitness(currentParams.s_e);
             document.getElementById('insight-theta').textContent = describeTheta(currentParams.theta, currentParams.seniority);
@@ -6690,6 +6765,38 @@
             const resultsSection = document.getElementById('results-column');
             const explanationSection = document.getElementById('model-explanation-section');
             const legacyWizard = document.querySelector('.legacy-wizard');
+            const reemploymentCard = document.getElementById('reemployment-card');
+            const reemploymentCTA = document.getElementById('reemployment-cta');
+            const reemploymentInfo = document.getElementById('reemployment-info');
+            const reemploymentValue = document.getElementById('reemployment-value');
+            const reemploymentBlurbs = Array.from(document.querySelectorAll('.reemployment-blurb'));
+
+            // Seed blurb variants
+            reemploymentBlurbs.forEach((el, idx) => {
+                el.textContent = REEMPLOYMENT_BLURBS[idx] || '';
+            });
+
+            function setReemploymentReveal(state) {
+                reemploymentRevealed = !!state;
+                if (reemploymentCard) {
+                    reemploymentCard.classList.toggle('revealed', reemploymentRevealed);
+                }
+                if (reemploymentCTA) {
+                    reemploymentCTA.innerHTML = reemploymentRevealed
+                        ? '<span class="dot"></span><span>Hide re-employment likelihood</span>'
+                        : '<span class="dot"></span><span>Examine re-employment likelihood</span>';
+                }
+                if (!reemploymentRevealed && reemploymentValue) {
+                    reemploymentValue.textContent = 'Hidden until opened';
+                }
+            }
+            setReemploymentReveal(false);
+
+            reemploymentCTA?.addEventListener('click', () => {
+                setReemploymentReveal(!reemploymentRevealed);
+                updateResults();
+            });
+
             const sequenceItems = Array.from(document.querySelectorAll('.sequence-item'))
                 .sort((a, b) => (parseInt(a.dataset.seq || '0') || 0) - (parseInt(b.dataset.seq || '0') || 0));
 
