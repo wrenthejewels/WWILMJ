@@ -4124,8 +4124,10 @@
             reemploymentConfig: {
                 base: 0.6,
                 scale: 0.2,
-                timingPenalties: { fast: 0.30, medium: 0.15, slow: 0.05 },
-                timingThresholds: { fast: 3, medium: 7, slow: 12 },
+                granularityWeights: { Q5: 0.35, Q6: 0.35, Q8: 0.30 },
+                granularityScale: 0.12,
+                laborScale: 0.05,
+                timeline: { floor: 0.2, exponent: 1.3, maxPenalty: 0.55 },
                 min: 0.1,
                 max: 0.85
             },
@@ -4735,6 +4737,7 @@
 
             const implementationRows = buildWeightTable(modelConfig.implementationWeights, 'implementationWeights');
             const reemploymentRows = buildWeightTable(modelConfig.reemploymentWeights, 'reemploymentWeights');
+            const reemploymentGranRows = buildWeightTable(modelConfig.reemploymentConfig.granularityWeights, 'reemploymentConfig.granularityWeights');
             const kRows = buildWeightTable(modelConfig.kWeights, 'kWeights');
 
             const compCfg = modelConfig.compressionWeights;
@@ -4988,22 +4991,6 @@
                             <thead><tr><th>Question</th><th>Weight</th></tr></thead>
                             <tbody>${implementationRows}</tbody>
                         </table>
-                        <div class="tuning-field" style="margin-top:8px;">
-                            <label>Re-employment timing penalties (fast / medium / slow)</label>
-                            <div class="tuning-split-3">
-                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timingPenalties.fast" value="${fmt(modelConfig.reemploymentConfig.timingPenalties.fast)}">
-                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timingPenalties.medium" value="${fmt(modelConfig.reemploymentConfig.timingPenalties.medium)}">
-                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timingPenalties.slow" value="${fmt(modelConfig.reemploymentConfig.timingPenalties.slow)}">
-                            </div>
-                        </div>
-                        <div class="tuning-field" style="margin-top:8px;">
-                            <label>Timing thresholds (years)</label>
-                            <div class="tuning-split-3">
-                                <input type="number" step="0.1" data-config-path="reemploymentConfig.timingThresholds.fast" value="${fmt(modelConfig.reemploymentConfig.timingThresholds.fast)}">
-                                <input type="number" step="0.1" data-config-path="reemploymentConfig.timingThresholds.medium" value="${fmt(modelConfig.reemploymentConfig.timingThresholds.medium)}">
-                                <input type="number" step="0.1" data-config-path="reemploymentConfig.timingThresholds.slow" value="${fmt(modelConfig.reemploymentConfig.timingThresholds.slow)}">
-                            </div>
-                        </div>
                     </div>
 
                     <div class="tuning-card">
@@ -5012,13 +4999,33 @@
                             <thead><tr><th>Re-employment question</th><th>Weight</th></tr></thead>
                             <tbody>${reemploymentRows}</tbody>
                         </table>
+                        <h5 style="margin-top:12px;">Granularity weights (task chunking / explicitness)</h5>
+                        <table class="tuning-table">
+                            <thead><tr><th>Question</th><th>Weight</th></tr></thead>
+                            <tbody>${reemploymentGranRows}</tbody>
+                        </table>
                         <div class="tuning-field" style="margin-top:8px;">
-                            <label>Re-employment base / scale / bounds</label>
+                            <label>Re-employment base / adaptability scale / bounds</label>
                             <div class="tuning-split-4">
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.base" value="${fmt(modelConfig.reemploymentConfig.base)}">
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.scale" value="${fmt(modelConfig.reemploymentConfig.scale)}">
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.min" value="${fmt(modelConfig.reemploymentConfig.min)}">
                                 <input type="number" step="0.01" data-config-path="reemploymentConfig.max" value="${fmt(modelConfig.reemploymentConfig.max)}">
+                            </div>
+                        </div>
+                        <div class="tuning-field" style="margin-top:8px;">
+                            <label>Granularity / labor multipliers</label>
+                            <div class="tuning-split-2">
+                                <input type="number" step="0.01" data-config-path="reemploymentConfig.granularityScale" value="${fmt(modelConfig.reemploymentConfig.granularityScale)}">
+                                <input type="number" step="0.01" data-config-path="reemploymentConfig.laborScale" value="${fmt(modelConfig.reemploymentConfig.laborScale)}">
+                            </div>
+                        </div>
+                        <div class="tuning-field" style="margin-top:8px;">
+                            <label>Timeline penalty (blue-curve floor / exponent / max)</label>
+                            <div class="tuning-split-3">
+                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timeline.floor" value="${fmt(modelConfig.reemploymentConfig.timeline.floor)}">
+                                <input type="number" step="0.1" data-config-path="reemploymentConfig.timeline.exponent" value="${fmt(modelConfig.reemploymentConfig.timeline.exponent)}">
+                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timeline.maxPenalty" value="${fmt(modelConfig.reemploymentConfig.timeline.maxPenalty)}">
                             </div>
                         </div>
                         <h5 style="margin-top:12px;">k (steepness shift) weights</h5>
@@ -5856,30 +5863,54 @@
         }
 
         // Calculate re-employment probability (0-1 scale)
-        // Dependent on technical feasibility timing and seniority
-        function calculateReemploymentProbability(answers, seniority, medianTechYears) {
-            let reemployScore = 0;
+        // Dependent on adaptability, task granularity, labor market, and where displacement lands on the blue curve
+        function calculateReemploymentProbability(answers, seniority, medianActualYears) {
+            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+            const reCfg = modelConfig.reemploymentConfig;
+
+            // Adaptability core (Q17-19)
+            let adaptScore = 0;
             for (const [qid, weight] of Object.entries(modelConfig.reemploymentWeights)) {
                 if (!isQuestionEnabled(qid)) continue;
                 const raw = getAnswerValue(answers, qid);
                 const x = codeAnswer(qid, raw);
-                reemployScore += weight * x;
+                adaptScore += weight * x;
             }
-            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-            reemployScore = clamp(reemployScore, -2.0, +2.0);
+            adaptScore = clamp(adaptScore, -2.0, +2.0);
 
-            // Base probability from adaptability factors
-            const reCfg = modelConfig.reemploymentConfig;
-            let probability = reCfg.base + (reemployScore * reCfg.scale);
+            // Task granularity / explicitness (Q5, Q6, Q8)
+            let granScore = 0;
+            if (reCfg.granularityWeights) {
+                for (const [qid, weight] of Object.entries(reCfg.granularityWeights)) {
+                    if (!isQuestionEnabled(qid)) continue;
+                    const raw = getAnswerValue(answers, qid);
+                    const x = codeAnswer(qid, raw);
+                    granScore += (weight || 0) * x;
+                }
+            }
+            granScore = clamp(granScore, -2.0, +2.0);
 
-            // Penalize based on how soon automation happens (sooner = harder to find work)
-            // If median is <fast: -fastPenalty, <medium: -mediumPenalty, <slow: -slowPenalty
-            let timingPenalty = 0;
-            if (medianTechYears < reCfg.timingThresholds.fast) timingPenalty = reCfg.timingPenalties.fast;
-            else if (medianTechYears < reCfg.timingThresholds.medium) timingPenalty = reCfg.timingPenalties.medium;
-            else if (medianTechYears < reCfg.timingThresholds.slow) timingPenalty = reCfg.timingPenalties.slow;
-            probability -= timingPenalty;
+            // Labor market tightness (Q15)
+            const laborScale = reCfg.laborScale || 0;
+            const laborSignal = codeAnswer('Q15', getAnswerValue(answers, 'Q15')) / 2; // normalize to [-1, 1]
 
+            // Base probability from adaptability + granularity
+            let probability = reCfg.base +
+                (adaptScore * reCfg.scale) +
+                (granScore * (reCfg.granularityScale || 0));
+
+            // Timeline penalty: later on the blue curve = fewer safe harbors
+            const tl = reCfg.timeline || {};
+            const floor = (typeof tl.floor === 'number') ? tl.floor : 0;
+            const exponent = (typeof tl.exponent === 'number') ? tl.exponent : 1;
+            const maxPenalty = (typeof tl.maxPenalty === 'number') ? tl.maxPenalty : 0;
+            const blueLevel = clamp(calculateDisplacementProbability(Math.max(0, medianActualYears || 0)), 0, 1);
+            const norm = clamp((blueLevel - floor) / Math.max(1e-6, 1 - floor), 0, 1);
+            const timelinePenalty = maxPenalty * Math.pow(norm, exponent);
+            probability -= timelinePenalty;
+
+            // Labor market multiplier and seniority boost
+            probability *= (1 + laborScale * laborSignal);
             const seniorityProfile = SENIORITY_PROFILES[seniority - 1] || SENIORITY_PROFILES[0];
             probability *= seniorityProfile.reemploymentBoost;
 
@@ -6600,11 +6631,11 @@
             document.getElementById('risk-2031').textContent =
                 `${(Math.max(0, risk2031) * 100).toFixed(1)}%`;
 
-            // Re-employment likelihood (calculated here with medianTech timing)
+            // Re-employment likelihood (calculated here with median displacement timing)
             const reemployProb = calculateReemploymentProbability(
                 currentParams.answers,
                 currentParams.seniority,
-                medianTech
+                medianActual
             );
             const reemployPct = (reemployProb * 100).toFixed(0);
             let reemployLabel = 'Moderate';

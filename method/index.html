@@ -1345,9 +1345,14 @@
 
                         <h3 style='margin: 32px 0 16px 0;'>Re-employment probability</h3>
 
-                        <p>Re-employment odds start at a 60% baseline and adjust based on transferable skills, learning speed, and job performance (0.2 per weighted point). The model subtracts a timing penalty if displacement occurs soon (market saturation makes finding work harder) and applies a hierarchy boost (+0% to +10%). The result clamps between 10% and 85%. No one is guaranteed, but no one is written off.</p>
-
-                        <p><strong>Timing penalty (graduated scale):</strong> If the median technical feasibility hazard occurs within a shorter timeframe, re-employment becomes more difficult due to market saturation. The penalty is a probability reduction applied as follows: median &lt; 3 years: $-0.30$; 3-7 years: $-0.15$; 7-12 years: $-0.05$; &gt;12 years: $0$ (no penalty). This reflects the difficulty of finding alternative employment when many similar roles are being automated simultaneously.</p>
+                        <p>Re-employment starts at a 60% baseline and blends four forces:</p>
+                        <ul class='detail-list'>
+                            <li><strong>Adaptability core (Q17, Q18, Q19):</strong> Transferability, learning speed, and performance move odds up or down (0.2 per weighted point, clamped to avoid runaway extremes).</li>
+                            <li><strong>Task granularity (Q5, Q6, Q8):</strong> Finer, more explicit, more varied tasks are easier to recombine into new roles, adding up to ~12 percentage points at the defaults; coarse/tacit work subtracts.</li>
+                            <li><strong>Labor tightness (Q15):</strong> A modest multiplier (±5% at defaults) reflecting how forgiving the market is.</li>
+                            <li><strong>Timeline penalty (blue-curve position):</strong> The farther along technical feasibility is when displacement happens, the fewer safe harbors remain. Penalty scales smoothly with the blue curve at your median displacement year: $\text{penalty} = p_{\max}\left(\dfrac{\max(0, p_{\text{blue}} - f)}{1 - f}\right)^{\alpha}$ with defaults $p_{\max}=0.55$, floor $f=0.20$, exponent $\alpha=1.3$.</li>
+                        </ul>
+                        <p>Seniority applies a small boost, and results clamp between 10% and 85%. No one is guaranteed, but no one is written off.</p>
 
                         <div class='insight-callout'>
                             <p><strong>Protection mechanisms (user-actionable):</strong></p>
