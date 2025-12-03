@@ -916,9 +916,9 @@
 
                             </a>
 
-                            <p>METR measures how long frontier AI agents can work autonomously before their success rate degrades. Since 2019, this task horizon has doubled roughly every seven months, providing a grounded baseline that replaces guesswork about capability curves.</p>
+                            <p>METR measures how long frontier AI agents can work autonomously before they start failing. Since 2019, this task horizon has doubled roughly every seven months, and we can extrapolate future capability trends given this curve.</p>
 
-                            <p>On each page load, the calculator pulls the full METR benchmark dataset and identifies the latest state-of-the-art model (currently GPT-5.1-Codex-Max, November 2025) as the capability baseline. It <strong>computes the doubling time dynamically</strong> via linear regression across all historical SOTA models, so the trend reflects actual measured progress rather than a hardcoded assumption. Your current date serves as the projection starting point.</p>
+                            <p>On each page load, the calculator pulls the full METR benchmark dataset and identifies the latest state-of-the-art model (currently GPT-5.1-Codex-Max, November 2025) as the capability baseline. It <strong>calculates the doubling time automatically</strong> via linear regression across all historical SOTA models, so the trend reflects actual measured progress rather than a hardcoded assumption. Your current date serves as the projection starting point.</p>
 
                             <p>For example, GPT-5.1-Codex-Max shows a 50th percentile task horizon of ~162 minutes and an 80% success horizon of ~31 minutes. We fit a logistic success curve through these measurements, and at the default 95% reliability requirement, the effective horizon contracts significantly to about 33&times; shorter than the median, or ~235&times; shorter at 99% reliability.</p>
 
@@ -926,7 +926,7 @@
 
                                 <li><strong>Doubling trend:</strong> Computed dynamically from METR data via linear regression (typically ~6-7 months). The calculator fits log<sub>2</sub>(p50) against time across all SOTA models to derive the current doubling rate.</li>
 
-                                <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. Technical capability requires a high bar to outperform human error, though you can adjust this threshold in the calculator.</li>
+                                <li><strong>Reliability gate:</strong> We require 95% success before automation kicks in. AI needs to be reliable enough to beat human error rates, though you can adjust this threshold in the calculator.</li>
 
                                 <li><strong>Task mapping:</strong> Your job gets decomposed into five task duration buckets: [5, 30, 120, 360, 720] minutes (roughly &lt;10 min, 10-45 min, 45 min-3 hr, 3-8 hr, and &gt;12 hr tasks). These thresholds are calibrated for corporate production work. Once AI can reliably complete enough of these categories, the hazard channel opens.</li>
 
@@ -951,7 +951,7 @@
                     </section>
                     <section>
                         <h2>What the calculator actually simulates</h2>
-                        <p>The calculator models job displacement as a survival problem with multiple compounding hazard channels. While a complete model would include macroeconomic forces, firm performance, layoffs, and other non-AI risks, this calculator focuses solely on AI-related hazards at the role, personal, and firm levels. The output represents one component of your total displacement risk, not the whole picture.</p>
+                        <p>The calculator models job displacement as a survival problem with several risk factors that stack together. While a complete model would include macroeconomic forces, firm performance, layoffs, and other non-AI risks, this calculator focuses solely on AI-related hazards at the role, personal, and firm levels. The output represents one component of your total displacement risk, not the whole picture.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Survival relationship</span>
                             <div class='equation-display'>$$P_{\text{loss}}(t) = 1 - \exp\left(-\int_0^t \lambda_{\text{total}}(s)\, ds\right)$$</div>
@@ -1185,7 +1185,7 @@
                         </div>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Friction Decay Parameter</h3>
-                        <p>The model tracks how quickly organizational barriers erode over time using a decay rate (&lambda;). This parameter is calculated from your questionnaire responses about company adoption readiness, infrastructure, labor market dynamics, and role characteristics:</p>
+                        <p>The model tracks how quickly organizational barriers weaken over time using a decay rate (&lambda;). This parameter is calculated from your questionnaire responses about company adoption readiness, infrastructure, labor market dynamics, and role characteristics:</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>Friction decay rate</span>
                             <div class='equation-display'>$$\lambda = 0.02 + 0.01 \times (n_{12} - 0.5) + 0.01 \times (n_{15} - 0.5) + 0.005 \times (n_{13} - 0.5) + 0.005 \times (n_{14} - 0.5) - 0.01 \times (n_{11} - 0.5) - 0.01 \times (n_{10} - 0.5)$$</div>
@@ -1199,17 +1199,17 @@
                             <div class='bubble-item'><span class='bubble-key'>Q11 (Human judgment)</span><span class='bubble-val'>-0.01 weight</span></div>
                             <div class='bubble-item'><span class='bubble-key'>Q10 (Task reallocation)</span><span class='bubble-val'>-0.01 weight</span></div>
                         </div>
-                        <p>This parameter controls how quickly implementation barriers diminish as AI capability grows. The model implements dynamic friction decay where implementation delay decreases exponentially: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) equals technical feasibility at the earlier time $t - \Delta(t)$. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds, while lower $\lambda$ means barriers persist even as capability advances. This captures how regulatory frameworks and organizational inertia may initially delay adoption by several years, though these delays shrink as AI becomes more capable and widespread adoption creates network effects.</p>
-                        <p>Delay dynamics apply a knee and saturation shaping to $\lambda$: the knee is at 0.025, with a saturation boost of 0.6 and a capability gain factor of 0.8. These shape how quickly delays compress once capability and organizational readiness compound.</p>
+                        <p>This parameter controls how quickly implementation barriers shrink as AI capability grows. The model implements dynamic friction decay where implementation delay decreases exponentially: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. At time $t$, the green curve (actual job loss) equals technical feasibility at the earlier time $t - \Delta(t)$. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds, while lower $\lambda$ means barriers persist even as capability advances. This captures how regulatory frameworks and organizational inertia may initially delay adoption by several years, though these delays shrink as AI improves and more companies adopt it.</p>
+                        <p>The decay curve has a knee point at 0.025 (where delays start collapsing faster), with a saturation boost of 0.6 and capability gain factor of 0.8. These shape how quickly delays compress once capability and organizational readiness combine.</p>
 
                         <h3 style='color: #2a5298; margin: 26px 0 12px 0; font-size: 1.05em;'>Role Presets</h3>
                         <p>Different roles face different automation barriers. Software engineering maps most directly to AI's training data and requires less physical presence, so it gets lower friction (1.05x). Legal work and traditional engineering involve more tacit knowledge, regulatory constraints, and liability concerns, earning higher friction multipliers (1.45&ndash;1.50x). These multipliers reflect how much harder it is to automate each domain compared to software.</p>
-                        <p><strong>Two-layer friction system:</strong> The model applies friction at two layers: industry and role. The industry slider affects all roles in a sector (for example, finance's 1.35× multiplier applies to analysts, controllers, and auditors alike), while your questionnaire responses add role-specific friction based on tacit knowledge, physical presence, and context dependencies. Both layers multiply together, meaning a high-context legal role in a regulated industry faces compounded barriers.</p>
+                        <p><strong>Two-layer friction system:</strong> The model applies friction at two layers: industry and role. The industry slider affects all roles in a sector (for example, finance's 1.35× multiplier applies to analysts, controllers, and auditors alike), while your questionnaire responses add role-specific friction based on tacit knowledge, physical presence, and context dependencies. Both layers multiply together, so a high-context legal role in a regulated industry faces stacked barriers.</p>
                         <ul class='detail-list'>
                             <li><strong>Domain friction (preset baseline):</strong> Role presets set an initial friction multiplier (software ~1.05x, admin/data ~1.10x, finance/consulting ~1.35x, legal ~1.45x, engineering ~1.50x) before individual job characteristics are considered.</li>
                             <li><strong>Recommended reliability:</strong> Presets suggest a reliability starting point per role based on typical error tolerance and stakes (finance/legal 97&ndash;98%, software/data 92&ndash;93%, creative/customer service 88&ndash;90%). Seniority adjusts these baselines: entry-level roles tolerate slightly lower reliability (&minus;0.05), while executive decisions demand higher confidence (+0.05). Higher reliability requirements significantly reduce effective task horizon. You can override both friction and reliability in the UI to test different scenarios.</li>
                         </ul>
-                        <p>Beyond the preset baseline, the calculator derives a role-specific <em>domain alignment</em> penalty from your answers. Digitized, decomposable, and standardized work (Q4/Q5/Q6 high) reduces the penalty, while context dependence, tacit knowledge, judgment/relationship load, and physical presence (Q7/Q9/Q11/Q12 high) increase it. The model forms a signed weighted sum and maps it to a penalty multiplier via an exponential, clamped to a reasonable range. This penalty then multiplies with the sector slider, so domain misalignment compounds friction.</p>
+                        <p>Beyond the preset baseline, the calculator derives a role-specific <em>domain alignment</em> penalty from your answers. Digitized, decomposable, and standardized work (Q4/Q5/Q6 high) reduces the penalty, while context dependence, tacit knowledge, judgment/relationship load, and physical presence (Q7/Q9/Q11/Q12 high) increase it. The model forms a signed weighted sum and maps it to a penalty multiplier via an exponential, clamped to a reasonable range. This penalty multiplies with the sector slider, so domain misalignment adds to friction.</p>
                         <div class='equation-callout'>
                             <span class='callout-label'>AI hazard core</span>
                             <div class='equation-display'>$$\lambda_{\text{AI}}(s) = \frac{h_{\max}}{1 + \exp\!\big(-\gamma (A_{\text{job}}(s) - \theta)\big)} \cdot M_{\text{user}}(s)$$</div>
@@ -1249,7 +1249,7 @@
                         </ul>
                         <p><strong>How role clarity affects the threshold:</strong> Questions Q1, Q2, Q3, Q4, Q5, Q6, and Q8 (positive factors) are averaged together, while Q7 and Q9 (context dependency and tacit knowledge, the protective factors) are averaged separately. The formula $s_e = 0.65 \times \text{norm}(s_{\text{pos}}) - 0.35 \times \text{norm}(s_{\text{neg}}) + 0.10$ produces a score between 0 and 1. Higher scores (more explicit roles) reduce $\theta$ via the shift $\Delta_{s_e} = 0.10 \times (0.5 - s_e)$, meaning AI needs less total job coverage before automation becomes economically viable.</p>
 
-                        <p>The model also adjusts the gate steepness $\gamma$ based on task characteristics. Structured work, fast feedback, and standardized tasks sharpen the S-curve; messy, collaborative, or bespoke work flattens it. This captures whether adoption snaps into place once the threshold is crossed or grinds along for years.</p>
+                        <p>The model also adjusts how sharply the hazard ramps up ($\gamma$) based on task characteristics. Structured work, fast feedback, and standardized tasks make the transition sudden; messy, collaborative, or custom work makes it gradual. This affects whether adoption happens quickly once the threshold is crossed or drags out over years.</p>
                     </section>
 
                     <section>
@@ -1286,7 +1286,7 @@
                             <p style="font-size: 0.9em; margin-top: 8px; color: #666;">$s_{\text{delay}} \in [-2,2]$ from Q13-Q16; $\Delta_{\text{seniority}} \in \{-0.10,-0.03,+0.06,+0.10,+0.12\}$ by level</p>
                         </div>
 
-                        <p><strong>Dynamic friction decay:</strong> The delay doesn't stay constant. As AI capability increases and adoption spreads, organizational barriers erode exponentially: $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. The decay rate $\lambda$ (typically 0.02 to 0.05 per year) is inferred from your answers about adoption readiness, infrastructure, and role characteristics. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds, while lower $\lambda$ means barriers persist even as capability advances.</p>
+                        <p><strong>Dynamic friction decay:</strong> The delay doesn't stay constant. As AI capability increases and adoption spreads, organizational barriers shrink over time (exponentially): $\Delta(t) = \Delta_0 \cdot e^{-\lambda t}$. The decay rate $\lambda$ (typically 0.02 to 0.05 per year) is inferred from your answers about adoption readiness, infrastructure, and role characteristics. Higher $\lambda$ means barriers collapse faster once AI crosses initial thresholds, while lower $\lambda$ means barriers persist even as capability advances.</p>
 
                         <p><strong>Example delays:</strong> An early-adopting entry-level role starts with a 0.3-year delay. A defensive environment with senior leadership starts with a 4.0-year delay. Performance (Q19) adjusts these: high performers get extended delays; low performers face shortened timelines.</p>
 
@@ -1334,13 +1334,13 @@
                         <div class='insight-callout'>
                             <p><strong>Protected: Senior consultant with high context needs</strong></p>
                             <p>Jordan advises executives on organizational transformation. The deliverables are digital (slides, memos, financial models), but the work runs on tacit knowledge and context. Jordan's recommendations come from pattern recognition across years and industries, reading client politics, and knowing what's unsaid in stakeholder conversations. Each project is different and needs a custom approach.</p>
-                            <p>AI can draft sections and crunch numbers, but it can't replicate judgment built from years of pattern recognition or the relationship intelligence Jordan brings to each engagement. The work is digital but not learnable from outputs alone. Jordan sits at Level 4 with few people above capable of doing this work, and the tasks don't transfer easily. Compression risk is nearly zero. The real threat is full automation much later, when AI develops genuine strategic reasoning. That's a longer horizon than Alex faces.</p>
+                            <p>AI can draft sections and crunch numbers, but it can't replicate judgment built from years of pattern recognition or the relationship intelligence Jordan brings to each engagement. The work is digital but not learnable from outputs alone. Jordan sits at Level 4 with few people above capable of doing this work, and the tasks don't transfer easily. Compression risk is nearly zero. The bigger risk is full automation later, when AI can actually do strategic reasoning—but that's further out than Alex's timeline.</p>
                         </div>
 
                         <div class='insight-callout'>
                             <p><strong>Moderate risk: Entry-level accountant</strong></p>
                             <p>Sam processes invoices, reconciles statements, and prepares journal entries at a mid-sized company. The work is mostly digital and somewhat structured, but it isn't fully automated because it needs judgment: matching vendor names that don't quite line up, deciding when to escalate a discrepancy, knowing company-specific account codes. There's context about how the business runs and some unwritten rules about when to bend process.</p>
-                            <p>Sam is at Level 1 with senior accountants and controllers above. As AI improves, those seniors handle more volume. AI helps them process invoices and catch errors faster, so they need less junior support. Sam's work has more context and judgment than Alex's tickets, which slows compression. But it's more learnable than Jordan's consulting, so AI amplification still bites. The result is moderate compression risk that grows with AI capability, though not as fast as it does for the junior engineer.</p>
+                            <p>Sam is at Level 1 with senior accountants and controllers above. As AI improves, those seniors handle more volume. AI helps them process invoices and catch errors faster, so they need less junior support. Sam's work has more context and judgment than Alex's tickets, which slows compression. But it's more learnable than Jordan's consulting, so AI amplification still hurts. The result is moderate compression risk that grows with AI capability, though not as fast as it does for the junior engineer.</p>
                         </div>
 
                         <h3 style='margin: 32px 0 16px 0;'>Re-employment probability</h3>
@@ -1353,7 +1353,7 @@
                             <li><strong>Global AI saturation penalty:</strong> As global AI capability matures (measured by when the blue technical feasibility curve hits 50%), the total number of available jobs shrinks. This penalty affects everyone equally based on the global state of AI: $\text{penalty}_{\text{global}} = p_{\max}\left(\dfrac{\max(0, p_{\text{blue,global}} - f_g)}{1 - f_g}\right)^{\alpha_g}$ with defaults $p_{\max}=0.35$, floor $f_g=0.20$, exponent $\alpha_g=1.3$.</li>
                             <li><strong>Relative timing bonus:</strong> Being displaced later than the global median provides an advantage—you've watched peers navigate transitions and can learn from their paths. The bonus scales linearly with delay: $\text{bonus}_{\text{relative}} = b_{\max} \cdot \min\left(1, \dfrac{t_{\text{yours}} - t_{\text{global}}}{s_r}\right)$ where $b_{\max}=0.15$ and the scale $s_r=5.0$ years at defaults. Full bonus applies when displaced 5+ years after the global median.</li>
                         </ul>
-                        <p>Seniority applies a small boost, and results clamp between 10% and 85%. No one is guaranteed, but no one is written off.</p>
+                        <p>Seniority applies a small boost, and results clamp between 10% and 85%.</p>
 
                         <div class='insight-callout'>
                             <p><strong>Protection mechanisms (user-actionable):</strong></p>
@@ -1429,10 +1429,10 @@
                         <h2>How to work with the model</h2>
                         <ol class='action-list'>
                             <li>Start with the preset that feels closest to your role, then tweak one cluster of questions at a time so you can see which dimensions move the hazard.</li>
-                            <li>Stress-test the extremes: set AI readiness to five while leaving friction high, then flip it. The distance between those runs is a map of where to invest your energy.</li>
-                            <li>Pair the re-employment score with the green curve. A fast hazard plus weak re-employment is the trigger for upskilling or a job search; a slow hazard plus strong re-employment buys time for deliberate moves.</li>
+                            <li>Stress-test the extremes: set AI readiness to five while leaving friction high, then flip it. The gap between those runs shows which factors matter most for you.</li>
+                            <li>Pair the re-employment score with the green curve. Fast hazard plus weak re-employment means you should start upskilling or job searching now; slow hazard plus strong re-employment means you have time to be strategic.</li>
                         </ol>
-                        <p>Use the weight structure as a checklist: strengthen the protective items you can influence, document the assumptions you cannot, and revisit the calculator as real-world signals shift.</p>
+                        <p>Use the weight structure as a checklist: strengthen the protective factors you can influence, note which assumptions you can't change, and revisit the calculator as real-world signals shift.</p>
                     </section>
 
                     <section>
