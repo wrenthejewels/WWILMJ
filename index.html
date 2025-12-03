@@ -961,31 +961,12 @@
             grid-column: span 2;
         }
 
-        #reemployment-card .bubble-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 999px;
-            padding: 8px 14px;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        #reemployment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 28px 64px rgba(15, 23, 42, 0.08);
         }
 
-        #reemployment-card .bubble-cta:hover {
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 255, 255, 0.35);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(0,0,0,0.16);
-        }
-
-        #reemployment-card .bubble-cta .chevron {
-            font-size: 0.9em;
+        #reemployment-card .reemployment-cta-text .chevron {
             opacity: 0.9;
         }
 
@@ -1008,6 +989,10 @@
 
         #reemployment-card.revealed .reemployment-info {
             display: block;
+        }
+
+        #reemployment-card.revealed .reemployment-cta-text .chevron {
+            transform: rotate(180deg);
         }
 
         .result-card.critical {
@@ -3858,12 +3843,15 @@
                         <h4>Risk by 2031</h4>
                         <div class="result-value" id="risk-2031">-</div>
                     </div>
-                    <div class="result-card" id="reemployment-card">
+                    <div class="result-card" id="reemployment-card" style="cursor: pointer;">
                         <div class="result-card-header" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
                             <h4 style="margin:0;">Re-employment Likelihood</h4>
-                            <button type="button" class="bubble-cta" id="reemployment-cta">
-                                <span>Examine Re-Employment Likelihood</span>
-                            </button>
+                            <div class="reemployment-cta-text" id="reemployment-cta" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.9em; opacity: 0.95;">
+                                <span>Examine re-employment likelihood</span>
+                                <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition: transform 0.2s ease;">
+                                    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="reemployment-info" id="reemployment-info">
                             <p class="reemployment-blurb" id="reemployment-blurb"></p>
@@ -4021,9 +4009,9 @@
         let reemploymentRevealed = false;
 
         const REEMPLOYMENT_BLURB_TEMPLATE =
-            'We estimate a {PCT}% re-employment chance, driven by your adaptability, task granularity, market tightness, and the blue-curve level when you’re displaced.';
-        const REEMPLOYMENT_CTA_OPEN = 'Examine Re-Employment Likelihood';
-        const REEMPLOYMENT_CTA_CLOSE = 'Hide Re-Employment Likelihood';
+            "We estimate a {PCT}% re-employment chance, driven by your adaptability, task granularity, market tightness, and the blue-curve level when you're displaced.";
+        const REEMPLOYMENT_CTA_OPEN = 'Examine re-employment likelihood';
+        const REEMPLOYMENT_CTA_CLOSE = 'Hide re-employment likelihood';
 
         const domainPaceSliderBaseline = 1.0;
 
@@ -6776,10 +6764,16 @@
                 }
                 if (reemploymentCTA) {
                     const label = reemploymentRevealed ? REEMPLOYMENT_CTA_CLOSE : REEMPLOYMENT_CTA_OPEN;
-                    const chevron = reemploymentRevealed ? '▲' : '▼';
-                    reemploymentCTA.innerHTML = `<span>${label}</span><span class="chevron">${chevron}</span>`;
-                    reemploymentCTA.setAttribute('aria-expanded', reemploymentRevealed ? 'true' : 'false');
-                    reemploymentCTA.setAttribute('aria-label', label);
+                    reemploymentCTA.innerHTML = `
+                        <span>${label}</span>
+                        <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition: transform 0.2s ease;">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    `;
+                }
+                if (reemploymentCard) {
+                    reemploymentCard.setAttribute('aria-expanded', reemploymentRevealed ? 'true' : 'false');
+                    reemploymentCard.setAttribute('aria-label', reemploymentRevealed ? REEMPLOYMENT_CTA_CLOSE : REEMPLOYMENT_CTA_OPEN);
                 }
                 if (!reemploymentRevealed && reemploymentValue) {
                     reemploymentValue.textContent = 'Hidden until opened';
@@ -6790,7 +6784,7 @@
             }
             setReemploymentReveal(false);
 
-            reemploymentCTA?.addEventListener('click', () => {
+            reemploymentCard?.addEventListener('click', () => {
                 setReemploymentReveal(!reemploymentRevealed);
                 updateResults();
             });
