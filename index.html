@@ -4179,7 +4179,13 @@
                 granularityWeights: { Q5: -0.35, Q6: -0.35, Q8: -0.30 },
                 granularityScale: 0.12,
                 laborScale: 0.05,
-                timeline: { floor: 0.2, exponent: 1.3, maxPenalty: 0.55 },
+                timeline: {
+                    globalFloor: 0.2,
+                    globalExponent: 1.3,
+                    globalMaxPenalty: 0.35,
+                    relativeScale: 5.0,
+                    relativeMaxBonus: 0.15
+                },
                 min: 0.1,
                 max: 0.85
             },
@@ -5073,11 +5079,18 @@
                             </div>
                         </div>
                         <div class="tuning-field" style="margin-top:8px;">
-                            <label>Timeline penalty (blue-curve floor / exponent / max)</label>
+                            <label>Global AI saturation penalty (floor / exponent / max)</label>
                             <div class="tuning-split-3">
-                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timeline.floor" value="${fmt(modelConfig.reemploymentConfig.timeline.floor)}">
-                                <input type="number" step="0.1" data-config-path="reemploymentConfig.timeline.exponent" value="${fmt(modelConfig.reemploymentConfig.timeline.exponent)}">
-                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timeline.maxPenalty" value="${fmt(modelConfig.reemploymentConfig.timeline.maxPenalty)}">
+                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timeline.globalFloor" value="${fmt(modelConfig.reemploymentConfig.timeline.globalFloor)}">
+                                <input type="number" step="0.1" data-config-path="reemploymentConfig.timeline.globalExponent" value="${fmt(modelConfig.reemploymentConfig.timeline.globalExponent)}">
+                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timeline.globalMaxPenalty" value="${fmt(modelConfig.reemploymentConfig.timeline.globalMaxPenalty)}">
+                            </div>
+                        </div>
+                        <div class="tuning-field" style="margin-top:8px;">
+                            <label>Relative timing bonus (scale in years / max bonus)</label>
+                            <div class="tuning-split-2">
+                                <input type="number" step="0.1" data-config-path="reemploymentConfig.timeline.relativeScale" value="${fmt(modelConfig.reemploymentConfig.timeline.relativeScale)}">
+                                <input type="number" step="0.01" data-config-path="reemploymentConfig.timeline.relativeMaxBonus" value="${fmt(modelConfig.reemploymentConfig.timeline.relativeMaxBonus)}">
                             </div>
                         </div>
                         <h5 style="margin-top:12px;">k (steepness shift) weights</h5>
@@ -5914,8 +5927,25 @@
             return clamp(delay, delayCfg.finalMin, delayCfg.finalMax);
         }
 
+        // Calculate when the blue curve (technical feasibility) reaches 50%
+        // Used to determine global AI saturation for re-employment timeline penalty
+        function calculateBlueCurveMedianYear() {
+            // Binary search for efficiency
+            let low = 0, high = 50;
+            while (high - low > 0.1) {
+                const mid = (low + high) / 2;
+                const prob = calculateDisplacementProbability(mid);
+                if (prob < 0.5) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            return (low + high) / 2;
+        }
+
         // Calculate re-employment probability (0-1 scale)
-        // Dependent on adaptability, task granularity, labor market, and where displacement lands on the blue curve
+        // Dependent on adaptability, task structure, labor market, global AI saturation, and relative timing
         function calculateReemploymentProbability(answers, seniority, medianActualYears) {
             const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
             const reCfg = modelConfig.reemploymentConfig;
@@ -5951,15 +5981,27 @@
                 (adaptScore * reCfg.scale) +
                 (granScore * (reCfg.granularityScale || 0));
 
-            // Timeline penalty: later on the blue curve = fewer safe harbors
+            // Hybrid timeline model: Global AI saturation penalty + Relative timing bonus
             const tl = reCfg.timeline || {};
-            const floor = (typeof tl.floor === 'number') ? tl.floor : 0;
-            const exponent = (typeof tl.exponent === 'number') ? tl.exponent : 1;
-            const maxPenalty = (typeof tl.maxPenalty === 'number') ? tl.maxPenalty : 0;
-            const blueLevel = clamp(calculateDisplacementProbability(Math.max(0, medianActualYears || 0)), 0, 1);
-            const norm = clamp((blueLevel - floor) / Math.max(1e-6, 1 - floor), 0, 1);
-            const timelinePenalty = maxPenalty * Math.pow(norm, exponent);
-            probability -= timelinePenalty;
+
+            // 1. Global AI saturation penalty (based on blue curve median)
+            const globalAIYear = calculateBlueCurveMedianYear();
+            const globalBlueLevel = clamp(calculateDisplacementProbability(globalAIYear), 0, 1);
+            const globalFloor = (typeof tl.globalFloor === 'number') ? tl.globalFloor : 0.2;
+            const globalExponent = (typeof tl.globalExponent === 'number') ? tl.globalExponent : 1.3;
+            const globalMaxPenalty = (typeof tl.globalMaxPenalty === 'number') ? tl.globalMaxPenalty : 0.35;
+            const globalNorm = clamp((globalBlueLevel - globalFloor) / Math.max(1e-6, 1 - globalFloor), 0, 1);
+            const globalPenalty = globalMaxPenalty * Math.pow(globalNorm, globalExponent);
+
+            // 2. Relative timing bonus (outlasting peers)
+            const relativeScale = (typeof tl.relativeScale === 'number') ? tl.relativeScale : 5.0;
+            const relativeMaxBonus = (typeof tl.relativeMaxBonus === 'number') ? tl.relativeMaxBonus : 0.15;
+            const relativeDelay = (medianActualYears - globalAIYear) / relativeScale;
+            const relativeBonus = relativeMaxBonus * clamp(relativeDelay, 0, 1);
+
+            // Apply combined timeline effect
+            probability -= globalPenalty;
+            probability += relativeBonus;
 
             // Labor market multiplier and seniority boost
             probability *= (1 + laborScale * laborSignal);
