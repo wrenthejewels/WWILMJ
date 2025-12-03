@@ -964,31 +964,27 @@
         .reemployment-reveal-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #2a5298;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            font-size: 0.9em;
-            font-weight: 600;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
         .reemployment-reveal-btn:hover {
-            background: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
         .reemployment-reveal-btn .chevron {
             transition: transform 0.2s ease;
-        }
-
-        #reemployment-card .result-value {
-            display: none !important;
+            opacity: 0.8;
         }
 
         #reemployment-card .reemployment-info {
@@ -3862,9 +3858,10 @@
                     </div>
                     <div class="result-card" id="reemployment-card">
                         <h4>Re-employment Likelihood</h4>
+                        <div class="result-value" id="reemployment-value">-</div>
                         <button type="button" class="reemployment-reveal-btn" id="reemployment-cta">
-                            <span>Examine re-employment likelihood</span>
-                            <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <span id="reemployment-cta-label">Show details</span>
+                            <svg class="chevron" width="12" height="12" viewBox="0 0 16 16" fill="none">
                                 <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </button>
@@ -4025,8 +4022,8 @@
 
         const REEMPLOYMENT_BLURB_TEMPLATE =
             "We estimate a {PCT}% re-employment chance, driven by your adaptability, task granularity, market tightness, and the blue-curve level when you're displaced.";
-        const REEMPLOYMENT_CTA_OPEN = 'Examine re-employment likelihood';
-        const REEMPLOYMENT_CTA_CLOSE = 'Hide re-employment likelihood';
+        const REEMPLOYMENT_CTA_OPEN = 'Show details';
+        const REEMPLOYMENT_CTA_CLOSE = 'Hide details';
 
         const domainPaceSliderBaseline = 1.0;
 
@@ -6697,25 +6694,26 @@
                 `${(Math.max(0, risk2031) * 100).toFixed(1)}%`;
 
             // Re-employment likelihood (calculated here with median displacement timing)
+            const reemployProb = calculateReemploymentProbability(
+                currentParams.answers,
+                currentParams.seniority,
+                medianActual
+            );
+            const reemployPct = (reemployProb * 100).toFixed(0);
+            let reemployLabel = 'Moderate';
+            if (reemployProb >= 0.7) reemployLabel = 'Good';
+            else if (reemployProb >= 0.5) reemployLabel = 'Moderate';
+            else if (reemployProb >= 0.3) reemployLabel = 'Low';
+            else reemployLabel = 'Very Low';
+
             const reemploymentValueEl = document.getElementById('reemployment-value');
-            if (!reemploymentRevealed) {
-                if (reemploymentValueEl) reemploymentValueEl.textContent = 'Hidden until opened';
-            } else {
-                const reemployProb = calculateReemploymentProbability(
-                    currentParams.answers,
-                    currentParams.seniority,
-                    medianActual
-                );
-                const reemployPct = (reemployProb * 100).toFixed(0);
-                let reemployLabel = 'Moderate';
-                if (reemployProb >= 0.7) reemployLabel = 'Good';
-                else if (reemployProb >= 0.5) reemployLabel = 'Moderate';
-                else if (reemployProb >= 0.3) reemployLabel = 'Low';
-                else reemployLabel = 'Very Low';
+            if (reemploymentValueEl) {
+                reemploymentValueEl.textContent = `${reemployLabel} (${reemployPct}%)`;
+            }
+
+            // Only update blurb if revealed
+            if (reemploymentRevealed) {
                 const blurbText = REEMPLOYMENT_BLURB_TEMPLATE.replace('{PCT}', reemployPct);
-                if (reemploymentValueEl) {
-                    reemploymentValueEl.textContent = `${reemployLabel} (${reemployPct}%)`;
-                }
                 const blurbEl = document.getElementById('reemployment-blurb');
                 if (blurbEl) {
                     blurbEl.textContent = blurbText;
@@ -6777,24 +6775,12 @@
                 if (reemploymentCard) {
                     reemploymentCard.classList.toggle('revealed', reemploymentRevealed);
                 }
-                if (reemploymentCTA) {
-                    const label = reemploymentRevealed ? REEMPLOYMENT_CTA_CLOSE : REEMPLOYMENT_CTA_OPEN;
-                    reemploymentCTA.innerHTML = `
-                        <span>${label}</span>
-                        <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition: transform 0.2s ease;">
-                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    `;
+                const ctaLabel = document.getElementById('reemployment-cta-label');
+                if (ctaLabel) {
+                    ctaLabel.textContent = reemploymentRevealed ? REEMPLOYMENT_CTA_CLOSE : REEMPLOYMENT_CTA_OPEN;
                 }
                 if (reemploymentCard) {
                     reemploymentCard.setAttribute('aria-expanded', reemploymentRevealed ? 'true' : 'false');
-                    reemploymentCard.setAttribute('aria-label', reemploymentRevealed ? REEMPLOYMENT_CTA_CLOSE : REEMPLOYMENT_CTA_OPEN);
-                }
-                if (!reemploymentRevealed && reemploymentValue) {
-                    reemploymentValue.textContent = 'Hidden until opened';
-                }
-                if (!reemploymentRevealed && reemploymentBlurb) {
-                    reemploymentBlurb.textContent = '';
                 }
             }
             setReemploymentReveal(false);
