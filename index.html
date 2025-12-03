@@ -4027,9 +4027,9 @@
         let reemploymentRevealed = false;
 
         const REEMPLOYMENT_BLURBS = [
-            'This probability blends your transferable skills, learning speed, task granularity, labor market tightness, and where displacement hits on the technical feasibility (blue) curve. Later displacement means fewer safe harbors. See Methodology for the math.',
-            'We score re-employment from your adaptability answers, how chunkable/explicit your tasks are, how tight the labor market is, and how far along the blue curve the world is when you\'re displaced. It is noisier than the main timeline metrics—check Methodology for details.',
-            'Your odds combine adaptability (Q17–Q19), task granularity (Q5/6/8), labor tightness (Q15), and a penalty that grows as the blue curve advances. This is harder to model than the core hazard curves; Methodology explains the assumptions.'
+            'This probability blends your transferable skills and learning speed with how chunkable/explicit your tasks are, labor market tightness, and how far along the technical feasibility (blue) curve the world is when displacement hits. Later displacement means fewer safe harbors, and it is harder to model than the core hazard curves—see Methodology for the math.',
+            '',
+            ''
         ];
 
         const domainPaceSliderBaseline = 1.0;
@@ -6773,7 +6773,9 @@
 
             // Seed blurb variants
             reemploymentBlurbs.forEach((el, idx) => {
-                el.textContent = REEMPLOYMENT_BLURBS[idx] || '';
+                const text = REEMPLOYMENT_BLURBS[idx] || '';
+                el.textContent = text;
+                el.style.display = text ? 'block' : 'none';
             });
 
             function setReemploymentReveal(state) {
