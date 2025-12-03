@@ -974,30 +974,25 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
         }
 
         #reemployment-card .bubble-cta:hover {
             background: rgba(255, 255, 255, 0.18);
             border-color: rgba(255, 255, 255, 0.35);
-        }
-
-        #reemployment-card .bubble-cta .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #5df2c1;
-            display: inline-block;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.16);
         }
 
         #reemployment-card .result-value {
-            display: none;
+            display: none !important;
         }
 
         #reemployment-card .reemployment-info {
             display: none;
             text-align: left;
             margin-top: 10px;
-            font-size: 0.9em;
+            font-size: 0.95em;
             color: #e8eefc;
             line-height: 1.5;
         }
@@ -1006,11 +1001,10 @@
             margin: 8px 0;
         }
 
-        #reemployment-card.revealed .result-value,
         #reemployment-card.revealed .reemployment-info {
             display: block;
         }
-        
+
         .result-card.critical {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
         }
@@ -3863,16 +3857,11 @@
                         <div class="result-card-header" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
                             <h4 style="margin:0;">Re-employment Likelihood</h4>
                             <button type="button" class="bubble-cta" id="reemployment-cta">
-                                <span class="dot"></span>
-                                <span>Examine re-employment likelihood</span>
+                                <span>Examine Re-Employment Likelihood</span>
                             </button>
                         </div>
-                        <div class="result-value" id="reemployment-value">-</div>
                         <div class="reemployment-info" id="reemployment-info">
-                            <p class="reemployment-blurb" data-variant="a"></p>
-                            <p class="reemployment-blurb" data-variant="b"></p>
-                            <p class="reemployment-blurb" data-variant="c"></p>
-                            <p style="margin-top:10px; opacity:0.9;">For the full breakdown, see the Methodology page.</p>
+                            <p class="reemployment-blurb" id="reemployment-blurb"></p>
                         </div>
                     </div>
                 </div>
@@ -4026,11 +4015,8 @@
         let chart = null;
         let reemploymentRevealed = false;
 
-        const REEMPLOYMENT_BLURBS = [
-            'This probability blends your transferable skills and learning speed with how chunkable/explicit your tasks are, labor market tightness, and how far along the technical feasibility (blue) curve the world is when displacement hits. Later displacement means fewer landing spots, and it is harder to model than the core hazard curves—see Methodology for the math.',
-            '',
-            ''
-        ];
+        const REEMPLOYMENT_BLURB_TEMPLATE =
+            'We estimate a {PCT}% re-employment chance, driven by your adaptability, task granularity, market tightness, and the blue-curve level when you’re displaced.';
 
         const domainPaceSliderBaseline = 1.0;
 
@@ -6716,8 +6702,13 @@
                 else if (reemployProb >= 0.5) reemployLabel = 'Moderate';
                 else if (reemployProb >= 0.3) reemployLabel = 'Low';
                 else reemployLabel = 'Very Low';
+                const blurbText = REEMPLOYMENT_BLURB_TEMPLATE.replace('{PCT}', reemployPct);
                 if (reemploymentValueEl) {
                     reemploymentValueEl.textContent = `${reemployLabel} (${reemployPct}%)`;
+                }
+                const blurbEl = document.getElementById('reemployment-blurb');
+                if (blurbEl) {
+                    blurbEl.textContent = blurbText;
                 }
             }
 
@@ -6769,14 +6760,7 @@
             const reemploymentCTA = document.getElementById('reemployment-cta');
             const reemploymentInfo = document.getElementById('reemployment-info');
             const reemploymentValue = document.getElementById('reemployment-value');
-            const reemploymentBlurbs = Array.from(document.querySelectorAll('.reemployment-blurb'));
-
-            // Seed blurb variants
-            reemploymentBlurbs.forEach((el, idx) => {
-                const text = REEMPLOYMENT_BLURBS[idx] || '';
-                el.textContent = text;
-                el.style.display = text ? 'block' : 'none';
-            });
+            const reemploymentBlurb = document.getElementById('reemployment-blurb');
 
             function setReemploymentReveal(state) {
                 reemploymentRevealed = !!state;
@@ -6785,11 +6769,14 @@
                 }
                 if (reemploymentCTA) {
                     reemploymentCTA.innerHTML = reemploymentRevealed
-                        ? '<span class="dot"></span><span>Hide re-employment likelihood</span>'
-                        : '<span class="dot"></span><span>Examine re-employment likelihood</span>';
+                        ? '<span>Hide Re-Employment Likelihood</span>'
+                        : '<span>Examine Re-Employment Likelihood</span>';
                 }
                 if (!reemploymentRevealed && reemploymentValue) {
                     reemploymentValue.textContent = 'Hidden until opened';
+                }
+                if (!reemploymentRevealed && reemploymentBlurb) {
+                    reemploymentBlurb.textContent = '';
                 }
             }
             setReemploymentReveal(false);
