@@ -984,6 +984,11 @@
             box-shadow: 0 6px 14px rgba(0,0,0,0.16);
         }
 
+        #reemployment-card .bubble-cta .chevron {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
         #reemployment-card .result-value {
             display: none !important;
         }
@@ -4017,6 +4022,8 @@
 
         const REEMPLOYMENT_BLURB_TEMPLATE =
             'We estimate a {PCT}% re-employment chance, driven by your adaptability, task granularity, market tightness, and the blue-curve level when you’re displaced.';
+        const REEMPLOYMENT_CTA_OPEN = 'Examine Re-Employment Likelihood';
+        const REEMPLOYMENT_CTA_CLOSE = 'Hide Re-Employment Likelihood';
 
         const domainPaceSliderBaseline = 1.0;
 
@@ -6768,9 +6775,11 @@
                     reemploymentCard.classList.toggle('revealed', reemploymentRevealed);
                 }
                 if (reemploymentCTA) {
-                    reemploymentCTA.innerHTML = reemploymentRevealed
-                        ? '<span>Hide Re-Employment Likelihood</span>'
-                        : '<span>Examine Re-Employment Likelihood</span>';
+                    const label = reemploymentRevealed ? REEMPLOYMENT_CTA_CLOSE : REEMPLOYMENT_CTA_OPEN;
+                    const chevron = reemploymentRevealed ? '▲' : '▼';
+                    reemploymentCTA.innerHTML = `<span>${label}</span><span class="chevron">${chevron}</span>`;
+                    reemploymentCTA.setAttribute('aria-expanded', reemploymentRevealed ? 'true' : 'false');
+                    reemploymentCTA.setAttribute('aria-label', label);
                 }
                 if (!reemploymentRevealed && reemploymentValue) {
                     reemploymentValue.textContent = 'Hidden until opened';
