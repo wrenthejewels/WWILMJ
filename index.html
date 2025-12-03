@@ -959,32 +959,25 @@
         /* Let re-employment bubble fill the leftover horizontal slot */
         #reemployment-card {
             grid-column: span 2;
-        }
-
-        .reemployment-reveal-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 6px;
-            font-size: 0.75em;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 12px;
         }
 
-        .reemployment-reveal-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.4);
+        #reemployment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .reemployment-reveal-btn .chevron {
-            transition: transform 0.2s ease;
-            opacity: 0.8;
+        .reemployment-header {
+            width: 100%;
+            color: white;
+        }
+
+        .reemployment-header h4 {
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-align: left;
         }
 
         #reemployment-card .reemployment-info {
@@ -1004,8 +997,9 @@
             display: block;
         }
 
-        #reemployment-card.revealed .reemployment-reveal-btn .chevron {
-            transform: rotate(180deg);
+        /* Hide re-employment value (always hidden, metric shown in text instead) */
+        #reemployment-card .result-value {
+            display: none !important;
         }
 
         .result-card.critical {
@@ -3857,14 +3851,10 @@
                         <div class="result-value" id="risk-2031">-</div>
                     </div>
                     <div class="result-card" id="reemployment-card">
-                        <h4>Re-employment Likelihood</h4>
+                        <div class="reemployment-header" id="reemployment-cta">
+                            <h4>Examine Re-Employment Likelihood</h4>
+                        </div>
                         <div class="result-value" id="reemployment-value">-</div>
-                        <button type="button" class="reemployment-reveal-btn" id="reemployment-cta">
-                            <span id="reemployment-cta-label">Show details</span>
-                            <svg class="chevron" width="12" height="12" viewBox="0 0 16 16" fill="none">
-                                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
                         <div class="reemployment-info" id="reemployment-info">
                             <p class="reemployment-blurb" id="reemployment-blurb"></p>
                         </div>
@@ -4021,9 +4011,9 @@
         let reemploymentRevealed = false;
 
         const REEMPLOYMENT_BLURB_TEMPLATE =
-            "We estimate a {PCT}% re-employment chance, driven by your adaptability, task granularity, market tightness, and the blue-curve level when you're displaced.";
-        const REEMPLOYMENT_CTA_OPEN = 'Show details';
-        const REEMPLOYMENT_CTA_CLOSE = 'Hide details';
+            "We estimate a {PCT}% re-employment chance, driven by your adaptability, task structure, market tightness, and the blue-curve level when you're displaced. This metric is harder to model compared to the feasibility and job loss metrics, given other macroeconomic forces.";
+        const REEMPLOYMENT_CTA_OPEN = 'Examine re-employment likelihood';
+        const REEMPLOYMENT_CTA_CLOSE = 'Hide re-employment likelihood';
 
         const domainPaceSliderBaseline = 1.0;
 
@@ -4186,7 +4176,7 @@
             reemploymentConfig: {
                 base: 0.6,
                 scale: 0.2,
-                granularityWeights: { Q5: 0.35, Q6: 0.35, Q8: 0.30 },
+                granularityWeights: { Q5: -0.35, Q6: -0.35, Q8: -0.30 },
                 granularityScale: 0.12,
                 laborScale: 0.05,
                 timeline: { floor: 0.2, exponent: 1.3, maxPenalty: 0.55 },
@@ -6774,12 +6764,6 @@
                 reemploymentRevealed = !!state;
                 if (reemploymentCard) {
                     reemploymentCard.classList.toggle('revealed', reemploymentRevealed);
-                }
-                const ctaLabel = document.getElementById('reemployment-cta-label');
-                if (ctaLabel) {
-                    ctaLabel.textContent = reemploymentRevealed ? REEMPLOYMENT_CTA_CLOSE : REEMPLOYMENT_CTA_OPEN;
-                }
-                if (reemploymentCard) {
                     reemploymentCard.setAttribute('aria-expanded', reemploymentRevealed ? 'true' : 'false');
                 }
             }
